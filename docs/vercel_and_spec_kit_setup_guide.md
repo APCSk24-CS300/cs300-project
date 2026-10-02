@@ -2,8 +2,109 @@
 ## Introduction
 This guide will provide a introduction to hosting our application on Vercel and utilizing the strengths of spec-driven development (SDD) via Github Spec-kit (spec-kit). Each of the following section will describe the general context for each of the tools, followed by a detailed, beginner-oriented guide to using them. 
 If you have any further questions, contact Lac and I will try to my best to answer it.
+## Vercel hosting
+### Web hosting
+Web hosting is using a cloud service to store all the files that makes a website and make that website accessible to Internet users (IBM). There are many ways to do this; we will look at one such way: deploying a Git repository (provided by GitHub) on Vercel.
+
+### Setup and Commands
+
+#### Setup 
+This setup assumes a Git repository that runs locally and is already connected to Github, as well as a Vercel account.
+
+From this point on, we can either use the web GUI or the CLI alternative. For extra aura, this guide will be using Vercel CLI.
+
+1. In your project directory, install Vercel CLI using `npm` and verify:
+```
+npm install -g vercel
+vercel --version
+```
+2. Authenticate using your Vercel account:
+``` 
+vercel login
+```
+### Commands:
+
+#### Important:
+
+Run steps 1-3 **once** when deploying to Vercel for the **first time**. After that simply do `npm run build` and run step 4.
+
+1. Link the project to Vercel (since we are in the project directory already, simply run the command with no argument):
+```
+vercel link [path-to-directory]
+```
+This command will open a series of interactive prompts (if you have ever used CLI agents like Codex, you know how it works). Type Y for yes, N for no, and use up and down arrows to choose between options. The questions will be approximately like this (answers are also provided as part of an example):
+```
+? Set up "~/projects/my-project"?
+  Yes → Select Yes and press Enter
+
+? Which scope should contain your project?
+  Your Account → Select your account and press Enter
+
+? Link to existing project?
+  No → Select No and press Enter
+
+? What's your project's name?
+  my-website → Type your preferred name and press Enter
+
+? In which directory is your code located?
+  ./ → Press Enter to accept the default
+```
+Note that for the last question, since we are using HTML/CSS?JS, **make sure** that the current directory has the file `index.html` before choosing `./` as the answer.
+
+2. Configure environment variables. Run:
+```
+vercel env add API_KEY [api-key-name]
+```
+A prompt will appear for you to enter the value:
+```
+? What's the value of API_KEY?
+```
+Paste the key and confirm that Vercel has logged it:
+```
+vercel env ls
+```
+
+3. Deploy a preview:
+```
+vercel deploy
+```
+Vercel will return a deployment URL to preview the website. Note that in this stage, we use the URL to test the website's functionalities only.
+
+4. Moving from deploy to production:
+```
+vercel --prod
+```
+In this stage, Vercel builds  the actual production application and hosts it using the project's production domain. The website is now live. We can inspect it from the terminal using:
+```
+vercel inspect [link-to-website]
+```
+#### Important (reiterating):
+After running step 4, if you are modifying the source code, you only need to run step 4 again to publish the changes.
+
+### Other commands:
+1. Debugging: use the following commands:
+```
+// show deployment history
+vercel ls
+
+// show runtime logs
+vercel logs
+// or error logs
+vercel logs --level error
+// or stream runtime logs
+vercel logs --follow
+
+// view deployment's details
+vercel inspect [link-to-website]
+// list env var
+vercel env ls
+// open project dashboard
+vercel open
+```
+
+
 ## Github Spec-kit  (spec-kit)
-### Spec-driven development (SDD) and Github Spec-kit (spec-kit)
+### Concepts
 It is perhaps helpful, before we use the tool, to get a grasp of its underlying principles and the benefit they provide. The next few subsections provides a quick overview of SDD and its key concepts. 
 #### SDD
 Unlike regular vibe coding, which simply involves typing prompts and waiting for AI models to output results, SDD utilizes natural-language documents known as **"specs"** that clearly define the project to guide the models in the right direction during development. SDD has become more popular in recent years due to the greater control it give developers over AI coding assistants, enhacing clarity while reducing misalignment. SDD also lowers AI agents' "cognititve load" by introducing a single source of truth as the persistent context, without having them extensively referencing past chats and logs.
@@ -12,6 +113,9 @@ Spec, short for specification, are documents (artifacts) written in natural lang
 #### Tools
 There are many tools for SDD, such as Kiro, Tessl, or spec-kit, to name a few. In this guide, we will be focusing solely on spec-kit.
 ### spec-kit
+---
+##### (This section extensively references (and plagiarize) spec-kit's GitHub README.md and official documentation)
+---
 spec-kit is Github's toolkit for SDD, providing direct CLI integration, high customizability of artifacts, and a range of community add-ons. spec-kit offers three processes: SDD, Bug fixing, and Idea assesssment; we will only talk about the first one in this guide. Its general workflow can be understood as follows:
 
 1. Constitution: Setting up the high-level specs for the project; spec-kit call these the "constitution". The constitution are universal and immutable in the project, meaning every modification must follow them.

@@ -181,7 +181,7 @@ An inline example is given in each step, while the markdown file approach for st
 ```
 /speckit-converge
 ```
-That's about 90% of your daily spec-kit workflow, I think. I will update additional commands in the `Other commands` subsection when we encounter issues along the way. Before ending this subsection, here's a few key principles on spec-kit's website:
+That's about 90% of your daily spec-kit workflow, I think. I will update additional commands in the `Other commands` subsection when we encounter issues along the way. Before ending this subsection, here's a few key principles on spec-kit's official documentation:
 - Be explicit about what you're building and why
 - Don't focus on tech stack during specification phase
 - Iterate and refine your specifications before implementation

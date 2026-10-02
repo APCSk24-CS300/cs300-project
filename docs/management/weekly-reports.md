@@ -1,6 +1,6 @@
 # Weekly Reports
 
-## Sprint 1 &mdash; Planning meeting
+## ======== Sprint 1 &mdash; 2/10 Planning meeting ========
 ### Presence
 Team members present:
 - Kỳ
@@ -13,34 +13,42 @@ Team members absent: None
 
 ### Status report - Kỳ
 Completed tasks:
+- Set up Jira (for upholding Scrum procedure), Git repo (for source control), and Discord (for communication between members)
+- Divided preliminary proposal tasks for each member
+- Completed individual project proposal
 
 To-do tasks:
 
 Issues/Obstacles:
 
+
 ### Status reports - Lạc
-Completed tasks
+Completed tasks:
+- Completed individual project proposal
 
 To-do tasks:
 
 Issues/Obstacles:
 
 ### Status reports - Thịnh
-Completed tasks
+Completed tasks:
+- Completed individual project proposal
 
 To-do tasks:
 
 Issues/Obstacles:
 
 ### Status reports - Trang
-Completed tasks
+Completed tasks:
+- Completed individual project proposal
 
 To-do tasks:
 
 Issues/Obstacles:
 
 ### Status reports - Khôi
-Completed tasks
+Completed tasks:
+- Completed individual project proposal
 
 To-do tasks:
 

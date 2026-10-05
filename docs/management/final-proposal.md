@@ -1,4 +1,4 @@
-# B - Project Proposal
+# Project Proposal
 
 ## Introduction
 

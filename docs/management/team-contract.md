@@ -2,20 +2,21 @@
 
 ## Team Information
 
-**Course:** [Course name / code]  
-**Project:** [Project name]  
-**Team Name:** [Team name]  
-**Date Created:** [DD/MM/YYYY]  
-**Contract Version:** [Version]
+**Course:** CS300 - Elements of Software Engineering  
+**Project:** TBD  
+**Team Name:** debug docker vào 25h sáng  
+**Date Created:** 5/10/2026  
+**Contract Version:** v1.0.0
 
 ### Team Members
 
 | Name | Student ID | Primary Role | Contact |
 |---|---|---|---|
-| [Member 1] | [ID] | [Role] | [Contact] |
-| [Member 2] | [ID] | [Role] | [Contact] |
-| [Member 3] | [ID] | [Role] | [Contact] |
-| [Member 4] | [ID] | [Role] | [Contact] |
+| Trần Tôn Minh Kỳ   | 24125102 | Project Manager    | 0946128824 |
+| Quách Thiên Lạc    | 24125092 | Database Developer | TBD |
+| Nguyễn Khang Thịnh | 24125104 | UI/UX Designer     | TBD |
+| Phạm Vân Trang     | 24125046 | Tester             | TBD |
+| Phan Minh Khôi     | 24125061 | Backend Developer  | TBD |
 
 ## Team Roles and Responsibilities
 

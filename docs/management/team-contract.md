@@ -24,10 +24,11 @@ All team members will participate as full-stack engineers. The primary roles bel
 
 | Member | Primary Role | Main Responsibilities |
 |---|---|---|
-| [Name] | [e.g., Project Manager] | [Responsibilities] |
-| [Name] | [e.g., UI/UX Lead] | [Responsibilities] |
-| [Name] | [e.g., Backend Lead] | [Responsibilities] |
-| [Name] | [e.g., Testing Lead] | [Responsibilities] |
+| Trần Tôn Minh Kỳ   | Project Manager    | Facilitates Scrum, oversees team members' work |
+| Quách Thiên Lạc    | Database Developer | Devises application's database schema, prepares data |
+| Nguyễn Khang Thịnh | UI/UX Designer     | Designs application screens, develops the application's frontend |
+| Phạm Vân Trang     | Tester             | Tests the application for bugs and vulnerabilities, reports bugs to the team and assists in fixing them |
+| Phan Minh Khôi     | Backend Developer  | Develops the application's server, deals with hosting |
 
 ### Shared Responsibilities
 

@@ -1,6 +1,6 @@
 # Team Contract
 
-## 1. Team Information
+## Team Information
 
 **Course:** [Course name / code]  
 **Project:** [Project name]  
@@ -17,7 +17,7 @@
 | [Member 3] | [ID] | [Role] | [Contact] |
 | [Member 4] | [ID] | [Role] | [Contact] |
 
-## 2. Team Roles and Responsibilities
+## Team Roles and Responsibilities
 
 All team members will participate as full-stack engineers. The primary roles below indicate the areas in which each member is expected to take leadership or primary responsibility. Other members are still expected to participate and contribute when necessary.
 
@@ -41,7 +41,7 @@ All members are expected to:
 - Communicate blockers, delays, or problems as early as possible.
 - Assist other members when reasonably necessary.
 
-## 3. Communication Plan
+## Communication Plan
 
 ### Communication Tools
 
@@ -73,7 +73,7 @@ Meeting expectations:
 - Important decisions should be recorded in [tool/document].
 - Each meeting should end with clearly assigned tasks and deadlines.
 
-## 4. Work Schedule and Deadlines
+## Work Schedule and Deadlines
 
 ### Team Availability
 
@@ -112,7 +112,7 @@ If a member expects to miss a deadline:
     - Reassign part or all of the task.
 4. Repeated missed deadlines without reasonable communication may result in the accountability process being applied.
 
-## 5. Task Assignment and Workflow
+## Task Assignment and Workflow
 
 Tasks will be tracked using **[tool]**.
 
@@ -137,7 +137,7 @@ A task is considered complete only when:
 - Required documentation has been updated.
 - The work has been reviewed where necessary.
 
-## 6. Code and Documentation Standards
+## Code and Documentation Standards
 
 ### Technology Stack
 
@@ -159,13 +159,6 @@ The team agrees to:
 - Remove unused or obsolete code before merging.
 - Add comments when the purpose or reasoning of the code is not obvious.
 - Avoid committing passwords, API keys, credentials, or other confidential information.
-
-### Formatting and Linting
-
-**Formatter:** [Tool]  
-**Linter:** [Tool]
-
-Code should pass agreed formatting and linting checks before being merged.
 
 ### Git Workflow
 
@@ -252,7 +245,7 @@ The project should maintain relevant documentation, including where applicable:
 
 Members are responsible for updating documentation when their work makes existing documentation inaccurate or incomplete.
 
-## 7. Decision-Making Process
+## Decision-Making Process
 
 The team will attempt to make decisions through discussion and consensus.
 
@@ -273,7 +266,7 @@ If a vote results in a tie, the final decision will be made by:
 
 If the disagreement is significant or cannot reasonably be resolved internally, the matter may be escalated to the TA or instructor.
 
-## 8. Accountability and Performance
+## Accountability and Performance
 
 Each member is expected to contribute fairly and consistently to the project.
 
@@ -312,7 +305,7 @@ Failure to follow this contract may result in:
 - Escalation to the TA or instructor.
 - Other consequences permitted by the course policies.
 
-## 9. Conflict Resolution
+## Conflict Resolution
 
 Team members agree to discuss disagreements professionally and focus on project-related facts and behavior rather than personal criticism.
 
@@ -332,7 +325,7 @@ The following process will be used:
 
 Important conflicts and their resolutions should be documented when they affect responsibilities, deadlines, project quality, or assessment.
 
-## 10. Contingency Plan
+## Contingency Plan
 
 If unexpected problems occur, including illness, technical issues, scheduling conflicts, or major delays:
 
@@ -343,7 +336,7 @@ If unexpected problems occur, including illness, technical issues, scheduling co
 - Project scope may be adjusted when appropriate and permitted by the course requirements.
 - The team should prioritize completing a stable and functional project over unfinished optional features.
 
-## 11. Review and Update Process
+## Review and Update Process
 
 This contract will be reviewed:
 
@@ -366,16 +359,3 @@ Changes should be:
 |---|---|---|---|
 | 1.0 | [Date] | Initial contract | [Names] |
 | [Version] | [Date] | [Changes] | [Names] |
-
-## 12. Team Agreement
-
-By agreeing to this contract, each team member confirms that they understand the expectations, responsibilities, communication rules, development standards, and accountability procedures described above.
-
-Each member agrees to make a reasonable and consistent effort to support the team's objectives and complete the project successfully.
-
-| Team Member | Signature / Confirmation | Date |
-|---|---|---|
-| [Name] | [Signature / Agreed] | [Date] |
-| [Name] | [Signature / Agreed] | [Date] |
-| [Name] | [Signature / Agreed] | [Date] |
-| [Name] | [Signature / Agreed] | [Date] |

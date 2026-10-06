@@ -264,9 +264,7 @@ For major technical decisions:
 
 ### Final Decision Authority
 
-If a vote results in a tie, the final decision will be made by:
-
-**[Project Manager / Technical Lead / designated member]**
+If a vote results in a tie, the final decision will be made by the **Project Manager**.
 
 If the disagreement is significant or cannot reasonably be resolved internally, the matter may be escalated to the TA or instructor.
 

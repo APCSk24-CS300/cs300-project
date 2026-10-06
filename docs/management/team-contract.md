@@ -13,10 +13,10 @@
 | Name | Student ID | Primary Role | Contact |
 |---|---|---|---|
 | Trần Tôn Minh Kỳ   | 24125102 | Project Manager    | 0946128824 |
-| Quách Thiên Lạc    | 24125092 | Database Developer | TBD |
-| Nguyễn Khang Thịnh | 24125104 | UI/UX Designer     | TBD |
-| Phạm Vân Trang     | 24125046 | Tester             | TBD |
-| Phan Minh Khôi     | 24125061 | Backend Developer  | TBD |
+| Quách Thiên Lạc    | 24125092 | Database Developer | 0347202125 |
+| Nguyễn Khang Thịnh | 24125104 | UI/UX Designer     | 0938999653 |
+| Phạm Vân Trang     | 24125046 | Tester             | 0963399763 |
+| Phan Minh Khôi     | 24125061 | Backend Developer  | 0918472332 |
 
 ## Team Roles and Responsibilities
 

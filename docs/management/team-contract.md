@@ -144,12 +144,12 @@ A task is considered complete only when:
 
 ### Technology Stack
 
-- **Frontend:** [Technology]
-- **Backend:** [Technology]
-- **Database:** [Technology]
-- **Testing:** [Technology]
-- **Version Control:** [GitHub / GitLab]
-- **Other Tools:** [Tools]
+- **Frontend:** TBD
+- **Backend:** TBD
+- **Database:** TBD
+- **Testing:** TBD
+- **Version Control:**  GitHub
+- **Other Tools:** TBD
 
 ### Coding Standards
 
@@ -168,16 +168,17 @@ The team agrees to:
 The team will use the following branch naming convention:
 
 - `main` for the stable version.
-- `develop` for [optional shared development branch].
+- `dev` for  shared development.
 - `feature/<feature-name>` for new features.
 - `fix/<bug-name>` for bug fixes.
+- `chore/<bug-name>` for routine maintenance and configuration.
 
 Example:
 
 ```text
 feature/user-login
-feature/product-search
 fix/login-validation
+chore/team-contract
 ```
 
 ### Commit Messages
@@ -187,16 +188,16 @@ Commit messages should clearly describe the change.
 Preferred format:
 
 ```text
-<type>: <short description>
+<short description>
 ```
 
 Examples:
 
 ```text
-feat: add user registration endpoint
-fix: prevent duplicate email registration
-test: add login validation tests
-docs: update API documentation
+add user registration endpoint
+prevent duplicate email registration
+add login validation tests
+update API documentation
 ```
 
 Avoid vague commit messages such as:
@@ -214,7 +215,7 @@ Before significant changes are merged:
 
 1. The author should review their own changes.
 2. Required tests should pass.
-3. At least **[X]** other team member(s) should review the changes.
+3. At least **2** other team member(s) should review the changes.
 4. Requested changes should be addressed before merging.
 5. Code with known critical issues should not be merged into the main branch.
 
@@ -230,7 +231,7 @@ The team will perform, where applicable:
 - UI or functional testing.
 - Regression testing before major submissions.
 
-Bugs will be tracked using **[GitHub Issues / Jira / Trello / other tool]**.
+Bugs will be tracked using **Jira**.
 
 ### Documentation
 

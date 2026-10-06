@@ -49,30 +49,30 @@ All members are expected to:
 
 | Purpose | Tool |
 |---|---|
-| Primary communication | [Discord / Zalo / Slack / Messenger] |
-| Online meetings | [Google Meet / Discord / Zoom] |
-| Source code | [GitHub / GitLab] |
-| Task tracking | [GitHub Projects / Trello / Notion / Jira] |
-| Documentation | [Google Docs / Notion / GitHub Wiki] |
+| Primary communication | Discord, Messenger |
+| Online meetings | Discord |
+| Source code | GitHub |
+| Task tracking |  Jira |
+| Documentation | Markdown |
 
 ### Response Expectations
 
-- Members should respond to normal messages within **[X hours]**.
-- Urgent messages should be acknowledged within **[X hours]**, when reasonably possible.
-- Members who expect to be unavailable for more than **[X hours/days]** should notify the team in advance when possible.
+- Members should respond to normal messages within **6 hours**.
+- Urgent messages should be acknowledged within **30 minutes**, when reasonably possible.
+- Members who expect to be unavailable for more than **1 day** should notify the team in advance when possible.
 - Members should report blockers that may affect deadlines as soon as they are identified.
 
 ### Meetings
 
-**Meeting frequency:** [e.g., Twice per week]  
-**Regular meeting time:** [Day and time]  
-**Meeting platform:** [Platform]
+**Meeting frequency:** Twice per week  
+**Regular meeting time:** Depends on the members' common free time  
+**Meeting platform:** Real life
 
 Meeting expectations:
 
 - Members should arrive on time.
 - Members should notify the team beforehand if they cannot attend.
-- Important decisions should be recorded in [tool/document].
+- Important decisions should be recorded in Jira.
 - Each meeting should end with clearly assigned tasks and deadlines.
 
 ## Work Schedule and Deadlines

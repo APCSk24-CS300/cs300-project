@@ -115,13 +115,15 @@ If a member expects to miss a deadline:
 
 ## Task Assignment and Workflow
 
-Tasks will be tracked using **[tool]**.
+Tasks will be tracked using **Jira**.
 
 Each task should include:
 
-- A clear description.
+- A clear name and description.
 - Assigned member(s).
-- Expected completion date.
+- Due date.
+- Start date.
+- Completion date.
 - Acceptance criteria where appropriate.
 - Links to related issues, branches, pull requests, or documents.
 
@@ -129,7 +131,7 @@ Each task should include:
 
 The team will normally use the following workflow:
 
-`To Do → In Progress → Review / Testing → Done`
+`To Do → In Progress → Needs Review → Done`
 
 A task is considered complete only when:
 

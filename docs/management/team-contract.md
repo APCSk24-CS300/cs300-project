@@ -14,9 +14,10 @@
 |---|---|---|---|
 | Trần Tôn Minh Kỳ   | 24125102 | Project Manager    | 0946128824 |
 | Quách Thiên Lạc    | 24125092 | Database Developer | 0347202125 |
-| Nguyễn Khang Thịnh | 24125104 | UI/UX Designer     | 0938999653 |
+| Nguyễn Khang Thịnh | 24125104 | UI/UX Manager      | 0938999653 |
 | Phạm Vân Trang     | 24125046 | Tester             | 0963399763 |
 | Phan Minh Khôi     | 24125061 | Backend Developer  | 0918472332 |
+| Nguyễn Văn Tĩnh    | 24125106 | UI/UX Designer     | 0836223377 |
 
 ## Team Roles and Responsibilities
 
@@ -26,9 +27,10 @@ All team members will participate as full-stack engineers. The primary roles bel
 |---|---|---|
 | Trần Tôn Minh Kỳ   | Project Manager    | Facilitates Scrum, oversees team members' work |
 | Quách Thiên Lạc    | Database Developer | Devises application's database schema, prepares data |
-| Nguyễn Khang Thịnh | UI/UX Designer     | Designs application screens, develops the application's frontend |
+| Nguyễn Khang Thịnh | UI/UX Manager      | Designs application screens, oversees the development of the frontend |
 | Phạm Vân Trang     | Tester             | Tests the application for bugs and vulnerabilities, reports bugs to the team and assists in fixing them |
 | Phan Minh Khôi     | Backend Developer  | Develops the application's server, deals with hosting |
+| Nguyễn Văn Tĩnh    | UI/UX Designer     | Develops the application frontend, connects backend and frontend |
 
 ### Shared Responsibilities
 

@@ -32,33 +32,45 @@ Completed tasks:
 - Completed individual project proposal
 
 To-do tasks:
+- Research into Spec Kit and Vercel
 
 Issues/Obstacles:
+- None
 
 ### Status reports - Thịnh
 Completed tasks:
 - Completed individual project proposal
 
 To-do tasks:
+- Design the application's proof of concept
 
 Issues/Obstacles:
+- None
 
 ### Status reports - Trang
 Completed tasks:
 - Completed individual project proposal
 
 To-do tasks:
+- Compose the final proper project proposal
 
 Issues/Obstacles:
+- None
 
 ### Status reports - Khôi
 Completed tasks:
 - Completed individual project proposal
 
 To-do tasks:
+- Do a survey on existing apps whose idea overlap with the proposed idea
 
 Issues/Obstacles:
+- None
 
 ### Actions
+- The final proposal must be finalized and formalized.
+- The remaining documents are to be completed.
 
 ### Summary
+- Every member's ideas have been reviewed and cherry-picked to produce the most suitable and feasible idea.
+- Other documents required is in progress.

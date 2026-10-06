@@ -20,8 +20,11 @@ Completed tasks:
 - Completed individual project proposal
 
 To-do tasks:
+- Compose the team contract
 
 Issues/Obstacles:
+- Needed to learn and uphold Scrum methodology effectively
+- Did a bit of research in the feasibility of a music maker UI, as well as useful tools for geological purposes
 
 
 ### Status reports - Lạc

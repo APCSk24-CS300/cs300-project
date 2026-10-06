@@ -83,25 +83,22 @@ Meeting expectations:
 
 | Member | General Availability |
 |---|---|
-| [Name] | [Days and times] |
-| [Name] | [Days and times] |
-| [Name] | [Days and times] |
-| [Name] | [Days and times] |
+| Trần Tôn Minh Kỳ   | 8h - 21h  |
+| Quách Thiên Lạc    | 21h - 24h |
+| Nguyễn Khang Thịnh | 19h - 23h |
+| Phạm Vân Trang     | 18h - 22h |
+| Phan Minh Khôi     | 20h - 22h |
+| Nguyễn Văn Tĩnh    | 18h - 22h |
 
 ### Project Milestones
 
 | Milestone | Deliverable | Responsible Member(s) | Deadline |
 |---|---|---|---|
-| [Planning] | [Deliverable] | [Names] | [Date] |
-| [Design] | [Deliverable] | [Names] | [Date] |
-| [Implementation Phase 1] | [Deliverable] | [Names] | [Date] |
-| [Implementation Phase 2] | [Deliverable] | [Names] | [Date] |
-| [Testing] | [Deliverable] | [Names] | [Date] |
-| [Final Submission] | [Deliverable] | [Names] | [Date] |
+| Planning | Markdown document of project idea proposal | Phạm Vân Trang, Phan Minh Khôi | 5/10/2026 |
 
 ### Internal Deadlines
 
-Whenever possible, internal deadlines will be set **[X days] before the official deadline** to allow time for integration, testing, review, and corrections.
+Whenever possible, internal deadlines will be set **3 days before the official deadline** to allow time for integration, testing, review, and corrections.
 
 ### Missed Deadlines
 

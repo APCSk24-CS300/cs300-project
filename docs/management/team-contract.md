@@ -6,7 +6,7 @@
 **Project:** TBD  
 **Team Name:** debug docker vào 25h sáng  
 **Date Created:** 5/10/2026  
-**Contract Version:** v1.0.0
+**Contract Version:** v1.0
 
 ### Team Members
 
@@ -342,7 +342,7 @@ If unexpected problems occur, including illness, technical issues, scheduling co
 
 This contract will be reviewed:
 
-- [Weekly / Every two weeks / At the end of each milestone].
+- At the end of each milestone.
 - When a major issue affects the team's workflow.
 - When team responsibilities or project requirements change significantly.
 
@@ -351,7 +351,7 @@ Any member may propose a change to the contract.
 Changes should be:
 
 1. Discussed with the team.
-2. Approved by **[consensus / majority vote]**.
+2. Approved by consensus/majority vote.
 3. Recorded in the contract.
 4. Assigned a new version number or revision date.
 
@@ -359,5 +359,4 @@ Changes should be:
 
 | Version | Date | Description of Changes | Approved By |
 |---|---|---|---|
-| 1.0 | [Date] | Initial contract | [Names] |
-| [Version] | [Date] | [Changes] | [Names] |
+| v1.0 | 6/10/2026 | Initial contract | Trần Tôn Minh Kỳ |

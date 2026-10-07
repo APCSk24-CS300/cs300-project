@@ -1,54 +1,67 @@
-# Home Page
+# Existing App Survey
+
+This survey covers three existing websites that are similar to CampusHub: the RMIT LMS (student portal with Canvas), the UEH LMS, and the UEH conduct score website.
+
+## App 1: RMIT LMS
+
+| | |
+|---|---|
+| **Platform** | Website |
+| **Purpose** | RMIT's student portal: enrollment, timetable, academic records, tuition payment, and student requests, with a link out to Canvas for course content |
+| **Target users** | Students (the portal has almost no value for Teachers, apart from Canvas); Canvas supports Admin, Student and Teacher roles |
+| **Main sections** | Tasks, Personal Details, Enrollment, Timetable, Academic Record, Financial Account, Important Dates, Canvas, Submit Request |
+
+### Home Page
 
 ![][image1]
 
-# Task
+### Tasks
 
-Làm Form (Form trường yêu cầu sv điền) 
+Complete forms (forms the university requires students to fill in)
 
-# Personal Details
+### Personal Details
 
 ![][image2]
 
-# Enrollment
+### Enrollment
 
 ![][image3] 
 
 ![][image4]  
 ![][image5]
 
-- Review Courses and Penalties: Mục này chỉ hiển thị khi sinh viên có vi phạm.
+- Review Courses and Penalties: This section is only displayed when the student has a violation.
 
 ![][image6]  
 ![][image7]
 
-# Timetable
+### Timetable
 
 ![][image8]
 
-- Timetable tự động cập nhật lịch học khi sinh viên đăng ký môn học thành công.
+- The timetable is automatically updated with the class schedule when the student successfully enrolls in a course.
 
 ![][image9]
 
-# Academic Record
+### Academic Record
 
 ![][image10]  
 ![][image11]  
-Note: Khi nhấn vào nút “\>”, hệ thống sẽ xuất tệp PDF như minh họa dưới đây:
+Note: When the “\>” button is clicked, the system exports a PDF file, as illustrated below:
 
 ![][image12]
 
-# Financial Account
+### Financial Account
 
 ![][image13]  
-Note: Khi sinh viên có học phí cần đóng, trang này sẽ hiển thị và liệt kê các khoản phải thanh toán.  
-Note: Sinh viên có thể nhập thông tin thẻ ngân hàng tại đây để thanh toán tự động.
+Note: When the student has tuition fees to pay, this page is displayed and lists the outstanding payments.  
+Note: Students can enter their bank card details here to pay automatically.
 
-# Important Dates
+### Important Dates
 
 ![][image14]
 
-# Canvas
+### Canvas
 
 ![][image15]  
 ![][image16]  
@@ -56,23 +69,23 @@ Note: Sinh viên có thể nhập thông tin thẻ ngân hàng tại đây để
 
 ![][image18]  
 ![][image19]  
-Note: Mục History có chức năng tương tự mục thông báo (Notification) của Moodle.  
-Note: Mục Studio có chức năng tương tự Private Files của Moodle.  
-Note: Mục Canvas chuyển hướng sang một liên kết khác trong tab mới. Cần nghiên cứu kỹ khi phân quyền theo vai trò (Admin, Student, Teacher).
+Note: The History section works like the Notification section in Moodle.  
+Note: The Studio section works like Private Files in Moodle.  
+Note: The Canvas section redirects to another link in a new tab. Role-based permissions (Admin, Student, Teacher) need to be studied carefully.
 
-# Submit Request
+### Submit Request
 
 ![][image20]  
 ![][image21]  
-Note: Đây là nơi sinh viên gửi yêu cầu đến nhà trường.
+Note: This is where students send requests to the university.
 
-# Nhận xét (tldr)
+### Review 
 
-- Hệ thống tương tự portal hiện tại của nhóm, bổ sung thêm Canvas (tính năng tương đương Moodle của nhóm).  
-- Có nhiều tính năng đáng tham khảo như: lịch học tự động cập nhật khi đăng ký môn học thành công, thanh toán học phí trực tuyến, xuất kết quả học tập dưới dạng PDF, v.v.  
-- Hạn chế: Không có hệ thống điểm rèn luyện; hệ thống hầu như không có giá trị sử dụng đối với vai trò Teacher (ngoại trừ Canvas).
+- The system is similar to the team's current portal, with Canvas added (the equivalent of the team's Moodle).  
+- It has many features worth borrowing, such as: the timetable updating automatically when course enrollment succeeds, online tuition payment, exporting academic results as a PDF, etc.  
+- Limitations: There is no conduct score system; the system has almost no value for the Teacher role (apart from Canvas).
 
-# Component Tree (Mermaid)
+### Component Tree (Mermaid)
 
 ```mermaid
 graph TD
@@ -93,7 +106,7 @@ graph TD
     Root --> FAQs["12. FAQs"]
 
     %% 1. Tasks
-    %% Tasks --> TaskForm["Làm Form theo yêu cầu trường"]
+    %% Tasks --> TaskForm["Complete forms as required by the university"]
 
     %% 2. Personal Details
     Personal --> PD_Personal["Personal Details"]
@@ -141,7 +154,7 @@ graph TD
     Academic --> AR_History["Academic History"]
     Academic --> AR_Statement["Statement of Enrolment"]
 
-    AR_History --> AR_PDF["Xuất file PDF kết quả học tập (GPA / WAM / Điểm môn học)"]
+    AR_History --> AR_PDF["Export academic results as PDF (GPA / WAM / Course grades)"]
 
     %% 6. Financial Account
     Financial --> Fin_Balance["Account Balance"]
@@ -179,114 +192,197 @@ graph TD
     SubmitReq --> SR_Forms["My Forms / Fill out a new form"]
 ```
 
-# Home Page (Also the “UEH LMS” tab)  
+## App 2: UEH LMS
+
+| | |
+|---|---|
+| **Platform** | Website |
+| **Purpose** | The learning management system of UEH (University of Economics Ho Chi Minh City), which appears to be Moodle-based, used for course content, exams and learning activities |
+| **Target users** | Students, Teachers (lecturers) and Admins, each with a separate view |
+| **Main sections** | Home Page, UEH Shop, Quick Access to My Folders, Midterm Exam (students / lecturers), SEB Practice Exam, Dashboard |
+
+### Home Page (Also the “UEH LMS” tab)  
 ![][image22]  
 ![][image23]  
 ![][image24]  
 ![][image25]  
 (End of Home Page)
 
-# UEH Shop  
+### UEH Shop  
 ![][image26]  
-Note: Mục này chuyển hướng sang một tab khác với đường dẫn (URL) khác.
+Note: This section redirects to another tab with a different URL.
 
-# Đến nhanh thư mục của tôi  
+### Quick Access to My Folders (Đến nhanh thư mục của tôi)  
 ![][image27]  
-Note: Tab “Đến nhanh thư mục của tôi” không thay đổi màu sắc khi được chọn; các tab khác cũng gặp tình trạng tương tự.
+Note: The “Quick Access to My Folders” tab does not change color when selected; the other tabs have the same issue.
 
-# Thi giữa kỳ cho sinh viên  
+### Midterm Exam for Students (Thi giữa kỳ cho sinh viên)  
 ![][image28]   
-Note: Mục này chỉ cung cấp hướng dẫn, không có đề thi.
+Note: This section only provides instructions; it contains no exam paper.
 
-# Thi giữa kỳ cho GV  
+### Midterm Exam for Lecturers (Thi giữa kỳ cho GV)  
 ![][image29]  
-Note: Nội dung tương tự tab “Thi giữa kỳ cho sinh viên”.
+Note: The content is similar to the “Midterm Exam for Students” tab.
 
-# Thi thử SEB  
+### SEB Practice Exam (Thi thử SEB)  
 ![][image30]
 
-# Bảng điều khiển
+### Dashboard (Bảng điều khiển)
 
-(Chưa xác định được tên chính thức của tab này; khi nhấn vào “Bảng điều khiển”, hệ thống sẽ chuyển hướng đến trang này.)  
+(The official name of this tab has not been identified; clicking “Dashboard” (“Bảng điều khiển”) redirects the user to this page.)  
 ![][image31]
 
-# Nhận xét (tldr)
+### Review 
 
-- Điểm mạnh: Phân biệt rõ ràng các vai trò Admin, Teacher và Student.  
-- Hạn chế: Trải nghiệm người dùng (UX) chưa tốt, giao diện thiếu gọn gàng. Quá nhiều thông tin được đặt trong cùng một trang (ví dụ: riêng Homepage đã chứa các thành phần của những tab khác).
+- Strengths: Clear distinction between the Admin, Teacher and Student roles.  
+- Limitations: Poor user experience (UX) and a cluttered interface. Too much information is placed on the same page (for example, the Homepage alone contains components of other tabs).
 
-# Homepage 
+## App 3: UEH Conduct Score Website
+
+| | |
+|---|---|
+| **Platform** | Website |
+| **Purpose** | A dedicated website for everything related to conduct scoring (điểm rèn luyện) of UEH students |
+| **Target users** | UEH students (profile, activity registration, score tracking, appeals, QR check-in) |
+| **Main sections** | Dashboard, Activities, Requests, Conduct Score, Profile, Utilities |
+
+### Homepage 
 
 ![][image32]
 
-# Dashboard
+### Dashboard
 
 ![][image33]  
 ![][image34]
 
-# Hoạt động
+### Activities
 
-- Tất cả hoạt động
+- All activities
 
 ![][image35]  
 ![][image36]  
-Note: Các trạng thái hoạt động gồm: “Đã duyệt”, “Đang tổ chức”, “Chờ cập nhật danh sách”, “Đang mở đăng ký”, v.v.  
+Note: The activity statuses include: “Approved”, “In progress”, “Awaiting participant list update”, “Registration open”, etc.  
 ![][image37]
 
-- Hoạt động đang mở đăng ký 
+- Activities open for registration
 
 ![][image38]
 
-# Yêu cầu
+### Requests
 
-- Hồ sơ minh chứng hoạt động ngoài UEH
+- Evidence documents for activities outside UEH
 
 ![][image39]  
 ![][image40]  
 ![][image41]
 
-- Phúc khảo GreenCampus 
+- GreenCampus score appeal 
 
 ![][image42]
 
-- Phúc khảo đrl
+- Conduct score appeal
 
 ![][image43]  
 ![][image44]
 
-# Điểm rèn luyện
+### Conduct Score
 
-- Điểm học kỳ hiện tại:
+- Current semester score:
 
 ![][image45]  
 ![][image46]  
 ![][image47]  
 ![][image48]
 
-- Lịch sử toàn khóa
+- Full-course history
 
 ![][image49]  
 ![][image50]  
 ![][image51]
 
-# Hồ sơ 
+### Profile
 
-(Trang này hiển thị thông tin cá nhân của sinh viên nên không đính kèm ảnh chụp.)
+(This page displays the student's personal information, so no screenshot is attached.)
 
-# Tiện ích
+### Utilities
 
-- Quét QR check-in
+- QR check-in scan
 
 ![][image52]
 
-- Lịch sử check-in
+- Check-in history
 
 ![][image53]
 
-# Nhận xét (tldr)
+### Review 
 
-- Điểm mạnh: Giao diện (UI) và trải nghiệm người dùng (UX) trực quan, dễ sử dụng và tiện lợi.  
-- Điểm yếu: Chưa xác định được.
+- Strengths: The user interface (UI) and user experience (UX) are intuitive, easy to use and convenient.  
+- Weaknesses: None identified yet.
+
+## Comparison Summary
+
+### Features the existing apps have in common
+
+Legend: ✔ = observed in the screenshots, — = not observed in the screenshots.
+
+| Feature | RMIT LMS | UEH LMS | UEH Conduct Score |
+|---|---|---|---|
+| Role-based access (Admin / Teacher / Student) | ✔ (Canvas) | ✔ | — (student view only) |
+| Personal profile / details | ✔ Personal Details | — | ✔ Profile |
+| Course content and learning tools | ✔ via Canvas | ✔ folders, midterm exam, SEB practice exam | — |
+| Timetable / calendar | ✔ Day / Week / Month views, filters, create event; Canvas Calendar | — | — |
+| Notifications / messaging | ✔ Canvas History and Inbox | — | — |
+| Dashboard with an overview of tasks | ✔ Tasks, Canvas Dashboard (to-do, recent feedback) | ✔ Dashboard | ✔ Dashboard |
+| Submitting requests / appeals to the university | ✔ Submit Request | — | ✔ Requests (evidence, score appeals) |
+| Campus activities and registration | — | — | ✔ Activities with statuses, QR check-in |
+| Academic results and records | ✔ Academic Record with PDF export | — | ✔ Conduct score (current semester and full history) |
+| Online payment | ✔ Financial Account | — | — |
+| Library room booking | — | — | — |
+| Academic or student community (posts, Q&A, sharing) | — (Canvas Groups and Inbox are course-level only) | — | — |
+| AI assistant | — | — | — |
+
+Common ground:
+
+- **Role-based access.** Each system shows different content depending on who is logged in.
+- **A central dashboard** that points the user to what needs attention.
+- **A structured way to send requests to the university** (RMIT Submit Request, Conduct Score appeals).
+- **A record of the student's history**: enrollment history and academic results at RMIT, conduct score history at the conduct site.
+
+Each app covers only one slice of student life. A UEH student today already needs two separate systems (the LMS and the conduct score site) and still has no room booking, community or AI support.
+
+### What CampusHub will do differently or better
+
+1. **One platform instead of several.** The three surveyed sites are separate systems with separate logins and URLs. Even inside them, features open in another tab or on another URL (UEH Shop, Canvas). CampusHub keeps courses, calendar, activities and community behind one login and one navigation.
+2. **Library room booking.** None of the three apps lets students or lecturers search for rooms by date, time and capacity, then book or cancel. Staff can manage availability in the same place.
+3. **Academic Community and Student Community.** The surveyed apps have no faculty or campus-wide spaces for Q&A, sharing study notes and past exams, buy/swap/giveaway posts, or lost-and-found. RMIT Canvas Groups and Inbox only cover a single course.
+4. **A truly unified calendar.** The RMIT timetable shows classes and personal events. Canvas has a separate calendar, and the conduct site lists activities elsewhere. CampusHub puts classes, assignment deadlines, exams, study sessions and campus activities in one calendar, with reminders.
+5. **Campus activities connected to the rest of the platform.** The conduct site covers activities and scores well but only on its own. CampusHub keeps activities in the calendar and tracks the extracurricular points they earn, while staff create activities and manage registrations.
+6. **An AI Student Assistant.** None of the apps help students find information or choose what to do next. CampusHub's assistant answers questions such as what to do when a student ID card is lost, and recommends activities based on interests or points needed.
+7. **A real role for lecturers.** The RMIT portal is almost useless for Teachers outside Canvas. CampusHub gives lecturers course content and announcements, scheduling for classes and exams, and room booking.
+8. **A cleaner interface.** The UEH LMS homepage is cluttered and mixes components from other tabs, and its navigation tabs do not show which one is active. CampusHub gives each feature its own page and a clear active-state navigation bar.
+
+### UI/UX patterns we plan to adopt
+
+| Pattern | Source | How we will use it |
+|---|---|---|
+| Timetable that updates automatically after an action succeeds | RMIT LMS (timetable after enrollment) | Course enrollment, activity registration and room bookings appear in the calendar automatically |
+| Calendar with Day / Week / Month views, filters and "create event" | RMIT LMS Timetable | The core of the Calendar and Planner feature, with filters (classes, deadlines, activities, personal) |
+| Two-step flows with a review step before confirming | RMIT LMS (Drop Courses: select, then review) | Room booking and activity registration: select, review, confirm |
+| Sections that appear only when relevant | RMIT LMS (Review Courses and Penalties, Financial Account) | Show alerts and action items only when they apply, which keeps the dashboard short |
+| Dashboard with course cards, to-do list and recent feedback | RMIT LMS Canvas Dashboard | Student home page: courses, upcoming deadlines, announcements |
+| Export records as PDF | RMIT LMS Academic Record | Export a student's activity participation and extracurricular points record |
+| Separate Submit Request area | RMIT LMS, UEH Conduct Score (Requests) | A single place for requests and appeals, with evidence upload |
+| Clear separation of Admin / Teacher / Student views | UEH LMS | Role-based access for students, lecturers and staff |
+| Status tags and "open for registration" filter | UEH Conduct Score (Activities) | Campus Activities list with statuses and filters |
+| QR check-in and check-in history | UEH Conduct Score (Utilities) | Attendance at campus activities, feeding the participation records |
+| Current-semester score plus full-course history | UEH Conduct Score (Conduct Score) | Extracurricular points view for students |
+| Short, intuitive top-level navigation (Dashboard, Activities, Requests, Score, Profile, Utilities) | UEH Conduct Score | Navigation structure for the whole app |
+
+Patterns we plan to avoid:
+
+- **Cluttered homepage** that holds components of other tabs (UEH LMS).
+- **Navigation with no active-state highlight** (UEH LMS).
+- **Features that open in a new tab on a different URL** (UEH Shop, RMIT Canvas), which breaks the sense of one platform.
 
 [image1]: img/Screenshot%202026-10-02%20211821.png
 [image2]: img/Screenshot%202026-10-02%20212144.png

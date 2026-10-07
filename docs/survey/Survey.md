@@ -323,23 +323,23 @@ Note: The activity statuses include: “Approved”, “In progress”, “Await
 
 ### Features the existing apps have in common
 
-Legend: ✔ = observed in the screenshots, — = not observed in the screenshots.
+Legend: $\checkmark$ = Found, - = not observed in the screenshots.
 
 | Feature | RMIT LMS | UEH LMS | UEH Conduct Score |
 |---|---|---|---|
-| Role-based access (Admin / Teacher / Student) | ✔ (Canvas) | ✔ | — (student view only) |
-| Personal profile / details | ✔ Personal Details | — | ✔ Profile |
-| Course content and learning tools | ✔ via Canvas | ✔ folders, midterm exam, SEB practice exam | — |
-| Timetable / calendar | ✔ Day / Week / Month views, filters, create event; Canvas Calendar | — | — |
-| Notifications / messaging | ✔ Canvas History and Inbox | — | — |
-| Dashboard with an overview of tasks | ✔ Tasks, Canvas Dashboard (to-do, recent feedback) | ✔ Dashboard | ✔ Dashboard |
-| Submitting requests / appeals to the university | ✔ Submit Request | — | ✔ Requests (evidence, score appeals) |
-| Campus activities and registration | — | — | ✔ Activities with statuses, QR check-in |
-| Academic results and records | ✔ Academic Record with PDF export | — | ✔ Conduct score (current semester and full history) |
-| Online payment | ✔ Financial Account | — | — |
-| Library room booking | — | — | — |
-| Academic or student community (posts, Q&A, sharing) | — (Canvas Groups and Inbox are course-level only) | — | — |
-| AI assistant | — | — | — |
+| Role-based access (Admin / Teacher / Student) | $\checkmark$ (Canvas) | $\checkmark$ | - (student view only) |
+| Personal profile / details | $\checkmark$ Personal Details | - | $\checkmark$ Profile |
+| Course content and learning tools | $\checkmark$ via Canvas | $\checkmark$ folders, midterm exam, SEB practice exam | - |
+| Timetable / calendar | $\checkmark$ Day / Week / Month views, filters, create event; Canvas Calendar | $\checkmark$ Homepage | - |
+| Notifications / messaging | $\checkmark$ Canvas History and Inbox | - | - |
+| Dashboard with an overview of tasks | $\checkmark$ Tasks, Canvas Dashboard (to-do, recent feedback) | $\checkmark$ Dashboard | $\checkmark$ Dashboard |
+| Submitting requests / appeals to the university | $\checkmark$ Submit Request | - | $\checkmark$ Requests (evidence, score appeals) |
+| Campus activities and registration | - | - | $\checkmark$ Activities with statuses, QR check-in |
+| Academic results and records | $\checkmark$ Academic Record with PDF export | - | $\checkmark$ Conduct score (current semester and full history) |
+| Online payment | $\checkmark$ Financial Account | - | - |
+| Library room booking | - | - | - |
+| Academic or student community (posts, Q&A, sharing) | - (Canvas Groups and Inbox are course-level only) | - | - |
+| AI assistant | - | - | - |
 
 Common ground:
 

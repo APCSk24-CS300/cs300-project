@@ -23,8 +23,8 @@ To-do tasks:
 - Compose the team contract
 
 Issues/Obstacles:
-- Needed to learn and uphold Scrum methodology effectively
-- Did a bit of research in the feasibility of a music maker UI, as well as useful tools for geological purposes
+- Needed to learn and uphold Scrum methodology effectively.
+- Did a bit of research in the feasibility of a music maker UI, as well as useful tools for geological purposes.
 
 
 ### Status reports - Lạc
@@ -45,7 +45,7 @@ To-do tasks:
 - Design the application's proof of concept
 
 Issues/Obstacles:
-- None
+- It is found to be quite complicated to first sketch a UI from scratch&mdash;in particular the website UI since Thịnh only has experience in mobile UI. Thus a consensus must be reached on the required features and UI templates. 
 
 ### Status reports - Trang
 Completed tasks:
@@ -55,7 +55,7 @@ To-do tasks:
 - Compose the final proper project proposal
 
 Issues/Obstacles:
-- None
+- The proposed idea needs to strike a balance between practicality, feasibility, and attractiveness.
 
 ### Status reports - Khôi
 Completed tasks:

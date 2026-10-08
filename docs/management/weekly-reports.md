@@ -1,4 +1,7 @@
 # Weekly Reports
+**Workers**: Trần Tôn Minh Kỳ
+**Reviewers**: Quách Thiên Lạc, Phạm Vân Trang, Phan Minh Khôi, Nguyễn Khang Thịnh, Nguyễn Văn Tĩnh  
+**Editors**: Trần Tôn Minh Kỳ  
 
 ## ======== Sprint 1 &mdash; 2/10 Planning meeting ========
 ![planning-tasks](../assets/PA1-planning-meeting-tasks.png)

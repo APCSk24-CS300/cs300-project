@@ -1,4 +1,7 @@
 # Existing App Survey
+**Workers**: Phan Minh Khôi  
+**Reviewers**: Trần Tôn Minh Kỳ  
+**Editors**: Phan Minh Khôi
 
 This survey covers three existing websites that are similar to CampusHub: the RMIT LMS (student portal with Canvas), the UEH LMS, and the UEH conduct score website.
 

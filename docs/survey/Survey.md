@@ -87,35 +87,52 @@ Note: This is where students send requests to the university.
 
 ### Component Tree (Mermaid)
 
+The full RMIT portal tree is split by feature group. The overview shows how the groups hang off the Home Page, and each group has its own diagram below.
+
+#### Overview
+
 ```mermaid
-graph TD
-    Root["Home Page"]
+graph LR
+    Root(["Home Page"])
 
-    %% Level 1
-    Root --> Tasks["1. Tasks"]
-    Root --> Personal["2. Personal Details"]
-    Root --> Enrolment["3. Enrolment"]
-    Root --> Timetable["4. Timetable"]
-    Root --> Academic["5. Academic Records"]
-    Root --> Financial["6. Financial Account"]
-    Root --> Scholarships["7. Scholarships"]
-    Root --> Graduations["8. Graduations"]
-    Root --> ImpDates["9. Important Dates"]
-    Root --> Canvas["10. Canvas"]
-    Root --> SubmitReq["11. Submit Request"]
-    Root --> FAQs["12. FAQs"]
+    Root --> G1["Student<br/>Personal Details, Academic Records, Scholarships, Graduations"]
+    Root --> G2["Academic Program<br/>Enrolment"]
+    Root --> G3["Time<br/>Timetable, Important Dates"]
+    Root --> G4["Finance<br/>Financial Account"]
+    Root --> G5["Learning<br/>Canvas"]
+    Root --> G6["Support<br/>Tasks, Submit Request, FAQs"]
+```
 
-    %% 1. Tasks
-    %% Tasks --> TaskForm["Complete forms as required by the university"]
+#### 1. Student
 
-    %% 2. Personal Details
+```mermaid
+graph LR
+    Student(["Student"])
+
+    Student --> Personal["Personal Details"]
+    Student --> Academic["Academic Records"]
+    Student --> Scholarships["Scholarships"]
+    Student --> Graduations["Graduations"]
+
     Personal --> PD_Personal["Personal Details"]
     Personal --> PD_Contact["Contact Details"]
     Personal --> PD_Address["Addresses"]
     Personal --> PD_Emergency["Emergency Contacts"]
     Personal --> PD_Privacy["Privacy Release"]
 
-    %% 3. Enrolment
+    Academic --> AR_EnrolHistory["Enrolment History"]
+    Academic --> AR_ViewResults["View Results"]
+    Academic --> AR_History["Academic History"]
+    Academic --> AR_Statement["Statement of Enrolment"]
+    AR_History --> AR_PDF["Export academic results as PDF (GPA / WAM / Course grades)"]
+```
+
+#### 2. Academic Program (Enrolment)
+
+```mermaid
+graph LR
+    Enrolment(["Enrolment"])
+
     Enrolment --> Enrol_Program["Enrol in my Program"]
     Enrolment --> Enrol_Plan["Plan my Program"]
     Enrolment --> Enrol_Drop["Drop Courses / Drop Classes"]
@@ -123,52 +140,77 @@ graph TD
     Enrolment --> Enrol_UpdateMM["Update your Majors or Minors"]
 
     Enrol_Program --> Program_Req["BEng(SoftEng)(Hons) Requirements"]
-    Program_Req --> Y1["Year One of Program"]
-    Y1 --> Y1_Core["Year One Core Courses"]
-    Program_Req --> Y2["Year Two of Program"]
-    Y2 --> Y2_Core["Year Two Core Courses"]
-    Y2 --> Y2_Opt["Year Two Option Courses"]
-    Program_Req --> Y3["Year Three of Program"]
-    Y3 --> Y3_Core["Year Three Core Courses"]
-    Y3 --> Y3_Elec["Year Three University Elective"]
 
     Enrol_Plan --> Plan_Filter["Filter Majors and Minors"]
     Enrol_Plan --> Plan_AddChange["Add or Change Majors or Minors"]
     Enrol_Plan --> Plan_Req["View Requirement Details"]
 
     Enrol_Drop --> Drop_S1["Step 1: Select Courses to Drop"]
-    Enrol_Drop --> Drop_S2["Step 2: Review Courses and Penalties"]
+    Drop_S1 --> Drop_S2["Step 2: Review Courses and Penalties"]
 
     Enrol_UpdateMM --> MM_S1["Step 1: Select Updates"]
-    Enrol_UpdateMM --> MM_S2["Step 2: Review Updates"]
+    MM_S1 --> MM_S2["Step 2: Review Updates"]
     Enrol_UpdateMM --> MM_List["Minor List"]
+```
 
-    %% 4. Timetable
+Program requirements (expanded from "Enrol in my Program"):
+
+```mermaid
+graph LR
+    Program_Req(["BEng(SoftEng)(Hons) Requirements"])
+
+    Program_Req --> Y1["Year One of Program"]
+    Program_Req --> Y2["Year Two of Program"]
+    Program_Req --> Y3["Year Three of Program"]
+
+    Y1 --> Y1_Core["Year One Core Courses"]
+
+    Y2 --> Y2_Core["Year Two Core Courses"]
+    Y2 --> Y2_Opt["Year Two Option Courses"]
+
+    Y3 --> Y3_Core["Year Three Core Courses"]
+    Y3 --> Y3_Elec["Year Three University Elective"]
+```
+
+#### 3. Time
+
+```mermaid
+graph LR
+    Time(["Time"])
+
+    Time --> Timetable["Timetable"]
+    Time --> ImpDates["Important Dates"]
+
     Timetable --> TT_View["Calendar (Day / Week / Month / Summary)"]
     Timetable --> TT_Filter["Filter (Semester, Lab, Online, Tutorial)"]
     Timetable --> TT_Create["Create Event"]
 
-    %% 5. Academic Records
-    Academic --> AR_EnrolHistory["Enrolment History"]
-    Academic --> AR_ViewResults["View Results"]
-    Academic --> AR_History["Academic History"]
-    Academic --> AR_Statement["Statement of Enrolment"]
+    ImpDates --> ID_Download["Download Academic Calendar (2026/2027)"]
+    ImpDates --> ID_Sem2["Semester 2 2026"]
+    ImpDates --> ID_Sem3["Semester 3 2026"]
+```
 
-    AR_History --> AR_PDF["Export academic results as PDF (GPA / WAM / Course grades)"]
+#### 4. Finance
 
-    %% 6. Financial Account
+```mermaid
+graph LR
+    Finance(["Finance"])
+
+    Finance --> Financial["Financial Account"]
+
     Financial --> Fin_Balance["Account Balance"]
     Financial --> Fin_MakePay["Make a Payment"]
     Financial --> Fin_PayHistory["Payment History"]
     Financial --> Fin_BankDetails["Bank Account Details"]
     Financial --> Fin_Invoices["Invoices"]
+```
 
-    %% 9. Important Dates
-    ImpDates --> ID_Download["Download Academic Calendar (2026/2027)"]
-    ImpDates --> ID_Sem2["Semester 2 2026"]
-    ImpDates --> ID_Sem3["Semester 3 2026"]
+#### 5. Learning (Canvas)
 
-    %% 10. Canvas
+```mermaid
+graph LR
+    Canvas(["Canvas"])
+
     Canvas --> Canvas_Dash["Dashboard"]
     Canvas --> Canvas_Courses["Courses"]
     Canvas --> Canvas_Groups["Groups"]
@@ -187,8 +229,19 @@ graph TD
 
     Canvas_Groups --> Group_Curr["Current Groups"]
     Canvas_Groups --> Group_Prev["Previous Groups"]
+```
 
-    %% 11. Submit Request
+#### 6. Support
+
+```mermaid
+graph LR
+    Support(["Support"])
+
+    Support --> Tasks["Tasks"]
+    Support --> SubmitReq["Submit Request"]
+    Support --> FAQs["FAQs"]
+
+    %% Tasks --> TaskForm["Complete forms as required by the university"]
     SubmitReq --> SR_Forms["My Forms / Fill out a new form"]
 ```
 

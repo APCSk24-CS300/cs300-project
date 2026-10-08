@@ -1,4 +1,7 @@
 # Project Proposal
+**Workers**: Phan Minh Khôi, Phạm Vân Trang  
+**Reviewers**: Trần Tôn Minh Kỳ  
+**Editors**: Phạm Vân Trang  
 
 ## Introduction
 

@@ -1,4 +1,7 @@
 # Team Contract
+**Workers**: Trần Tôn Minh Kỳ  
+**Reviewers**: Quách Thiên Lạc, Phạm Vân Trang, Phan Minh Khôi, Nguyễn Khang Thịnh  
+**Editors**: Trần Tôn Minh Kỳ
 
 ## Team Information
 

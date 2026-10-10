@@ -77,3 +77,79 @@ Issues/Obstacles:
 ### Summary
 - Every member's ideas have been reviewed and cherry-picked to produce the most suitable and feasible idea.
 - Other documents required is in progress.
+
+## ======== Sprint 1 &mdash; 10/10 Weekly meeting 1 ========
+### Presence
+Team members present:
+- Kỳ
+- Lạc
+- Thịnh
+- Trang
+- Khôi
+
+Team members absent:
+- None
+
+### Status report - Kỳ
+Completed tasks:
+- Set up Jira (for upholding Scrum procedure), Git repo (for source control), and Discord (for communication between members)
+- Divided preliminary proposal tasks for each member
+- Completed individual project proposal
+
+To-do tasks:
+- Compose the team contract
+
+Issues/Obstacles:
+- Needed to learn and uphold Scrum methodology effectively.
+- Did a bit of research in the feasibility of a music maker UI, as well as useful tools for geological purposes.
+
+
+### Status reports - Lạc
+Completed tasks:
+- Completed a Vercel & Spec Kit usage guide
+- Registered an AI Coding account
+- Reviewed weekly reports and team contract documents
+- Provided feedback on mock UI screen
+
+To-do tasks:
+<!-- - Research into Spec Kit and Vercel -->
+
+Issues/Obstacles:
+- None
+
+### Status reports - Thịnh
+Completed tasks:
+- Designed the mock UI for the application
+- Registered an AI Coding account
+- Reviewed weekly reports
+
+To-do tasks:
+<!-- - Design the application's proof of concept -->
+
+Issues/Obstacles:
+- None
+
+### Status reports - Trang
+Completed tasks:
+- Completed a preliminary version of the project proposal
+- Registered an AI Coding account
+- Reviewed weekly reports and team contract documents
+  
+To-do tasks:
+<!-- - Compose the final proper project proposal -->
+
+Issues/Obstacles:
+- None
+
+### Status reports - Khôi
+Completed tasks:
+- Completed existing apps survey
+- Reviewed weekly reports and team contract
+- Registered an AI Coding account
+- Reviewed the primitive backend implementation
+
+To-do tasks:
+<!-- - Do a survey on existing apps whose idea overlap with the proposed idea -->
+
+Issues/Obstacles:
+- None

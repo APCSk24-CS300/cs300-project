@@ -5,32 +5,36 @@
 
 ## Introduction
 
-**CampusHub** is a unified student management and campus community website designed to bring academic management, university facilities, and student communities into one platform. Instead of using multiple separate systems for courses, schedules, facility booking, academic discussions, and campus activities, students can access and manage their university life more conveniently through CampusHub.
+**myHCMUS** is a web-based platform designed to simplify the management of extracurricular activities and student training scores. It enables students to discover and register for activities, track their participation, and monitor their training scores, while providing organizers and administrators with tools to efficiently manage activities, attendance, and participation records.
 
 ## Target Users and Environments
 
-**Target Users:** The main users of CampusHub are university students, lecturers, and university staff.
+**Target Users:** University students and staff.
 
 **Environment:** Web browsers on desktop, laptop, and mobile devices.
 
 ## Key Features
 
-1. **Authentication** - Users can securely log in and log out of the system using their accounts. The system identifies their roles to provide access to the appropriate features and information.
+1. **Authentication:** Users can log in and log out of the system using their accounts. The system identifies their roles to provide access to the appropriate features and information.
 
-2. **Profile Management** - Users can edit their personal information, change passwords, update avatars, and manage basic academic information.
+2. **Profile Management:** Users can edit their personal information, change passwords, update avatars, and manage basic academic information.
 
-3. **Course Management** - Students can access their enrolled courses, course materials, assignments, announcements, and examination information. Lecturers can manage course content and publish materials or announcements for their students.
+3. **Activity Discovery:** Students can browse available activities and search or filter them by category, faculty, date, location, training-score criteria, and registration status. Each activity includes detailed information such as its description, schedule, capacity, eligibility requirements, and registration deadline.
 
-4. **Calendar and Planner** - Students can have their class schedules, assignment deadlines, examinations, personal study sessions, and university activities in a unified calendar. Lecturers can schedule classes, examinations, and academic events, while university staff can add university-wide events and activities. The system can also remind students about upcoming academic tasks and events.
-
-5. **Library Room Booking** - Students and lecturers can search for available study or meeting rooms based on date, time, and capacity, then reserve, manage, or cancel their bookings. University staff can manage room availability, booking schedules, and facility information.
-
-6. **Academic Community** - Each faculty has a dedicated space where students can ask and answer questions, discuss course-related topics, and share academic resources such as study notes, exercises, and past examination materials. Content can be organized by course or topic and searched or filtered to help students find relevant discussions and materials.
-
-7. **Student Community** - Students can participate in campus-wide communities to discuss student life, share experiences, exchange or give away items, find missing belongings, and interact with students outside their courses. Posts can be organized into different categories to help students discover relevant topic.
-
-8. **Campus Activities** - Students can discover and register for university activities, workshops, competitions, and other events, as well as keep track of activities that contribute to their extracurricular points. University staff can create and manage activities, handle student registrations, and update participation records.
+4. **Activity Registration Management:** Students can register for activities, cancel registrations within the permitted period, and track their registration status. Organizers can review participant lists, approve or reject applications when necessary, and manage waiting lists for activities with limited capacity.
+   
+5. **Activity Management:** Organizers can create and manage activities, including schedules, locations, participation requirements, capacity, and training-score criteria. They can also publish announcements, track activity statistics, and export reports.
+   
+6. **Training Score Management:** Students can view their accumulated training scores and participation history, organized by semester and evaluation criteria. Organizers can submit verified participation results, and adjust score where appropriate.
+   
+7.  **Calendar and Notification Management:** Students can view registered activities in a personal calendar and receive reminders about upcoming activities, registration deadlines, and schedule changes. The system can also detect scheduling conflicts to help students avoid registering for overlapping activities.
+    
+8.  **Appeal Management:** Students can appeal missing or incorrect participation records and training scores. Organizers can review submissions, provide responses, and update case statuses.
+    
+9.  **System Administration:** Administrators can  manage activity categories, and configure system-wide settings. They can also access reports and statistics on activity participation, registration trends, and training-score distribution.
+    
+10. **University Services Hub:** Students can quickly access university platforms such as Moodle, Student Portal, tuition payment systems through a centralized dashboard.
 
 ## AI Feature
 
-**AI Student Assistant** -  An AI-powered assistant that helps students search for information and manage their university activities using data available across the platform, such as what to do when losing a student ID card, and recommends suitable activities based on their interests or training-point needs.
+**AI Student Assistant:** An AI-powered assistant recommends suitable extracurricular activities based on students' interests, available schedules, participation history, and training-score needs.

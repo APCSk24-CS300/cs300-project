@@ -37,4 +37,4 @@
 
 ## AI Feature
 
-**AI Student Assistant:** An AI-powered assistant recommends suitable extracurricular activities based on students' interests, available schedules, participation history, and training-score needs.
+**AI Student Assistant:** An AI-powered assistant recommends extracurricular activities based on students' interests, schedules, participation history, and training-score needs, helping them discover relevant opportunities, save time, and make informed decisions.

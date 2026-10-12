@@ -79,6 +79,8 @@ Issues/Obstacles:
 - Other documents required is in progress.
 
 ## ======== Sprint 1 &mdash; 10/10 Weekly meeting 1 ========
+![weekly-1-tasks](../assets/PA1-weekly-meeting-tasks.png)
+
 ### Presence
 Team members present:
 - Kỳ

@@ -86,23 +86,26 @@ Team members present:
 - Thịnh
 - Trang
 - Khôi
+- Tĩnh
 
 Team members absent:
 - None
 
 ### Status report - Kỳ
 Completed tasks:
-- Set up Jira (for upholding Scrum procedure), Git repo (for source control), and Discord (for communication between members)
-- Divided preliminary proposal tasks for each member
-- Completed individual project proposal
+- Completed the planning meeting report
+- Appended a list of members who contributed in tasks for each document
+- Set up the backend and the root `/` endpoint
+- Registered an AI Coding account
+- Set up an automated start date and completion date system for work item transitions
+- Set up Discord webhook for centralized Jira notifications
 
 To-do tasks:
-- Compose the team contract
+- Complete the weekly meeting 1 report
+- Set up Docker
 
 Issues/Obstacles:
-- Needed to learn and uphold Scrum methodology effectively.
-- Did a bit of research in the feasibility of a music maker UI, as well as useful tools for geological purposes.
-
+- None
 
 ### Status reports - Lạc
 Completed tasks:
@@ -153,3 +156,10 @@ To-do tasks:
 
 Issues/Obstacles:
 - None
+
+### Status reports - Tĩnh
+Completed tasks
+
+To-do tasks:
+
+Issues/Obstacles:

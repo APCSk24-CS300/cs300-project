@@ -169,3 +169,12 @@ To-do tasks:
 
 Issues/Obstacles:
 - None
+
+### Actions
+- Upon consultation with TAs about the proposal, it is imperative the proposed idea be descoped and refined further.
+- Members may now construct the core application's user flow in tandem with refining the project's idea.
+
+### Summary
+- The team discusses the current project state with the new member Tĩnh.
+- Every member reports their work over the week.
+- The project idea's scope is reduced to only include the university's events, calendar, and conduct score viewing.

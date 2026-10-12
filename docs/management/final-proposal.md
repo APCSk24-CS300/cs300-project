@@ -29,7 +29,7 @@
    
 7. **Calendar Management:** Students can view registered activities in a personal calendar and detect scheduling conflicts to avoid overlapping activities.
 
-8. **Notification Management: **Students receive notifications and reminders about upcoming activities, registration deadlines, schedule changes, and registration updates.
+8. **Notification Management:** Students receive notifications and reminders about upcoming activities, registration deadlines, schedule changes, and registration updates.
     
 9.  **Appeal Management:** Students can appeal missing or incorrect participation records and training scores. Organizers can review submissions, provide responses, and update case statuses.
     

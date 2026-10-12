@@ -115,7 +115,8 @@ Completed tasks:
 - Provided feedback on mock UI screen
 
 To-do tasks:
-<!-- - Research into Spec Kit and Vercel -->
+- Consult with the TAs about the planning meeting report
+- Outline the database business requirements
 
 Issues/Obstacles:
 - None

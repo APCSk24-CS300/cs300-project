@@ -154,7 +154,8 @@ Completed tasks:
 - Reviewed the primitive backend implementation
 
 To-do tasks:
-<!-- - Do a survey on existing apps whose idea overlap with the proposed idea -->
+- Refine the existing apps survey
+- Implement `/health` endpoint
 
 Issues/Obstacles:
 - None

@@ -161,8 +161,11 @@ Issues/Obstacles:
 - None
 
 ### Status reports - Tĩnh
-Completed tasks
+Completed tasks:
+- Registered an AI Coding account
 
 To-do tasks:
+- Design the application core user flow
 
 Issues/Obstacles:
+- None

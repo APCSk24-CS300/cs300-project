@@ -140,7 +140,8 @@ Completed tasks:
 - Reviewed weekly reports and team contract documents
   
 To-do tasks:
-<!-- - Compose the final proper project proposal -->
+- Refine the project proposal
+- Export git log after all documents are finalized
 
 Issues/Obstacles:
 - None

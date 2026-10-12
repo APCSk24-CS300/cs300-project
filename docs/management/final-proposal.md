@@ -27,13 +27,15 @@
    
 6. **Training Score Management:** Students can view their accumulated training scores and participation history, organized by semester and evaluation criteria. Organizers can submit verified participation results, and adjust score where appropriate.
    
-7.  **Calendar and Notification Management:** Students can view registered activities in a personal calendar and receive reminders about upcoming activities, registration deadlines, and schedule changes. The system can also detect scheduling conflicts to help students avoid registering for overlapping activities.
+7. **Calendar Management:** Students can view registered activities in a personal calendar and detect scheduling conflicts to avoid overlapping activities.
+
+8. **Notification Management: **Students receive notifications and reminders about upcoming activities, registration deadlines, schedule changes, and registration updates.
     
-8.  **Appeal Management:** Students can appeal missing or incorrect participation records and training scores. Organizers can review submissions, provide responses, and update case statuses.
+9.  **Appeal Management:** Students can appeal missing or incorrect participation records and training scores. Organizers can review submissions, provide responses, and update case statuses.
     
-9.  **System Administration:** Administrators can  manage activity categories, and configure system-wide settings. They can also access reports and statistics on activity participation, registration trends, and training-score distribution.
+10. **System Administration:** Administrators can  manage activity categories, and configure system-wide settings. They can also access reports and statistics on activity participation, registration trends, and training-score distribution.
     
-10. **University Services Hub:** Students can quickly access university platforms such as Moodle, Student Portal, tuition payment systems through a centralized dashboard.
+11. **University Services Hub:** Students can quickly access university platforms such as Moodle, Student Portal, tuition payment systems through a centralized dashboard.
 
 ## AI Feature
 

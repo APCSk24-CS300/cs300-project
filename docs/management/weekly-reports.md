@@ -128,7 +128,7 @@ Completed tasks:
 - Reviewed weekly reports
 
 To-do tasks:
-<!-- - Design the application's proof of concept -->
+- Design the application's core screens
 
 Issues/Obstacles:
 - None

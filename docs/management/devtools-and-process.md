@@ -1,5 +1,5 @@
 # Development Tools and Process Setup
-**Workers**: Quách Thiên Lạc
+**Workers**: Quách Thiên Lạc  
 **Reviewers**: Trần Tôn Minh Kỳ  
 **Editors**: Quách Thiên Lạc
 
@@ -13,7 +13,7 @@ Our team follows Scrum throughout the project. Each project assignment (PA) is o
 - **Scrum meetings (twice per sprint):** Meet at separate points during the sprint to report progress, upcoming work, and obstacles.
 - **Sprint Review (once per sprint):** Review the completed work at the end of the sprint.
 
-We document meetings using the format in [Weekly Reports](weekly-reports.md), including attendance, each member's status, obstacles, and follow-up actions.
+We document meetings using the format in [Weekly Reports](weekly-reports.md) (also specified in PA1), including attendance, each member's status, obstacles, and follow-up actions.
 
 ### Task tracking
 
@@ -21,7 +21,7 @@ We use Jira to track all project work, including coding, documentation, and self
 
 - Create and assign each task **before** starting the work. Assign exactly one owner to each task.
 - Tasks' creation date, assignment date, and actual completion date are recorded. Creation and assignment may happen on the same day.
-- When the owner begins work on a task, it must be moved to the "In Progress" column; when work is finished, the task must be moved to "Needs Review" column. After the task has been reviewed, the Scrum master moves it to the "Finished" column.
+- When the owner begins work on a task, it must be moved to the "In Progress" column; when work is finished, the task must be moved to "Needs Review" column. After the task has been reviewed, the Scrum master moves it to the "Done" column.
 - Mark a task complete only when the work is finished; do not create, assign, and close it afterward in one step.
 
 We provide an ad-hoc definition for Task and Story task types:

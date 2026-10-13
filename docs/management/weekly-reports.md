@@ -79,7 +79,7 @@ Issues/Obstacles:
 - Other documents required is in progress.
 
 ## ======== Sprint 1 &mdash; 10/10 Weekly meeting 1 ========
-![weekly-1-tasks](../assets/PA1-weekly-meeting-tasks.png)
+![weekly-1-tasks](../assets/PA1-weekly-meeting-1-tasks.png)
 
 ### Presence
 Team members present:
@@ -182,6 +182,7 @@ Issues/Obstacles:
 - The project idea's scope is reduced to only include the university's events, calendar, and conduct score viewing.
 
 ## ======== Sprint 1 &mdash; 13/10 Weekly meeting 2 ========
+![weekly-2-tasks](../assets/PA1-weekly-meeting-2-tasks.png)
 
 
 ### Presence

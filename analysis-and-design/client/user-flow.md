@@ -123,7 +123,7 @@ flowchart TD
 ```
 
 1. User opens the myHCMUS website.
-2. System displays the Landing Page.
+2. System displays the [Landing Page](./pages/common.md#landing-page).
 3. User can:
    - Navigate to the featured activity details.
    - Navigate to the [Help /Guide Page](./pages/common.md#help--guide).
@@ -137,6 +137,50 @@ flowchart TD
 - External University Services
 
 ## 2.2 Login Page Flow
+
+**Page Description**: [Login Page](./pages/common.md#login-page)
+
+**Actor:** Guest (Unauthenticated users)
+
+### Main Flow
+```mermaid
+flowchart TD
+    loginPage[Login Page] --> enterCredentials[Enter Credentials]
+    
+    enterCredentials --> submitLogin[Submit Login]
+    submitLogin --> credentialsValid{Credentials Valid?}
+
+    credentialsValid -->|Yes| userRole{User Role}
+    credentialsValid -->|No| displayError[Display Error]
+    displayError --> enterCredentials
+
+    userRole -->|Student| studentDashboard[Student Dashboard]
+    userRole -->|Organizer| organizerDashboard[Organizer Dashboard]
+    userRole -->|Administrator| adminDashboard[Admin Dashboard]
+
+    loginPage --> forgotPassword[Forgot Password]
+    forgotPassword --> forgotPasswordPage[Forgot Password Page]
+    loginPage --> landingPage[Landing Page]
+```
+
+1. User opens the [Login Page](./pages/common.md#login-page).
+2. User enters account credentials.
+3. User submits the login form.
+4. System validates the credentials.
+5. If authentication succeeds, system identifies the user's role.
+6. System redirects the user to the corresponding Dashboard.
+7. If authentication fails, system displays an error message and allows the user to retry.
+8. User can navigate to the [Forgot Password Page](./pages/common.md#forgot-password).
+9. User can back to the [Landing Page](./pages/common.md#landing-page).
+
+### Exit Points
+- [Student Dashboard](./pages/student.md#dashboard)
+- [Organizer Dashboard](./pages/organizer.md#dashboard)
+- [Admin Dashboard](./pages/admin.md#dashboard)
+- [Forgot Password](./pages/common.md#forgot-password)
+- [Landing Page](./pages/common.md#landing-page)
+
+
 
 ## 2.3 Forgot Password Flow
 

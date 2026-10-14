@@ -7,35 +7,6 @@ user's role: Student, Organizer and Administrator
 
 # 1. Global Navigation Flow
 
-```mermaid
-flowchart TD
-    A[Open myHCMUS] --> B{Authenticated?}
-
-    B -->|No| C[Landing Page]
-    C --> D[Login Page]
-    C --> E[Help / Guide]
-    C --> F[Forgot Password]
-    F --> G[Reset Password]
-    G --> D
-
-    D --> H{Credentials Valid?}
-    H -->|No| I[Display Error]
-    I --> D
-    H -->|Yes| J{User Role}
-
-    B -->|Yes| J
-    J -->|Student| K[Student Dashboard]
-    J -->|Organizer| L[Organizer Dashboard]
-    J -->|Administrator| M[Admin Dashboard]
-
-    K --> N[Role-specific Navigation]
-    L --> N
-    M --> N
-
-    N --> O[Logout]
-    O --> C
-```
-
 ## 1.1 Entry Point
 
 Users can access myHCMUS via website url
@@ -77,3 +48,53 @@ Authenticated users can access with role-based pages on the sidebar navigation:
 - **Student**: [Dashboard](./pages/student.md#dashboard), [Activities](./pages/student.md#activities), [DRS Management](./pages/student.md#drs-management), [My Registrations](./pages/student.md#my-registrations), [Calendar](./pages/student.md#calendar), [AI Student Assistant](./pages/student.md#ai-student-assistant), [University Services](./pages/student.md#university-services), [Profile](./pages/common.md#profile).
 - **Organizer**: [Activity Management](./pages/organizer.md#activity-management), [Registration Management](./pages/organizer.md#registration-management), [Attendance and Results](./pages/organizer.md#attendance-and-results), [Appeals](./pages/organizer.md#appeals), [Reports](./pages/organizer.md#reports), [Profile](./pages/common.md#profile).
 - **Administrator**: [User Management](./pages/admin.md#user-management), [Activity Categories](./pages/admin.md#activity-categories), [System Configuration](./pages/admin.md#system-configuration), [Reports and Analytics](./pages/admin.md#reports-and-analytics), and [Audit Logs](./pages/admin.md#audit-logs).
+
+## 1.6 Global Flow Overview
+
+```mermaid
+flowchart TD
+    openWebsite[Open myHCMUS Website] --> authenticated{Authenticated?}
+
+    subgraph publicPages["Public Pages"]
+        landingPage[Landing Page]
+        loginPage[Login Page]
+        helpGuide[Help / Guide]
+        forgotPassword[Forgot Password]
+        resetPassword[Reset Password]
+    end
+
+    subgraph authenticatedPages["Authenticated Pages"]
+        studentDashboard[Student Dashboard]
+        organizerDashboard[Organizer Dashboard]
+        adminDashboard[Admin Dashboard]
+        roleNavigation[Role-specific Navigations]
+    end
+
+    authenticated -->|No| landingPage
+
+    landingPage --> loginPage
+    landingPage --> helpGuide
+    landingPage --> forgotPassword
+
+    forgotPassword --> resetPassword
+    resetPassword --> loginPage
+
+    loginPage --> credentialsValid{Credentials Valid?}
+    credentialsValid -->|No| displayError[Display Error]
+    displayError --> loginPage
+    credentialsValid -->|Yes| userRole{User Role}
+
+    authenticated -->|Yes| userRole
+
+    userRole -->|Student| studentDashboard
+    userRole -->|Organizer| organizerDashboard
+    userRole -->|Administrator| adminDashboard
+
+    studentDashboard --> roleNavigation
+    organizerDashboard --> roleNavigation
+    adminDashboard --> roleNavigation
+
+    roleNavigation --> logout[Logout]
+    logout --> landingPage
+```
+

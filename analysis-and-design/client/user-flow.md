@@ -1,14 +1,11 @@
+---
+purpose: To document the navigation flows and user interactions in myHCMUS system.
+scope: Cover the navigation flows of public pages and authenticated pages, including the role-based navigations for different roles.
+target users: University students and staff at VNU-HCMUS.
+user's role: Student, Organizer and Administrator
+---
 
-# myHCMUS - Overview 
-- **Purpose**:  To document the navigation flows and user interactions in myHCMUS system.
-- **Scope**: Cover the navigation flows of public pages and authenticated pages, including the role-based navigations for different roles.
-- **Target Users**: University students and staff at VNU-HCMUS.
-- **User Roles**:
-    - Student
-    - Organizer
-    - Administrator
-
-# 2. Global Navigation Flow
+# 1. Global Navigation Flow
 
 ```mermaid
 flowchart TD
@@ -39,60 +36,44 @@ flowchart TD
     O --> C
 ```
 
-## 2.1 Entry Point
+## 1.1 Entry Point
+
 Users can access myHCMUS via website url
 
-- Unauthenticated users are directed at the [Landing Page](#31-landing-page)
-- Authenticated users are directed to role-based Dashboard ([Student Dashboard](#student-dashboard), [Organizer Dashboard](#organizer-dashboard), [Admin Dashboard](#ad-dashboard))
-- Users logging out their account are  linked back to [Landing Page](#31-landing-page)
+- Unauthenticated users are directed at the [Landing Page](./pages/common.md#landing-page)
+- Authenticated users are directed to role-based Dashboard ([Student Dashboard](./pages/student.md#dashboard), [Organizer Dashboard](./pages/organizer.md#dashboard), [Admin Dashboard](./pages/admin.md#dashboard))
+- Users logging out their account are linked back to [Landing Page](./pages/common.md#landing-page)
 
-## 2.2 Public Navigation 
+## 1.2 Public Navigation
+
 Unauthenticated users can access the following pages:
 
-- **[Landing Page](#31-landing-page)**: The first sight of myHCMUS, including the introduction, key highlights.
-- **[Login Page](#32-login-page)**: Allow users to authenticate.
-- **[Forgot Password](#33-forgot-password)** (OPTIONAL): Users request password recovery.
-- **[Help/Guide Page](#34-helpguide-page)**: Instructions and most frequent questions.
+- **[Landing Page](./pages/common.md#landing-page)**: The first sight of myHCMUS, including the introduction, key highlights.
+- **[Login Page](./pages/common.md#login-page)**: Allow users to authenticate.
+- **[Forgot Password](./pages/common.md#forgot-password)** (OPTIONAL): Users request password recovery.
+- **[Help/Guide Page](./pages/common.md#help--guide)**: Instructions and most frequent questions.
 
-## 2.3 Authentication Navigation
+## 1.3 Authentication Navigation
 
-1. Users open [Login Page](#32-login-page).
+1. Users open [Login Page](./pages/common.md#login-page).
 2. Users enter account credentials
-3. (OPTIONAL) If they forgot their password then re-direct to [Forgot Password](#33-forgot-password).
+3. (OPTIONAL) If they forgot their password then re-direct to [Forgot Password](./pages/common.md#forgot-password).
 4. System validates the creadentials
 5. If authentication succeeds, system identifies the user's role.
 6. If authentication fails, reset the credentials and display the error message.
 
-## 2.4 Role-Based Direction
+## 1.4 Role-Based Direction
+
 After the authentication succeeds and identifies the user's role, redirect to the specific Dashboard for their assigned role.
 
-- **Student**: [Student Dashboard](#student-dashboard).
-- **Organizer**: [Organizer Dashboard](#organizer-dashboard).
-- **Administrator**: [Admin Dashboard](#ad-dashboard).  
+- **Student**: [Student Dashboard](./pages/student.md#dashboard).
+- **Organizer**: [Organizer Dashboard](./pages/organizer.md#dashboard).
+- **Administrator**: [Admin Dashboard](./pages/admin.md#dashboard).
 
-## 2.5 Authentication Navigation 
+## 1.5 Authentication Navigation
+
 Authenticated users can access with role-based pages on the sidebar navigation:
 
-- **Student**: Dashboard, Activities, DRS Management, My Registrations, Calendar, AI Student Assistant, University Services, Profile.
-- **Organizer**: Activity Management, Registration Management, Attendance and Results, Appeals, Reports, Profile.
-- **Administrator**: User Management, Activity Categories, System Configuration, Reports and Analytics, and Audit Logs.
-
-
-# 3. Public User Flow
-
-## 3.1 Landing Page
-## 3.2 Login Page
-## 3.3 Forgot Password
-## 3.4 Help/Guide Page
-
-# 4. Authenticated User Flow 
-
-## A. Student Flow
-### Student Dashboard
-
-## B. Organizer/Staff Flow
-### Organizer Dashboard
-
-## C. Administrator Flow
-### AD Dashboard
-## D. Cross-role Flow
+- **Student**: [Dashboard](./pages/student.md#dashboard), [Activities](./pages/student.md#activities), [DRS Management](./pages/student.md#drs-management), [My Registrations](./pages/student.md#my-registrations), [Calendar](./pages/student.md#calendar), [AI Student Assistant](./pages/student.md#ai-student-assistant), [University Services](./pages/student.md#university-services), [Profile](./pages/common.md#profile).
+- **Organizer**: [Activity Management](./pages/organizer.md#activity-management), [Registration Management](./pages/organizer.md#registration-management), [Attendance and Results](./pages/organizer.md#attendance-and-results), [Appeals](./pages/organizer.md#appeals), [Reports](./pages/organizer.md#reports), [Profile](./pages/common.md#profile).
+- **Administrator**: [User Management](./pages/admin.md#user-management), [Activity Categories](./pages/admin.md#activity-categories), [System Configuration](./pages/admin.md#system-configuration), [Reports and Analytics](./pages/admin.md#reports-and-analytics), and [Audit Logs](./pages/admin.md#audit-logs).

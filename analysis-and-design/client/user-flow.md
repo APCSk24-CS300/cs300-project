@@ -212,7 +212,34 @@ flowchart TD
 - [Landing Page](./pages/common.md#landing-page)
 - [Login Page](./pages/common.md#login-page)
 
-## 2.6 Public User Flow Diagram
+## 2.6 Public User Flow Overview
+
+```mermaid
+flowchart TD
+    landingPage[Landing Page]
+
+    landingPage --> loginPage[Login Page]
+    landingPage --> helpGuidePage[Help / Guide Page]
+    landingPage --> featuredActivity[Featured Activity]
+    landingPage --> externalUniversityServices[External University Services]
+
+    featuredActivity --> activityDetails[Activity Details]
+
+    loginPage --> credentialsValid{Credentials Valid?}
+    credentialsValid -->|No| loginPage
+    credentialsValid -->|Yes| userRole{User Role}
+
+    loginPage --> forgotPassword[Forgot Password]
+    forgotPassword --> resetPassword[Reset Password]
+    resetPassword --> loginPage
+
+    userRole -->|Student| studentDashboard[Student Dashboard]
+    userRole -->|Organizer| organizerDashboard[Organizer Dashboard]
+    userRole -->|Administrator| adminDashboard[Admin Dashboard]
+
+    helpGuidePage --> landingPage
+    helpGuidePage --> loginPage
+```
 
 # 3. Authenticated User Flow
 

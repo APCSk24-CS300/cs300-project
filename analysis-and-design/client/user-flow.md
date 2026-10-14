@@ -181,12 +181,36 @@ flowchart TD
 - [Landing Page](./pages/common.md#landing-page)
 
 
-
 ## 2.3 Forgot Password Flow
 
 ## 2.4 Reset Password Flow
 
 ## 2.5 Help / Guide Flow
+
+**Page Description:** [Help / Guide](./pages/common.md#help--guide)
+
+**Actor:** Guest (Unauthenticated users)
+
+### Main Flow
+```mermaid
+flowchart TD
+    helpGuidePage[Help / Guide Page] --> browseGuide[Browse Guide]
+    browseGuide --> selectTopic[Select Topic]
+    selectTopic --> viewGuideFAQ[View Guide / FAQ]
+
+    helpGuidePage --> loginPage[Login Page]
+    helpGuidePage --> landingPage[Landing Page]
+```
+1. User opens the [Help / Guide Page](./pages/common.md#help--guide).
+2. System displays available guides and frequently asked questions.
+3. User selects a topic.
+4. System displays the corresponding guide or FAQ.
+5. User can navigate to the [Login Page](./pages/common.md#login-page).
+6. User can return to the [Landing Page](./pages/common.md#landing-page).
+
+### Exit Point
+- [Landing Page](./pages/common.md#landing-page)
+- [Login Page](./pages/common.md#login-page)
 
 ## 2.6 Public User Flow Diagram
 

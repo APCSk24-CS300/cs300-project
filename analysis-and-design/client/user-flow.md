@@ -98,3 +98,130 @@ flowchart TD
     logout --> landingPage
 ```
 
+
+# 2. Public User Flow
+
+## 2.1 Landing Page Flow
+
+**Page Description:** [Landing Page](./pages/common.md#landing-page)
+
+**Actor:** Guest (Unauthenticated users)
+
+### Main Flow
+
+```mermaid
+flowchart TD
+    openWebsite[Open myHCMUS Website] --> landingPage[Landing Page]
+
+    landingPage --> featuredActivity[Featured Activity]
+    landingPage --> helpGuide[Help / Guide Page]
+    landingPage --> loginPage[Login Page]
+    landingPage --> universityServices[University Services]
+
+    featuredActivity --> activityDetails[Activity Details]
+    universityServices --> externalUniversityServices[External University Services]
+```
+
+1. User opens the myHCMUS website.
+2. System displays the Landing Page.
+3. User can:
+   - Navigate to the featured activity details.
+   - Navigate to the [Help /Guide Page](./pages/common.md#help--guide).
+   - Navigate to the  [Login Page](./pages/common.md#login-page).
+   - Access available university services.
+
+### Exit Points
+- [Login Page](./pages/common.md#login-page)
+- [Help / Guide Page](./pages/common.md#help--guide)
+- Activity Details
+- External University Services
+
+## 2.2 Login Page Flow
+
+## 2.3 Forgot Password Flow
+
+## 2.4 Reset Password Flow
+
+## 2.5 Help / Guide Flow
+
+## 2.6 Public User Flow Diagram
+
+# 3. Authenticated User Flow
+
+## 3.1 Student Flow
+
+### 3.1.1 Student Dashboard
+
+### 3.1.2 Activities
+
+### 3.1.3 My Registrations
+
+### 3.1.4 DRS Management
+
+### 3.1.5 Calendar
+
+### 3.1.6 AI Student Assistant
+
+### 3.1.7 University Services
+
+### 3.1.8 Profile
+
+### 3.1.9 Notifications
+
+## 3.2 Organizer Flow
+
+### 3.2.1 Organizer Dashboard
+
+### 3.2.2 Activity Management
+
+### 3.2.3 Registration Management
+
+### 3.2.4 Attendance and Results
+
+### 3.2.5 Appeals
+
+### 3.2.6 Reports
+
+### 3.2.7 Profile
+
+## 3.3 Administrator Flow
+
+### 3.3.1 Administrator Dashboard
+
+### 3.3.2 User Management
+
+### 3.3.3 Activity Categories
+
+### 3.3.4 System Configuration
+
+### 3.3.5 Reports and Analytics
+
+### 3.3.6 Audit Logs
+
+### 3.3.7 Profile
+
+# 4. Cross-role User Flows
+
+## 4.1 Activity Registration and Participation
+
+## 4.2 Attendance and DRS Result Submission
+
+## 4.3 DRS Appeal and Resolution
+
+## 4.4 Activity Cancellation and Notifications
+
+# 5. Alternative and Error Flows
+
+## 5.1 Authentication Failure
+
+## 5.2 Unauthorized Access
+
+## 5.3 Registration Deadline Passed
+
+## 5.4 Activity Capacity Reached
+
+## 5.5 Schedule Conflict
+
+## 5.6 Activity Cancelled
+
+## 5.7 Session Expiration

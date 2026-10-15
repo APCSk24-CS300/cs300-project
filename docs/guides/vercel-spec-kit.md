@@ -2,18 +2,23 @@
 **Workers**: Quách Thiên Lạc  
 **Reviewers**: Trần Tôn Minh Kỳ  
 **Editors**: Quách Thiên Lạc
+---
+**Version:** 1.0.0  
+**Admendment:** 2026/15/10
+---
 
 ## Introduction
-This guide provides an introduction to hosting our application on Vercel and utilizing the strengths of spec-driven development (SDD) via GitHub Spec Kit (spec-kit). Each of the following sections describes the general context for each tool, followed by a detailed, beginner-oriented guide to using them.
+This guide provides an introduction to hosting our application on Vercel and utilizing the strengths of spec-driven development (SDD) via GitHub Spec Kit (spec-kit). Each of the following sections will be divided into subsections as follows:
+- **Introduction:** present the general context and explain relevant terminologies.
+- **Setup:** Things that only needs to be done **once** to get the service up and running. Most of the time, only one member of the team needs to do this part (aside from installing the services themselves, which we all need to do).
+- **Daily workflow:** General, beginner-oriented guide to using the service. Each member of the team will need to read this subsection.
+- **Other commands:** Utitlies commands that are useful but not critical to the overall workflow.
 
-If you have any further questions, contact Lac, and I will do my best to answer them.
 ## Vercel hosting
-### Web hosting
+### Introduction 
 Web hosting is the use of a cloud service to store the files that make up a website and make that website accessible to Internet users (IBM). There are many ways to do this; we will look at one such way: deploying a Git repository (provided by GitHub) on Vercel.
 
-### Setup and Commands
-
-#### Setup 
+### Setup 
 This setup assumes a Git repository that runs locally and is already connected to GitHub, as well as a Vercel account.
 
 From this point on, we can either use the web GUI or the CLI alternative. For extra aura, this guide will use Vercel CLI.
@@ -27,13 +32,7 @@ vercel --version
 ``` 
 vercel login
 ```
-### Commands:
-
-#### Important:
-
-Run steps 1-3 **once** when deploying to Vercel for the **first time**. After that, simply run `npm run build` and then step 4.
-
-1. Link the project to Vercel (since we are already in the project directory, simply run the command with no argument):
+3. Link the project to Vercel (since we are already in the project directory, simply run the command with no argument):
 ```
 vercel link [path-to-directory]
 ```
@@ -56,7 +55,7 @@ This command will open a series of interactive prompts (if you have ever used CL
 ```
 Note that for the last question, since we are using HTML/CSS/JS, **make sure** that the current directory has the file `index.html` before choosing `./` as the answer.
 
-2. Configure environment variables. Run:
+4. Configure environment variables. Run:
 ```
 vercel env add API_KEY [api-key-name]
 ```
@@ -69,13 +68,15 @@ Paste the key and confirm that Vercel has logged it:
 vercel env ls
 ```
 
-3. Deploy a preview:
+5. Deploy a preview:
 ```
 vercel deploy
 ```
 Vercel will return a deployment URL to preview the website. Note that at this stage, we use the URL to test the website's functionality only.
 
-4. Moving from deploy to production:
+### Daily workflow:
+
+Moving from deploy to production:
 ```
 vercel --prod
 ```
@@ -84,7 +85,7 @@ At this stage, Vercel builds the actual production application and hosts it usin
 vercel inspect [link-to-website]
 ```
 #### Important (reiterating):
-After running step 4, if you are modifying the source code, you only need to run step 4 again to publish the changes.
+After running this step, if you are modifying the source code, you only need to run it again to publish the changes.
 
 ### Other commands:
 1. Debugging: use the following commands:
@@ -109,27 +110,21 @@ vercel open
 
 
 ## GitHub Spec Kit (spec-kit)
-### Concepts
-It is perhaps helpful, before we use the tool, to get a grasp of its underlying principles and the benefits they provide. The next few subsections provide a quick overview of SDD and its key concepts.
+### Introduction
 #### SDD
 Unlike regular vibe coding, which simply involves typing prompts and waiting for AI models to output results, SDD utilizes natural-language documents known as **"specs"** that clearly define the project and guide the models in the right direction during development. SDD has become more popular in recent years due to the greater control it gives developers over AI coding assistants, enhancing clarity while reducing misalignment. SDD also lowers AI agents' "cognitive load" by introducing a single source of truth as the persistent context, without requiring them to reference past chats and logs extensively.
 #### Spec
 A spec, short for specification, is a document (artifact) written in natural language whose content describes the implementation details of the software at hand. In other words, specs can be understood as the set of agreements between developers and AI coding assistants on "what to build and how to build it" (IBM). Specs are often more detailed and more specific to a project than general context documents for agents such as PLAN.md or AGENTS.md (Martin Fowler). Although there are different implementation levels, specs are always written before any development happens.
-#### Tools
-There are many tools for SDD, such as Kiro, Tessl, or spec-kit, to name a few. In this guide, we will focus solely on spec-kit.
-### spec-kit
----
-##### (This section extensively references (and plagiarizes) spec-kit's GitHub README.md and official documentation)
----
+
+#### spec-kit
+
 spec-kit is GitHub's toolkit for SDD, providing direct CLI integration, high customizability of artifacts, and a range of community add-ons. spec-kit offers three processes: SDD, bug fixing, and idea assessment; we will only talk about the first one in this guide. Its general workflow can be understood as follows:
 
 1. Constitution: Setting up the high-level specs for the project; spec-kit calls these the "constitution". The constitution is universal and immutable in the project, meaning every modification must follow it.
-2. Specify - Plan - Tasks: For actual coding tasks, spec-kit generates a number of files based on a template that are mostly checklists to track completion and alignment.
+2. Specify - Plan - Tasks - Analyze: For actual coding tasks, spec-kit generates a number of files based on a template that are mostly checklists to track completion and alignment.
 3. Implementation - Convergence: After the agent finishes implementing the task at hand, spec-kit checks whether the resulting code satisfies everything in step 2 (Convergence). This process is repeated until no violation of step 2's specs is made.
 
-The following section goes into detail about spec-kit setup and commands for day-to-day usage.
-### Setup and commands
-#### Setup
+### Setup
 1. First, install the tool using `uv` or `PyPI`. Install them if you have not. Run either of these commands:
 ```
 uv tool install specify-cli
@@ -139,17 +134,17 @@ pip install specify-cli
 ```
 specify init [project-name] --integration [agent-name]
 ```
-#### Commands 
-The next eight steps describe a complete workflow for an SDD pipeline. Step 1 is done for a project; **the rest is done for each feature (this is what you will work with)**; it is recommended that we iterate and plan each step from 1-7 as carefully as possible before moving on to steps 8-9.
+3. Set the constitution. `/speckit-constitution` establishes the guiding principles for the project. This is done **once** for each project:
+```
+/speckit-constitution Taskify is a "Security-First" application. All user inputs must be validated. We use a microservices architecture. Code must be fully documented.
+```
+
+### Daily workflow
+The next seven steps describe a complete workflow for an daily SDD pipeline. It is recommended that we iterate and plan each step from 1-7 as carefully as possible before moving on to steps 8-9.
 
 For the next steps, there are two approaches for writing the specs: either write them inline (for short specs), or create a markdown file (it is highly recommended to put these files in `docs/speckit-input/` for easier management) and then point spec-kit to that file in the command (for long and detailed specs).
 An inline example is given in each step, while the markdown file approach for steps 1-5 is provided as a template [here](https://github.com/github/spec-kit/tree/main/templates).
 
-1. Set the constitution. `/speckit-constitution` establishes the guiding principles for the project. This is done **once** for each project:
-```
-/speckit-constitution Taskify is a "Security-First" application. All user inputs must be validated. We use a microservices architecture. Code must be fully documented.
-
-```
 2. Declare what to build. `speckit-specify` focuses on the general whats and whys of the project, not the tech stack.
 ```
 /speckit-specify Develop Taskify, a team productivity platform where predefined users create projects, assign tasks, comment, and move tasks across Kanban columns (To Do, In Progress, In Review, Done). Five users (one product manager, four engineers), three sample projects, no login for this first phase.
@@ -193,7 +188,7 @@ That's about 90% of your daily spec-kit workflow, I think. I will update additio
 - Validate requirements and plans before coding begins
 - Let the coding agent handle the implementation details.
 
-#### Other commands
+### Other commands
 1. Agent management:
 
 To switch from one agent to another, use:
@@ -204,6 +199,6 @@ to check agent status. Then run:
 ```
 specify integration switch [new-agent-name]
 ```
-You can install multiple agents at once and switch when necessary. This is helpful when you run out of tokens halfway through work (T_T).
+You can install multiple agents at once and switch when necessary. This is helpful when you run out of tokens halfway through work.
 
 

@@ -120,24 +120,27 @@ A spec, short for specification, is a document (artifact) written in natural lan
 
 spec-kit is GitHub's toolkit for SDD, providing direct CLI integration, high customizability of artifacts, and a range of community add-ons. spec-kit offers three processes: SDD, bug fixing, and idea assessment; we will only talk about the first one in this guide. Its general workflow can be understood as follows:
 
-1. Constitution: Setting up the high-level specs for the project; spec-kit calls these the "constitution". The constitution is universal and immutable in the project, meaning every modification must follow it.
-2. Specify - Plan - Tasks - Analyze: For actual coding tasks, spec-kit generates a number of files based on a template that are mostly checklists to track completion and alignment.
-3. Implementation - Convergence: After the agent finishes implementing the task at hand, spec-kit checks whether the resulting code satisfies everything in step 2 (Convergence). This process is repeated until no violation of step 2's specs is made.
+1. **Constitution:** Setting up the high-level specs for the project; spec-kit calls these the "constitution". The constitution is universal and immutable in the project, meaning every modification must follow it.
+2. **Specify - Plan - Tasks - Analyze:** For actual coding tasks, spec-kit generates a number of files based on a template that are mostly checklists to track completion and alignment.
+3. **Implementation - Convergence:** After the agent finishes implementing the task at hand, spec-kit checks whether the resulting code satisfies everything in step 2 (Convergence). This process is repeated until no violation of step 2's specs is made.
 
 ### Setup
-1. First, install the tool using `uv` or `PyPI`. Install them if you have not. Run either of these commands:
+1. First, install the tool using `uv` or `PyPI`. Again, all members need to do this step. Run either of these commands, depending on what you have:
 ```
 uv tool install specify-cli
 pip install specify-cli
 ```
-2. Then initialize it in the project (change the project name to our project's name; for the agent's name, use keys in [here](https://github.github.com/spec-kit/reference/integrations.html). Common candidates include `agy`, `codex`, `copilot`, `claude`, etc.):
+2. Go to our project's folder. Run the following command:
 ```
-specify init [project-name] --integration [agent-name]
+specify init  --here
 ```
+A prompt will pop up warning that conflict may happen since the project is not empty; proceed by pressing `y`. This will open up an interactive CLI to choose agent and shell type.  
+
 3. Set the constitution. `/speckit-constitution` establishes the guiding principles for the project. This is done **once** for each project:
 ```
 /speckit-constitution Taskify is a "Security-First" application. All user inputs must be validated. We use a microservices architecture. Code must be fully documented.
 ```
+Writing the constitution will be a task and as such, reviewed by all members; I will do this task and modify `constitution.md` directly so you don't have to worry about this step.
 
 ### Daily workflow
 The next seven steps describe a complete workflow for an daily SDD pipeline. It is recommended that we iterate and plan each step from 1-7 as carefully as possible before moving on to steps 8-9.

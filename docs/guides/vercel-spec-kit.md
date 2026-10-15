@@ -146,6 +146,8 @@ Given below is the result after successfully setting up speckit at this stage:
 ![.specify folder](../assets/speckit-guide/dot-specify-folder.png)  
 ![.agents folder](../assets/speckit-guide/dot-agent-folder.png)
 
+For now, to handle the issue of members using different (and potentially conflicting) agents, I have decided that only the `.specify` folder will be shared between members, while `.agents` (or related directories) will be kept local.
+
 ### Daily workflow
 ---
 **Important:** for Codex users, commands start with `$` rather than `/` (e.g., `$specify-constitution` instead of `/specify-constitution`)

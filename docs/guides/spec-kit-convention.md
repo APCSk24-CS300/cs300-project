@@ -1,4 +1,10 @@
 # Spec kit convention
+**Worker:** Quách Thiên Lạc  
+**Reviewer(s):** Trần Tôn Minh Kỳ  
+**Editor(s):** Quách Thiên Lạc
+
+**Version:** 1.0.0  
+**Admendment:** 2026/15/10
 ## Introduction 
 This document is supplementary to the spec-kit guide; in this document, I try establishing some conventions on writing specifications and prompts to improve productivity and standardize documents across features. Feel free to suggest modifications to this convention if you have a good idea on how to improve it.
 ## Specs writing convention

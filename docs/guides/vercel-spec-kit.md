@@ -1,11 +1,11 @@
 # Guide to setting up Vercel hosting and GitHub Spec Kit for this project
-**Workers**: Quách Thiên Lạc  
-**Reviewers**: Trần Tôn Minh Kỳ  
-**Editors**: Quách Thiên Lạc
----
-**Version:** 1.0.0  
+**Worker:** Quách Thiên Lạc  
+**Reviewer(s):** Trần Tôn Minh Kỳ  
+**Editor(s):** Quách Thiên Lạc
+
+**Version:** 2.0.0  
 **Admendment:** 2026/15/10
----
+
 
 ## Introduction
 This guide provides an introduction to hosting our application on Vercel and utilizing the strengths of spec-driven development (SDD) via GitHub Spec Kit (spec-kit). Each of the following sections will be divided into subsections as follows:

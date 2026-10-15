@@ -1,0 +1,20 @@
+name: myHCMUS
+services:
+  server:
+    container_name: myHCMUS-server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    env_file:
+      - server/.env
+    volumes:
+      - ./server:/app
+      - node_modules:/app/node_modules
+    restart: unless-stopped
+
+  # db:
+
+volumes:
+  node_modules:

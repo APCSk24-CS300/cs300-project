@@ -143,10 +143,15 @@ A prompt will pop up warning that conflict may happen since the project is not e
 Writing the constitution will be a task and as such, reviewed by all members; I will do this task and modify `constitution.md` directly so you don't have to worry about this step.
 
 ### Daily workflow
-The next seven steps describe a complete workflow for an daily SDD pipeline. It is recommended that we iterate and plan each step from 1-7 as carefully as possible before moving on to steps 8-9.
+---
+**Important:** for Codex users, commands start with `$` rather than `/` (e.g., `$specify-constitution` instead of `/specify-constitution`)
+---
 
-For the next steps, there are two approaches for writing the specs: either write them inline (for short specs), or create a markdown file (it is highly recommended to put these files in `docs/speckit-input/` for easier management) and then point spec-kit to that file in the command (for long and detailed specs).
-An inline example is given in each step, while the markdown file approach for steps 1-5 is provided as a template [here](https://github.com/github/spec-kit/tree/main/templates).
+The next steps describe a complete workflow for an daily SDD pipeline. It is recommended that we iterate and plan each step from 2-7 as carefully as possible before moving on to steps 8-9.
+
+We will share a `specs/` folder at the project's root level; each feature occupies a subfolder in it and will be worked on separately in each branch. This is important since working on multiple features at once can mess up the context of the agent. 
+
+Commands will be used within the agent's coding environment (CLI/GUI). All commands can be accompanied with an additional prompt; for some this is required, but for others, the add-on prompt is optional and only provide further context for the task. Some commands output a Markdown file in the feature subfolder; it is important that we review this file carefully before moving on to the next step. I will provide a separate document specifying the convention for writing prompts.
 
 2. Declare what to build. `speckit-specify` focuses on the general whats and whys of the project, not the tech stack.
 ```

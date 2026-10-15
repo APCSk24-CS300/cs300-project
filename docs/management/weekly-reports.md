@@ -16,60 +16,6 @@ Team members present:
 
 Team members absent: None
 
-### Status report - Kỳ
-Completed tasks:
-- Set up Jira (for upholding Scrum procedure), Git repo (for source control), and Discord (for communication between members)
-- Divided preliminary proposal tasks for each member
-- Completed individual project proposal
-
-To-do tasks:
-- Compose the team contract
-
-Issues/Obstacles:
-- Needed to learn and uphold Scrum methodology effectively.
-- Did a bit of research in the feasibility of a music maker UI, as well as useful tools for geological purposes.
-
-
-### Status reports - Lạc
-Completed tasks:
-- Completed individual project proposal
-
-To-do tasks:
-- Research into Spec Kit and Vercel
-
-Issues/Obstacles:
-- None
-
-### Status reports - Thịnh
-Completed tasks:
-- Completed individual project proposal
-
-To-do tasks:
-- Design the application's proof of concept
-
-Issues/Obstacles:
-- It is found to be quite complicated to first sketch a UI from scratch&mdash;in particular the website UI since Thịnh only has experience in mobile UI. Thus a consensus must be reached on the required features and UI templates. 
-
-### Status reports - Trang
-Completed tasks:
-- Completed individual project proposal
-
-To-do tasks:
-- Compose the final proper project proposal
-
-Issues/Obstacles:
-- The proposed idea needs to strike a balance between practicality, feasibility, and attractiveness.
-
-### Status reports - Khôi
-Completed tasks:
-- Completed individual project proposal
-
-To-do tasks:
-- Do a survey on existing apps whose idea overlap with the proposed idea
-
-Issues/Obstacles:
-- None
-
 ### Actions
 - The final proposal must be finalized and formalized.
 - The remaining documents are to be completed.
@@ -95,6 +41,10 @@ Team members absent:
 
 ### Status report - Kỳ
 Completed tasks:
+- Set up Jira (for upholding Scrum procedure), Git repo (for source control), and Discord (for communication between members)
+- Divided preliminary proposal tasks for each member
+- Completed individual project proposal
+- Completed the team contract
 - Completed the planning meeting report
 - Appended a list of members who contributed in tasks for each document
 - Set up the backend and the root `/` endpoint
@@ -107,10 +57,12 @@ To-do tasks:
 - Set up Docker
 
 Issues/Obstacles:
-- None
+- Needed to learn and uphold Scrum methodology effectively.
+- Did a bit of research in the feasibility of a music maker UI, as well as useful tools for geological purposes.
 
 ### Status reports - Lạc
 Completed tasks:
+- Completed individual project proposal
 - Completed a Vercel & Spec Kit usage guide
 - Registered an AI Coding account
 - Reviewed weekly reports and team contract documents
@@ -125,6 +77,7 @@ Issues/Obstacles:
 
 ### Status reports - Thịnh
 Completed tasks:
+- Completed individual project proposal
 - Designed the mock UI for the application
 - Registered an AI Coding account
 - Reviewed weekly reports
@@ -133,10 +86,11 @@ To-do tasks:
 - Design the application's core screens
 
 Issues/Obstacles:
-- None
+- It is found to be quite complicated to first sketch a UI from scratch&mdash;in particular the website UI since Thịnh only has experience in mobile UI. Thus a consensus must be reached on the required features and UI templates.
 
 ### Status reports - Trang
 Completed tasks:
+- Completed individual project proposal
 - Completed a preliminary version of the project proposal
 - Registered an AI Coding account
 - Reviewed weekly reports and team contract documents
@@ -146,10 +100,11 @@ To-do tasks:
 - Export git log after all documents are finalized
 
 Issues/Obstacles:
-- None
+- The proposed idea needs to strike a balance between practicality, feasibility, and attractiveness.
 
 ### Status reports - Khôi
 Completed tasks:
+- Completed individual project proposal
 - Completed existing apps survey
 - Reviewed weekly reports and team contract
 - Registered an AI Coding account

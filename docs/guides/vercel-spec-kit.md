@@ -211,8 +211,9 @@ specify integration status
 ```
 to check agent status. Then run:
 ```
+specify integration install [new-agent-name]
 specify integration switch [new-agent-name]
 ```
-You can install multiple agents at once and switch when necessary. This is helpful when you run out of tokens halfway through work.
+You can install multiple agents at once and switch when necessary. This is helpful when you run out of tokens halfway through work. However, pay attention that some agents are not safe for multi-install; this will make the install command fail. You can use the ``--force`` flag to bypass this, but configuration files for the agent will be modified and leading to potential conflict, so proceed with caution.
 
 

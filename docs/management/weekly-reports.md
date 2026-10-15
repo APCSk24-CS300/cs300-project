@@ -79,7 +79,7 @@ Issues/Obstacles:
 - Other documents required is in progress.
 
 ## ======== Sprint 1 &mdash; 10/10 Weekly meeting 1 ========
-![weekly-1-tasks](../assets/PA1-weekly-meeting-tasks.png)
+![weekly-1-tasks](../assets/PA1-weekly-meeting-1-tasks.png)
 
 ### Presence
 Team members present:
@@ -180,3 +180,88 @@ Issues/Obstacles:
 - The team discusses the current project state with the new member Tĩnh.
 - Every member reports their work over the week.
 - The project idea's scope is reduced to only include the university's events, calendar, and conduct score viewing.
+
+## ======== Sprint 1 &mdash; 13/10 Weekly meeting 2 ========
+![weekly-2-tasks](../assets/PA1-weekly-meeting-2-tasks.png)
+
+
+### Presence
+Team members present:
+- Kỳ
+- Lạc
+- Thịnh
+- Trang
+- Khôi
+- Tĩnh
+
+Team members absent:
+- None
+
+### Status report - Kỳ
+Completed tasks:
+- Set up Docker
+
+To-do tasks:
+- Prepare for v1.0.0 release
+- Compose documentation for Docker usage
+
+Issues/Obstacles:
+<!-- - None -->
+
+### Status reports - Lạc
+Completed tasks:
+- Consult with the TAs about the planning meeting report
+- Compose the development tools and process document
+
+To-do tasks:
+- Set up PostgreSQL database
+- Outline the database business requirements
+
+Issues/Obstacles:
+- None
+
+### Status reports - Thịnh
+Completed tasks:
+- None
+
+To-do tasks:
+- Design the application's core screens
+
+Issues/Obstacles:
+- None
+
+### Status reports - Trang
+Completed tasks:
+- Refine the project proposal
+  
+To-do tasks:
+- Export git log after all documents are finalized
+
+Issues/Obstacles:
+- None
+
+### Status reports - Khôi
+Completed tasks:
+- Refine the existing apps survey
+- Move survey images to `/assets` folder
+
+To-do tasks:
+- Implement `/health` endpoint
+- Implement response callback functions
+
+Issues/Obstacles:
+- None
+
+### Status reports - Tĩnh
+Completed tasks:
+- None
+
+To-do tasks:
+- Design the application core user flow
+
+Issues/Obstacles:
+- None
+
+### Summary
+- Every member reports their work over the week.
+- The documentations have been updated to align with the new project scope and further refined.

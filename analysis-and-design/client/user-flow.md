@@ -279,6 +279,44 @@ flowchart TD
 
 ### 3.2.7 Profile
 
+### 3.2.8 Organizer Flow Overview
+```mermaid
+flowchart TD
+    organizerDashboard[Organizer Dashboard]
+
+    organizerDashboard --> activityManagement[Activity Management]
+    organizerDashboard --> registrationManagement[Registration Management]
+    organizerDashboard --> attendanceResults[Attendance and Results]
+    organizerDashboard --> appeals[Appeals]
+    organizerDashboard --> reports[Reports]
+    organizerDashboard --> profile[Profile]
+
+    activityManagement --> activityAction{Activity Action}
+    activityAction -->|Create / Edit| activityManagement
+    activityAction -->|Publish| registrationManagement
+    activityAction -->|Cancel| organizerDashboard
+
+    registrationManagement --> registrationStatus{Registration Status}
+    registrationStatus -->|Review / Approve / Reject| registrationManagement
+    registrationStatus -->|Registration Closed| attendanceResults
+
+    attendanceResults --> attendanceAction{Attendance / Result Action}
+    attendanceAction -->|Record Attendance| attendanceResults
+    attendanceAction -->|Submit Results| appeals
+    attendanceAction -->|Completed| reports
+
+    appeals --> appealStatus{Appeal Status}
+    appealStatus -->|Review Appeal| appeals
+    appealStatus -->|Resolved| attendanceResults
+
+    reports --> reportAction{Report Action}
+    reportAction -->|View Report| reports
+    reportAction -->|Export Report| reports
+
+    profile --> organizerDashboard
+
+```
+
 ## 3.3 Administrator Flow
 
 ### 3.3.1 Administrator Dashboard

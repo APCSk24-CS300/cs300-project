@@ -142,14 +142,20 @@ A prompt will pop up warning that conflict may happen since the project is not e
 ```
 Writing the constitution will be a task and as such, reviewed by all members; I will do this task and modify `constitution.md` directly so you don't have to worry about this step.
 
+Given below is the result after successfully setting up speckit at this stage:  
+![.specify folder](../assets/speckit-guide/dot-specify-folder.png)  
+![.agents folder](../assets/speckit-guide/dot-agent-folder.png)
+
 ### Daily workflow
 ---
 **Important:** for Codex users, commands start with `$` rather than `/` (e.g., `$specify-constitution` instead of `/specify-constitution`)
 ---
 
-The next steps describe a complete workflow for an daily SDD pipeline. It is recommended that we iterate and plan each step from 2-7 as carefully as possible before moving on to steps 8-9.
+The next steps describe a complete workflow for an daily SDD pipeline. It is recommended that we iterate and plan each step from 1-6 as carefully as possible before moving on to steps 7-8.
 
-We will share a `specs/` folder at the project's root level; each feature occupies a subfolder in it and will be worked on separately in each branch. This is important since working on multiple features at once can mess up the context of the agent. 
+We will share a `specs/` folder at the project's root level; each feature occupies a subfolder in it and will be worked on separately in each branch. This is important since working on multiple features at once can mess up the context of the agent. A normal feature specs folder will look like this:
+
+![feature folder](../assets/speckit-guide/feature-folder.png)
 
 Commands will be used within the agent's coding environment (CLI/GUI). All commands can be accompanied with an additional prompt; for some this is required, but for others, the add-on prompt is optional and only provide further context for the task. Some commands output a Markdown file in the feature subfolder; it is important that we review this file carefully before moving on to the next step. I will provide a separate document specifying the convention for writing prompts.
 
@@ -168,16 +174,16 @@ Commands will be used within the agent's coding environment (CLI/GUI). All comma
 ```
 /speckit-plan Use .NET Aspire with Postgres. The frontend is Blazor Server with drag-and-drop boards and real-time updates. Expose REST APIs for projects, tasks, and notifications.
 ```
-5. Generate a quality checklist. `/speckit-checklist` generates a user-generated quality checklist to confirm that the spec is complete, clear, and consistent. A checked item in this list only means the quality is met, not that a task is completed. Leaving the prompt blank means spec-kit will automatically generate a checklist based on your files. You can check the items yourself (recommended), or ask an agent to do it for you.
+5. Generate a quality checklist. `/speckit-checklist` generates a user-generated quality checklist to confirm that the spec is complete, clear, and consistent. A checked item in this list only means the quality is met, not that a task is completed. Leaving the prompt blank means spec-kit will automatically generate a checklist based on your files. 
 ``` 
 /speckit-checklist
 ```
-6. Divide the work. `/speckit-tasks` generates an actionable, dependency-ordered `tasks.md` from the design artifacts. Again, you can DIY or leave it blank for the agent to do it.
+6. Divide the work. `/speckit-tasks` generates an actionable, dependency-ordered `tasks.md` from the design artifacts.
 ```
 /speckit-tasks
 ```
 
-7. Consistency check. `/speckit-analyze` reports conflicts, gaps, and ambiguities across `spec.md`, `plan.md`, and `tasks.md`. It's read-only — if it flags issues, fix them at the source and re-run before implementing. Same as above; DIY or agent, your choice.
+7. Consistency check. `/speckit-analyze` reports conflicts, gaps, and ambiguities across `spec.md`, `plan.md`, and `tasks.md`. It's read-only — if it flags issues, fix them at the source and re-run before implementing.
 ```
 /speckit-analyze
 ```
@@ -189,7 +195,7 @@ Commands will be used within the agent's coding environment (CLI/GUI). All comma
 ```
 /speckit-converge
 ```
-That's about 90% of your daily spec-kit workflow, I think. I will update additional commands in the `Other commands` subsection when we encounter issues along the way. Before ending this subsection, here are a few key principles from spec-kit's official documentation:
+That's about 90% of your daily spec-kit workflow. I will update additional commands in the `Other commands` subsection when we encounter issues along the way. Before ending this subsection, here are a few key principles from spec-kit's official documentation:
 - Be explicit about what you're building and why
 - Don't focus on the tech stack during the specification phase
 - Iterate and refine your specifications before implementation

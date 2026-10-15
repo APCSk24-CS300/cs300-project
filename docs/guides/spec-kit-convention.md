@@ -16,3 +16,14 @@ Describe observable behavior, avoiding technical implementation details.
 5. Address edge cases and assumptions, including invalid input, missing data, and failures.
 
 6. Keep optional sections relevant, rather than filling every section with unnecessary content.
+
+## Prompt writing convention
+
+A good use of natural language is usually sufficient for most prompts, but to ensure consistent high-quality output, consider the below structure:
+- **Context:** shortly describe the task you want to do in <=10 words.
+- **Goal:** what problem does this task solve?
+- **Scope:** what can be included/excluded as a part of the problem?
+- **Description:** Go in more detail about the task. For example, when specifying a feature, name its target user role, main functionality, and expected input/output during normal use. This is the most important part of the prompt, especially in the specify and plan stages; if you these well, you will generally need much less prompt engineering later down the line.
+- **Edge case:** include any edge case you can think of for this feature.
+- **Acceptance criteria:** clearly define what counts as success using concrete and measurable criteria (numbers and observable conditions rather than abstract descriptions)
+- **Delivarable:** specify in what form the result should be (code, docs, .etc.)

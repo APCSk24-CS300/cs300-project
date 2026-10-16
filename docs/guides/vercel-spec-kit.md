@@ -4,7 +4,7 @@
 **Editor(s):** Quách Thiên Lạc
 
 **Version:** 2.0.0  
-**Admendment:** 2026/15/10
+**Amendment:** 2026/15/10
 
 
 ## Introduction

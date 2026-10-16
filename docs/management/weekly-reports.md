@@ -1,5 +1,5 @@
 # Weekly Reports
-**Workers**: Trần Tôn Minh Kỳ
+**Workers**: Trần Tôn Minh Kỳ  
 **Reviewers**: Quách Thiên Lạc, Phạm Vân Trang, Phan Minh Khôi, Nguyễn Khang Thịnh, Nguyễn Văn Tĩnh  
 **Editors**: Trần Tôn Minh Kỳ  
 
@@ -16,13 +16,38 @@ Team members present:
 
 Team members absent: None
 
-### Actions
-- The final proposal must be finalized and formalized.
-- The remaining documents are to be completed.
+### Task identification
+Tasks are identified to be work items that should directly affect the codebase and thus requires at least one pull request, whereas user stories are often chores that do not require a pull request.
 
-### Summary
-- Every member's ideas have been reviewed and cherry-picked to produce the most suitable and feasible idea.
-- Other documents required is in progress.
+Some tasks will have their assignee name in parentheses after the task name because those tasks are shared and multiple Jira work items are created to circumvent the restriction upon shared tasks.
+
+The currently identified tasks are:
+- **SCRUM-7**: Complete final project proposal
+- **SCRUM-8**: Write an existing apps survey based on the proposed idea
+- **SCRUM-9**: Write a team contract
+- **SCRUM-17**: Research into Vercel and Spec Kit
+- **SCRUM-19**: Write the planning meeting report
+- **SCRUM-31**: Setup backend and implement `/` endpoint
+- **SCRUM-32**: Implement `/health` endpoint
+- **SCRUM-45**: Set up Docker
+- **SCRUM-56**: Design the application core user flow
+- **SCRUM-58**: Outline the database business requirements
+
+The currently identified user stories are:
+- **SCRUM-11**: Individual proposal preparation (Kỳ)
+- **SCRUM-12**: Individual proposal preparation (Lạc) 
+- **SCRUM-13**: Individual proposal preparation (Khôi)
+- **SCRUM-14**: Individual proposal preparation (Trang)
+- **SCRUM-15**: Individual proposal preparation (Thịnh)
+- **SCRUM-38**: Register an AI coding account (Kỳ)
+- **SCRUM-39**: Register an AI coding account (Lạc)
+- **SCRUM-40**: Register an AI coding account (Khôi)
+- **SCRUM-41**: Register an AI coding account (Trang)
+- **SCRUM-42**: Register an AI coding account (Thịnh)
+- **SCRUM-43**: Register an AI coding account (Tĩnh)
+- **SCRUM-57**: Design the application core screens
+
+Additional work items are assigned as the sprint progresses.
 
 ## ======== Sprint 1 &mdash; 10/10 Weekly meeting 1 ========
 ![weekly-1-tasks](../assets/PA1-weekly-meeting-1-tasks.png)

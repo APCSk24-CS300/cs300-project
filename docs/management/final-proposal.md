@@ -31,7 +31,7 @@
 
 8. **Notification Management:** Students receive notifications and reminders about upcoming activities, registration deadlines, schedule changes, and registration updates.
     
-9.  **Appeal Management:**Students can submit requests for recognition of activities inside or outside the university or appeal incorrect participation records and training scores. Staff can review requests, verify evidence, provide responses, and update request statuses.
+9.  **Appeal Management:** Students can submit requests for recognition of activities inside or outside the university or appeal incorrect participation records and training scores. Staff can review requests, verify evidence, provide responses, and update request statuses.
     
 10. **System Administration:** Administrators can configure system-wide settings, such as training-score criteria, and access reports and statistics on activity participation, registration trends, and training-score distribution.
     

@@ -9,7 +9,7 @@
 
 ## Target Users and Environments
 
-**Target Users:** University students and staff.
+**Target Users:** University students and staff (activity organizer, system administrator).
 
 **Environment:** Web browsers on desktop, laptop, and mobile devices.
 
@@ -31,9 +31,9 @@
 
 8. **Notification Management:** Students receive notifications and reminders about upcoming activities, registration deadlines, schedule changes, and registration updates.
     
-9.  **Appeal Management:** Students can appeal missing or incorrect participation records and training scores. Organizers can review submissions, provide responses, and update case statuses.
+9.  **Appeal Management:** Students can submit requests for recognition of activities inside or outside the university or appeal incorrect participation records and training scores. Staff can review requests, verify evidence, provide responses, and update request statuses.
     
-10. **System Administration:** Administrators can  manage activity categories, and configure system-wide settings. They can also access reports and statistics on activity participation, registration trends, and training-score distribution.
+10. **System Administration:** Administrators can configure system-wide settings, such as training-score criteria, and access reports and statistics on activity participation, registration trends, and training-score distribution.
     
 11. **University Services Hub:** Students can quickly access university platforms such as Moodle, Student Portal, tuition payment systems through a centralized dashboard.
 

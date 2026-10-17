@@ -140,7 +140,7 @@ To-do tasks:
 - Compose documentation for Docker usage
 
 Issues/Obstacles:
-<!-- - None -->
+- None
 
 ### Status reports - Lạc
 Completed tasks:

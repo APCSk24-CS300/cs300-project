@@ -246,22 +246,170 @@ flowchart TD
 ## 3.1 Student Flow
 
 ### 3.1.1 Student Dashboard
+```mermaid
+flowchart TD
+    dashboard[Student Dashboard] --> viewOverview[View Dashboard Overview]
+    viewOverview --> upcomingActivities[View Upcoming Activities]
+    viewOverview --> registrationSummary[View Registration Summary]
+    viewOverview --> drsSummary[View DRS Summary]
+    viewOverview --> notifications[View Recent Notifications]
+
+    upcomingActivities --> activityDetails[Activity Details]
+    registrationSummary --> myRegistrations[My Registrations]
+    drsSummary --> drsManagement[DRS Management]
+    notifications --> notificationDetails[Notification Details]
+
+    dashboard --> activities[Activities]
+    dashboard --> calendar[Calendar]
+    dashboard --> assistant[AI Student Assistant]
+```
+
 
 ### 3.1.2 Activities
+```mermaid
+flowchart TD
+    activities[Activities Page] --> browseActivities[Browse Activities]
+    browseActivities --> filterActivities[Search and Filter Activities]
+    filterActivities --> selectActivity[Select Activity]
+    selectActivity --> activityDetails[Activity Details]
+
+    activityDetails --> checkEligibility{Eligible to Register?}
+    checkEligibility -->|Yes| checkAvailability{Registration Available?}
+    checkAvailability -->|Yes| registerActivity[Submit Registration]
+    registerActivity --> registrationSuccess[Registration Successful]
+    registrationSuccess --> myRegistrations[My Registrations]
+
+    checkEligibility -->|No| eligibilityError[Display Eligibility Message]
+    checkAvailability -->|No| availabilityError[Display Registration Unavailable Message]
+
+    eligibilityError --> activityDetails
+    availabilityError --> activityDetails
+
+    activities --> myRegistrations
+```
 
 ### 3.1.3 My Registrations
+```mermaid
+flowchart TD
+    myRegistrations[My Registrations] --> viewRegistrations[View Registered Activities]
+    viewRegistrations --> selectRegistration[Select a Registration]
+    selectRegistration --> registrationDetails[Registration Details]
+
+    registrationDetails --> viewActivity[View Activity Details]
+    registrationDetails --> checkCancellation{Cancellation Allowed?}
+
+    checkCancellation -->|Yes| requestCancellation[Request Cancellation]
+    requestCancellation --> confirmCancellation{Confirm Cancellation?}
+    confirmCancellation -->|Yes| cancelRegistration[Cancel Registration]
+    cancelRegistration --> updateStatus[Update Registration Status]
+    updateStatus --> myRegistrations
+
+    confirmCancellation -->|No| registrationDetails
+    checkCancellation -->|No| cancellationUnavailable[Display Cancellation Unavailable Message]
+    cancellationUnavailable --> registrationDetails
+```
 
 ### 3.1.4 DRS Management
+```mermaid
+flowchart TD
+    drsManagement[DRS Management] --> viewDRSSummary[View DRS Summary]
+    viewDRSSummary --> viewDRSRecords[View DRS Records]
+    viewDRSRecords --> selectRecord[Select a DRS Record]
+    selectRecord --> recordDetails[View Record Details]
+
+    recordDetails --> checkDiscrepancy{Discrepancy Found?}
+    checkDiscrepancy -->|No| drsManagement
+    checkDiscrepancy -->|Yes| submitAppeal[Submit DRS Appeal]
+    submitAppeal --> appealConfirmation[Display Submission Confirmation]
+    appealConfirmation --> drsManagement
+```
 
 ### 3.1.5 Calendar
+```mermaid
+flowchart TD
+    calendar[Calendar] --> viewCalendar[View Calendar]
+    viewCalendar --> selectPeriod[Select Date or Period]
+    selectPeriod --> displayEvents[Display Scheduled Activities]
+    displayEvents --> selectEvent[Select an Activity]
+    selectEvent --> eventDetails[View Activity Details]
+
+    calendar --> myRegistrations[My Registrations]
+    eventDetails --> myRegistrations
+```
 
 ### 3.1.6 AI Student Assistant
+```mermaid
+flowchart TD
+    assistant[AI Student Assistant] --> enterQuestion[Enter a Question]
+    enterQuestion --> processQuestion[Process Question]
+    processQuestion --> responseAvailable{Response Available?}
+
+    responseAvailable -->|Yes| displayResponse[Display Response]
+    displayResponse --> followUp{Ask Follow-up Question?}
+    followUp -->|Yes| enterQuestion
+    followUp -->|No| endConversation[End Conversation]
+
+    responseAvailable -->|No| displayError[Display Error or Limitation]
+    displayError --> enterQuestion
+```
 
 ### 3.1.7 University Services
+```mermaid
+flowchart TD
+    universityServices[University Services] --> browseServices[Browse Available Services]
+    browseServices --> selectService[Select a Service]
+    selectService --> serviceType{Service Type}
+
+    serviceType -->|Internal| internalService[Open Internal Service Information]
+    serviceType -->|External| externalService[Open External University Service]
+
+    internalService --> universityServices
+    externalService --> returnToPlatform[Return to myHCMUS]
+    returnToPlatform --> universityServices
+```
 
 ### 3.1.8 Profile
+```mermaid
+flowchart TD
+    profile[Profile] --> viewProfile[View Profile Information]
+    viewProfile --> editProfile[Edit Profile]
+    editProfile --> updateInformation[Update Editable Fields]
+    updateInformation --> validateInformation{Information Valid?}
+
+    validateInformation -->|Yes| saveChanges[Save Changes]
+    saveChanges --> updateSuccess[Display Success Message]
+    updateSuccess --> profile
+
+    validateInformation -->|No| displayValidationError[Display Validation Errors]
+    displayValidationError --> editProfile
+
+    viewProfile --> changePassword[Change Password]
+    changePassword --> verifyPassword[Verify Required Credentials]
+    verifyPassword --> passwordResult{Password Change Successful?}
+    passwordResult -->|Yes| passwordSuccess[Display Success Message]
+    passwordResult -->|No| passwordError[Display Error Message]
+    passwordError --> changePassword
+    passwordSuccess --> profile
+```
 
 ### 3.1.9 Notifications
+```mermaid
+flowchart TD
+    notifications[Notifications] --> viewNotifications[View Notifications]
+    viewNotifications --> selectNotification[Select a Notification]
+    selectNotification --> notificationDetails[View Notification Details]
+    notificationDetails --> relatedContent{Related Content Available?}
+
+    relatedContent -->|Yes| openRelatedPage[Open Related Page]
+    relatedContent -->|No| returnToNotifications[Return to Notifications]
+
+    openRelatedPage --> endFlow[Continue Using Platform]
+    returnToNotifications --> notifications
+
+    viewNotifications --> markAsRead[Mark Notification as Read]
+    markAsRead --> updateReadStatus[Update Read Status]
+    updateReadStatus --> notifications
+```
 
 ## 3.2 Organizer Flow
 

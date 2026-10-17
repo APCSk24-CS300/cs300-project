@@ -5,3 +5,15 @@
 
 ## ======== Sprint 1 &mdash; 17/10 Review meeting ========
 ![review-tasks](../../../assets/PA1-review-meeting-tasks.png)
+
+### Presence
+Team members present:
+- Kỳ
+- Lạc
+- Thịnh
+- Trang
+- Khôi
+- Tĩnh
+
+Team members absent:
+- None

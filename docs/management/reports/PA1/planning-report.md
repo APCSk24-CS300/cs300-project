@@ -4,7 +4,7 @@
 **Editors**: Trần Tôn Minh Kỳ  
 
 ## ======== Sprint 1 &mdash; 2/10 Planning meeting ========
-![planning-tasks](../assets/PA1-planning-meeting-tasks.png)
+![planning-tasks](../../../assets/PA1-planning-meeting-tasks.png)
 
 ### Presence
 Team members present:

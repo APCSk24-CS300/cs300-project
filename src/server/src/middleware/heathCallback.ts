@@ -6,11 +6,6 @@ import { generate200Response } from '../helper/generate200Response.ts'
 
 export const healthCallback = async (req: Request, res: Response, next: NextFunction) => {
 
-    const timestamp: string = new Date().toLocaleString(
-        'vi-VN',
-        { timeZone: 'Asia/Ho_Chi_Minh' }
-    )
-
     // check server and database
     const checks = {
         server: checkServer(),
@@ -20,11 +15,10 @@ export const healthCallback = async (req: Request, res: Response, next: NextFunc
     let response : ServiceResponse = new ServiceResponse;
 
     // Are BOTH server AND database healthy (not down)?
-    const bothHealthy = Object.values(checks).every(check => check.status !== 'down');
+    const bothHealthy = Object.values(checks).every(check => check.up !== 'False');
     if (bothHealthy) {
         const data = {
-            status : 'OK',
-            timestamp: timestamp,
+            status : 'healthy',
             checks: checks
         };
         response = generate200Response(data);
@@ -33,8 +27,7 @@ export const healthCallback = async (req: Request, res: Response, next: NextFunc
     else {
         // TODO: Refactor this to get503Response() function later
         const data = {
-            status : "Service Unavailable",
-            timestamp: timestamp,
+            status : 'degraded',
             checks: checks
         };
         response.success = false;

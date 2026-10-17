@@ -1,6 +1,6 @@
-export type CheckStatus = 'up' | 'down' | 'not_configured';
+export type CheckStatus = 'True' | 'False';
 
 export interface CheckResult {
-	status: CheckStatus,
+	up: CheckStatus,
 	[detail: string]: unknown
 }

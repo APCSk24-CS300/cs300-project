@@ -6,7 +6,7 @@
 ## Team Information
 
 **Course:** CS300 - Elements of Software Engineering  
-**Project:** TBD  
+**Project:** myHCMUS  
 **Team Name:** debug docker vào 25h sáng  
 **Date Created:** 5/10/2026  
 **Contract Version:** v1.0

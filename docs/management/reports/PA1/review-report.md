@@ -17,3 +17,9 @@ Team members present:
 
 Team members absent:
 - None
+
+### What went well?
+
+### What went wrong and what caused it?
+
+### What did we learn?

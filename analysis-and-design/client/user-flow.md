@@ -337,6 +337,13 @@ flowchart TD
 - [Student Dashboard](./pages/student.md#student-dashboard)
 
 ### 3.1.3 My Registrations
+
+**Page Description:** [My Registrations](./pages/student.md#my-registrations)
+
+**Actor:** Student
+
+#### Main Flow
+
 ```mermaid
 flowchart TD
     myRegistrations[My Registrations] --> viewRegistrations[View Registered Activities]
@@ -356,6 +363,24 @@ flowchart TD
     checkCancellation -->|No| cancellationUnavailable[Display Cancellation Unavailable Message]
     cancellationUnavailable --> registrationDetails
 ```
+
+1. User opens [My Registrations](./pages/student.md#my-registrations).
+2. System displays the student's registered activities and their current registration statuses.
+3. User selects a registration to view its details.
+4. User can navigate to the corresponding [Activity Details](./pages/student.md#activity-details).
+5. System checks whether cancellation is currently allowed for the selected registration.
+6. If cancellation is unavailable, the system displays an appropriate message.
+7. If cancellation is allowed, the student can request cancellation.
+8. System asks the student to confirm the cancellation.
+9. If the student confirms, the system cancels the registration and updates its status.
+10. If the student does not confirm, the system returns to the registration details.
+11. User can return to the list of registered activities.
+
+
+### Exit Points
+- [Activity Details](./pages/student.md#activity-details)
+- [Student Dashboard](./pages/student.md#student-dashboard)
+- [Activities](./pages/student.md#activities)
 
 ### 3.1.4 DRS Management
 ```mermaid

@@ -251,7 +251,7 @@ flowchart TD
 
 **Actor:** Student
 
-
+#### Main Flow
 ```mermaid
 flowchart TD
     dashboard[Student Dashboard] --> viewOverview[View Dashboard Overview]
@@ -279,7 +279,7 @@ flowchart TD
 7. User can select a notification to view its details.
 8. User can navigate directly to [Activities](./pages/student.md#activities), [Calendar](./pages/student.md#calendar), or [AI Student Assistant](./pages/student.md#ai-student-assistant).
 
-### Exit Points
+#### Exit Points
 - [Activity Details](./pages/student.md#activity-details)
 - [Activities](./pages/student.md#activities)
 - [My Registrations](./pages/student.md#my-registrations)
@@ -290,6 +290,13 @@ flowchart TD
 
 
 ### 3.1.2 Activities
+
+**Page Description:** [Activities](./pages/student.md#activities)
+
+**Actor:** Student
+
+#### Main Flow
+
 ```mermaid
 flowchart TD
     activities[Activities Page] --> browseActivities[Browse Activities]
@@ -311,6 +318,23 @@ flowchart TD
 
     activities --> myRegistrations
 ```
+
+1. User opens the [Activities](./pages/student.md#activities) page.
+2. System displays available activities.
+3. User browses activities or searches and filters activities based on available criteria.
+4. User selects an activity to view its [Activity Details](./pages/student.md#activity-details).
+5. System checks whether the student is eligible to register for the activity.
+6. If the student is not eligible, the system displays the eligibility requirements or an appropriate message.
+7. If the student is eligible, the system checks whether registration is currently available.
+8. If registration is unavailable, the system displays an appropriate message.
+9. If registration is available, the student can submit a registration request.
+10. System processes the registration and displays the registration result.
+11. After a successful registration, the student can navigate to [My Registrations](./pages/student.md#my-registrations).
+
+#### Exit Points
+- [Activity Details](./pages/student.md#activity-details)
+- [My Registrations](./pages/student.md#my-registrations)
+- [Student Dashboard](./pages/student.md#student-dashboard)
 
 ### 3.1.3 My Registrations
 ```mermaid

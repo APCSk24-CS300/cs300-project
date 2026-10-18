@@ -246,6 +246,12 @@ flowchart TD
 ## 3.1 Student Flow
 
 ### 3.1.1 Student Dashboard
+
+**Page Description:** [Student Dashboard](./pages/student.md#student-dashboard)
+
+**Actor:** Student
+
+
 ```mermaid
 flowchart TD
     dashboard[Student Dashboard] --> viewOverview[View Dashboard Overview]
@@ -263,6 +269,24 @@ flowchart TD
     dashboard --> calendar[Calendar]
     dashboard --> assistant[AI Student Assistant]
 ```
+
+1. User opens the [Student Dashboard](./pages/student.md#student-dashboard).
+2. System displays an overview of the student's current activities and information.
+3. User can view upcoming activities, registration summary, DRS summary, and recent notifications.
+4. User can navigate from an upcoming activity to its [Activity Details](./pages/student.md#activity-details).
+5. User can navigate from the registration summary to [My Registrations](./pages/student.md#my-registrations).
+6. User can navigate from the DRS summary to [DRS Management](./pages/student.md#drs-management).
+7. User can select a notification to view its details.
+8. User can navigate directly to [Activities](./pages/student.md#activities), [Calendar](./pages/student.md#calendar), or [AI Student Assistant](./pages/student.md#ai-student-assistant).
+
+### Exit Points
+- [Activity Details](./pages/student.md#activity-details)
+- [Activities](./pages/student.md#activities)
+- [My Registrations](./pages/student.md#my-registrations)
+- [DRS Management](./pages/student.md#drs-management)
+- [Calendar](./pages/student.md#calendar)
+- [AI Student Assistant](./pages/student.md#ai-student-assistant)
+- [Notification Details](./pages/student.md#notification-details)
 
 
 ### 3.1.2 Activities

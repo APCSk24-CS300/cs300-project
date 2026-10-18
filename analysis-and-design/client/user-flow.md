@@ -5,6 +5,55 @@ target users: University students and staff at VNU-HCMUS.
 user's role: Student, Organizer and Administrator
 ---
 
+# Table of Contents
+
+- [1. Global Navigation Flow](#1-global-navigation-flow)
+  - [1.1 Entry Point](#11-entry-point)
+  - [1.2 Public Navigation](#12-public-navigation)
+  - [1.3 Authentication Navigation](#13-authentication-navigation)
+  - [1.4 Role-Based Direction](#14-role-based-direction)
+  - [1.5 Authenticated Navigation](#15-authenticated-navigation)
+
+- [2. Public User Flow](#2-public-user-flow)
+  - [2.1 Landing Page Flow](#21-landing-page-flow)
+  - [2.2 Login Page Flow](#22-login-page-flow)
+  - [2.3 Forgot Password Flow](#23-forgot-password-flow)
+  - [2.4 Reset Password Flow](#24-reset-password-flow)
+  - [2.5 Help / Guide Flow](#25-help--guide-flow)
+
+- [3. Authenticated User Flow](#3-authenticated-user-flow)
+  - [3.1 Student Flow](#31-student-flow)
+    - [3.1.1 Student Dashboard](#311-student-dashboard)
+    - [3.1.2 Activities](#312-activities)
+    - [3.1.3 My Registrations](#313-my-registrations)
+    - [3.1.4 DRS Management](#314-drs-management)
+    - [3.1.5 Calendar](#315-calendar)
+    - [3.1.6 AI Student Assistant](#316-ai-student-assistant)
+    - [3.1.7 University Services](#317-university-services)
+    - [3.1.8 Profile](#318-profile)
+    - [3.1.9 Notifications](#319-notifications)
+    - [3.1.10 Student Flow Overview](#3110-student-flow-overview)
+
+  - [3.2 Organizer Flow](#32-organizer-flow)
+    - [3.2.1 Organizer Dashboard](#321-organizer-dashboard)
+    - [3.2.2 Activity Management](#322-activity-management)
+    - [3.2.3 Registration Management](#323-registration-management)
+    - [3.2.4 Attendance and Results](#324-attendance-and-results)
+    - [3.2.5 Appeals](#325-appeals)
+    - [3.2.6 Reports](#326-reports)
+    - [3.2.7 Profile](#327-profile)
+    - [3.2.8 Organizer Flow Overview](#328-organizer-flow-overview)
+
+  - [3.3 Administrator Flow](#33-administrator-flow)
+    - [3.3.1 Administrator Dashboard](#331-administrator-dashboard)
+    - [3.3.2 User Management](#332-user-management)
+    - [3.3.3 Activity Categories](#333-activity-categories)
+    - [3.3.4 System Configuration](#334-system-configuration)
+    - [3.3.5 Reports and Analytics](#335-reports-and-analytics)
+    - [3.3.6 Audit Logs](#336-audit-logs)
+    - [3.3.7 Profile](#337-profile)
+    - [3.3.8 Admin Flow Overview](#338-admin-flow-overview)
+
 # 1. Global Navigation Flow
 
 ## 1.1 Entry Point
@@ -41,7 +90,7 @@ After the authentication succeeds and identifies the user's role, redirect to th
 - **Organizer**: [Organizer Dashboard](./pages/organizer.md#dashboard).
 - **Administrator**: [Admin Dashboard](./pages/admin.md#dashboard).
 
-## 1.5 Authentication Navigation
+## 1.5 Authenticated Navigation
 
 Authenticated users can access with role-based pages on the sidebar navigation:
 
@@ -706,28 +755,4 @@ flowchart TD
 
 ### 3.3.7 Profile
 
-# 4. Cross-role User Flows
-
-## 4.1 Activity Registration and Participation
-
-## 4.2 Attendance and DRS Result Submission
-
-## 4.3 DRS Appeal and Resolution
-
-## 4.4 Activity Cancellation and Notifications
-
-# 5. Alternative and Error Flows
-
-## 5.1 Authentication Failure
-
-## 5.2 Unauthorized Access
-
-## 5.3 Registration Deadline Passed
-
-## 5.4 Activity Capacity Reached
-
-## 5.5 Schedule Conflict
-
-## 5.6 Activity Cancelled
-
-## 5.7 Session Expiration
+### 3.3.8 Admin Flow Overview

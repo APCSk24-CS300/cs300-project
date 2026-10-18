@@ -377,12 +377,19 @@ flowchart TD
 11. User can return to the list of registered activities.
 
 
-### Exit Points
+#### Exit Points
 - [Activity Details](./pages/student.md#activity-details)
 - [Student Dashboard](./pages/student.md#student-dashboard)
 - [Activities](./pages/student.md#activities)
 
 ### 3.1.4 DRS Management
+
+**Page Description:** [DRS Management](./pages/student.md#drs-management)
+
+**Actor:** Student
+
+#### Main Flow
+
 ```mermaid
 flowchart TD
     drsManagement[DRS Management] --> viewDRSSummary[View DRS Summary]
@@ -396,6 +403,22 @@ flowchart TD
     submitAppeal --> appealConfirmation[Display Submission Confirmation]
     appealConfirmation --> drsManagement
 ```
+
+1. User opens [DRS Management](./pages/student.md#drs-management).
+2. System displays the student's DRS summary and accumulated training scores.
+3. User views their DRS records by semester or evaluation criteria.
+4. User selects a DRS record to view its details.
+5. System displays the participation and score information associated with the record.
+6. User checks whether the displayed information is correct.
+7. If no discrepancy is found, the user can return to DRS Management.
+8. If a discrepancy is found, the student can submit a DRS appeal.
+9. System records the appeal and displays a submission confirmation.
+10. The student can return to [DRS Management](./pages/student.md#drs-management) to track the updated record or appeal status.
+
+#### Exit Points
+- [Student Dashboard](./pages/student.md#student-dashboard)
+- [Appeals](./pages/student.md#appeals)
+- [Activity Details](./pages/student.md#activity-details)
 
 ### 3.1.5 Calendar
 ```mermaid

@@ -460,7 +460,8 @@ flowchart TD
 **Actor:** Student
 
 #### Main Flow
-<!-- TBD -->
+Status: TBD 
+
 ```mermaid
 flowchart TD
     assistant[AI Student Assistant] --> enterQuestion[Enter a Question]
@@ -500,11 +501,16 @@ flowchart TD
 1. User opens [University Services](./pages/student.md#university-services).
 2. System displays available university services.
 3. User browses the available services and selects a service.
-6. The system opens the corresponding university platform.
-7. After using an service, the user can return to myHCMUS.
+4. The system opens the corresponding university platform.
+5. After using an service, the user can return to myHCMUS.
 
 ### 3.1.8 Profile
 
+**Page Description:** [Profile](./pages/common.md#profile)
+
+**Actor:** Student
+
+#### Main flow
 
 ```mermaid
 flowchart TD
@@ -529,9 +535,28 @@ flowchart TD
     passwordSuccess --> profile
 ```
 
+1. User opens the [Profile](./pages/common.md#profile).
+2. System displays the user's profile information.
+3. User can edit their personal and academic information.
+4. User submits the updated information.
+5. System validates the submitted information.
+6. If the information is invalid, the system displays validation errors and allows the user to correct the information.
+7. If the information is valid, the system saves the changes and displays a success message.
+8. User can also change their password.
+9. System verifies the required credentials and processes the password change.
+10. If the password change fails, the system displays an error and allows the user to retry.
+11. If the password change succeeds, the system displays a success message.
+
 ### 3.1.9 Notifications
+
+**Page Description:** [Notifications](./pages/student.md#notifications)
+
+**Actor:** Student
+
+#### Main flow
+Status: TBD
 ```mermaid
-flowchart TD
+ flowchart TD
     notifications[Notifications] --> viewNotifications[View Notifications]
     viewNotifications --> selectNotification[Select a Notification]
     selectNotification --> notificationDetails[View Notification Details]
@@ -545,7 +570,71 @@ flowchart TD
 
     viewNotifications --> markAsRead[Mark Notification as Read]
     markAsRead --> updateReadStatus[Update Read Status]
-    updateReadStatus --> notifications
+    updateReadStatus --> notifications 
+```
+
+### 3.1.10 Student Flow Overview
+
+```mermaid
+flowchart TD
+    studentDashboard[Student Dashboard]
+
+    studentDashboard --> activities[Activities]
+    studentDashboard --> myRegistrations[My Registrations]
+    studentDashboard --> drsManagement[DRS Management]
+    studentDashboard --> calendar[Calendar]
+    studentDashboard --> assistant[AI Student Assistant]
+    studentDashboard --> universityServices[University Services]
+    studentDashboard --> profile[Profile]
+    studentDashboard --> notifications[Notifications]
+
+    activities --> activityDetails[Activity Details]
+    activityDetails --> registrationCheck{Eligible and Registration Available?}
+
+    registrationCheck -->|Yes| submitRegistration[Submit Registration]
+    submitRegistration --> myRegistrations
+
+    registrationCheck -->|No| activities
+
+    myRegistrations --> registrationDetails[Registration Details]
+    registrationDetails --> activityDetails
+    registrationDetails --> cancellationCheck{Cancellation Allowed?}
+
+    cancellationCheck -->|Yes| cancelRegistration[Cancel Registration]
+    cancelRegistration --> myRegistrations
+    cancellationCheck -->|No| myRegistrations
+
+    drsManagement --> drsRecords[DRS Records]
+    drsRecords --> drsRecordDetails[DRS Record Details]
+    drsRecordDetails --> discrepancyCheck{Discrepancy Found?}
+
+    discrepancyCheck -->|Yes| submitAppeal[Submit DRS Appeal]
+    submitAppeal --> drsManagement
+    discrepancyCheck -->|No| drsManagement
+
+    calendar --> scheduledActivity[Scheduled Activity]
+    scheduledActivity --> activityDetails
+    calendar --> myRegistrations
+
+    assistant --> activities
+    assistant --> calendar
+    assistant --> universityServices
+
+    universityServices --> externalService[External University Service]
+    externalService --> universityServices
+
+    notifications --> notificationDetails[Notification Details]
+    notificationDetails --> relatedPage{Related Content?}
+
+    relatedPage -->|Yes| relatedContent[Open Related Page]
+    relatedPage -->|No| notifications
+
+    relatedContent --> activities
+    relatedContent --> myRegistrations
+    relatedContent --> drsManagement
+
+    profile --> studentDashboard
+
 ```
 
 ## 3.2 Organizer Flow
@@ -599,7 +688,6 @@ flowchart TD
     reportAction -->|Export Report| reports
 
     profile --> organizerDashboard
-
 ```
 
 ## 3.3 Administrator Flow

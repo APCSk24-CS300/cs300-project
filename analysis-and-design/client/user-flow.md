@@ -421,6 +421,13 @@ flowchart TD
 - [Activity Details](./pages/student.md#activity-details)
 
 ### 3.1.5 Calendar
+
+**Page Description:** [Calendar](./pages/student.md#calendar)
+
+**Actor:** Student
+
+#### Main flow
+
 ```mermaid
 flowchart TD
     calendar[Calendar] --> viewCalendar[View Calendar]
@@ -433,7 +440,27 @@ flowchart TD
     eventDetails --> myRegistrations
 ```
 
+1. User opens the [Calendar](./pages/student.md#calendar).
+2. System displays the student's scheduled activities and relevant events.
+3. User selects a date or period to view activities within that period.
+4. System displays the scheduled activities.
+5. User selects an activity to view its [Activity Details](./pages/student.md#activity-details).
+6. User can navigate from the calendar to [My Registrations](./pages/student.md#my-registrations).
+
+#### Exit Points
+- [Activity Details](./pages/student.md#activity-details)
+- [My Registrations](./pages/student.md#my-registrations)
+- [Student Dashboard](./pages/student.md#student-dashboard)
+
+
 ### 3.1.6 AI Student Assistant
+
+**Page Description:** [AI Student Assistant](./pages/student.md#ai-student-assistant)
+
+**Actor:** Student
+
+#### Main Flow
+<!-- TBD -->
 ```mermaid
 flowchart TD
     assistant[AI Student Assistant] --> enterQuestion[Enter a Question]
@@ -450,6 +477,12 @@ flowchart TD
 ```
 
 ### 3.1.7 University Services
+
+**Page Description:** [University Services](./pages/student.md#university-services)
+
+**Actor:** Student
+#### Main flow
+
 ```mermaid
 flowchart TD
     universityServices[University Services] --> browseServices[Browse Available Services]
@@ -464,7 +497,15 @@ flowchart TD
     returnToPlatform --> universityServices
 ```
 
+1. User opens [University Services](./pages/student.md#university-services).
+2. System displays available university services.
+3. User browses the available services and selects a service.
+6. The system opens the corresponding university platform.
+7. After using an service, the user can return to myHCMUS.
+
 ### 3.1.8 Profile
+
+
 ```mermaid
 flowchart TD
     profile[Profile] --> viewProfile[View Profile Information]

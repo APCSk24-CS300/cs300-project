@@ -12,11 +12,14 @@ The business record connects **activity → registration → attendance and veri
 
 # Actors
 
-| Actor | Role in myHCMUS |
+| Actor | Role |
 | --- | --- |
 | **Student** | Maintains a profile; discovers activities; checks schedules, eligibility, and training-score criteria; registers or cancels within the allowed period; tracks registration, participation, and scores; and submits recognition requests or appeals with supporting evidence. The student also receives activity updates and recommendations. |
 | **Activity organizer** | Creates and manages activities, schedules, capacity, requirements, announcements, and participant lists; reviews applications and waiting lists; records attendance and verified participation; submits results for training scores; and views activity statistics or exports reports. |
-| **Staff reviewer** | Reviews requests to recognize activities and appeals about participation records or training scores, verifies submitted evidence, responds to students, and updates request status. This is a staff responsibility; the proposal does not specify whether it is a separate account role. |
+| **Staff reviewer** | Reviews requests to recognize activities and appeals about participation records or training scores, verifies submitted evidence, responds to students, and updates request status. |
 | **System administrator** | Configures system-wide settings and training-score criteria, and views reports and statistics covering activities, registrations, and score distribution. |
 
 A person may hold more than one staff responsibility. The system uses account roles to determine which actions and information each person can access.
+
+# Schema design
+## References entities

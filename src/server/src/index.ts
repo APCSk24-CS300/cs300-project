@@ -15,7 +15,7 @@ import config from './config/config.ts';
 // callbacks
 import errorHandler from './middleware/errorHandler.ts';
 import { rootCallback } from './middleware/rootCallback.ts';
-import { healthCallback } from './middleware/heathCallback.ts';
+import { healthCallback } from './middleware/healthCallback.ts';
 import { nonexistentRouteCallback } from './middleware/nonexistentRouteCallback.ts';
 
 

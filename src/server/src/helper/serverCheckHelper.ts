@@ -2,7 +2,7 @@ import type { CheckResult } from '../types/CheckResult.ts';
 
 export function checkServer(): CheckResult {
 	return {
-		up: 'True',
+		up: true,
 		uptime: process.uptime()
 	};
 }

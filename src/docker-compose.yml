@@ -15,6 +15,7 @@ services:
     restart: unless-stopped
 
   db:
+    container_name: myHCMUS-db
     image: postgres:18
     restart: always
     env_file:

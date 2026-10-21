@@ -21,6 +21,19 @@ The business record connects **activity → registration → attendance and veri
 
 A person may hold more than one staff responsibility. The system uses account roles to determine which actions and information each person can access.
 
+# Real-world working assumptions
+
+- Each user has one university identity in myHCMUS, which translates to one User row; they also get one role only, prioritizing the one with higher privilege. For example, a student working as a club board member or class monitor can receive user role Organizer instead of Student so they can post activities.
+- The university provides or verifies a student's number and faculty before those details are used for registration eligibility. Staff accounts may have no student number or faculty.
+- Administrators maintain the faculty list, academic semesters, score criteria, and staff role assignments. Organizers manage only activities assigned to them, and reviewers decide appeals using submitted evidence.
+- Each activity is managed within one semester. If a activity spans one semester but its evidence can be used for score addition in another, such as blood donation, user receives no score until they submit an appeal. This is how the current training score system is designed too.
+- Registration capacity counts approved students. Pending and waitlisted applications do not reserve seats (we have to define the limit of waitlisted students also); an organizer **may** need to review applications before approval in certain cases, so it is reasonable to provide them the ability to do that.
+- An organizer records attendance for each scheduled session and verifies participation before scores are awarded. The current flow is successful registration -> verified attendance -> participation update. An attendance record alone does not automatically earn a score.
+- Training-score criteria and their maximum points are treated as fixed for records already awarded. A later policy change is applied to future activities or semesters without silently changing historical scores.
+- Recognition of an activity outside the platform requires a student request and reviewer approval. The approved recognition is recorded separately from ordinary activity registrations; staff may put it in one of the existing criteria of their choice (putting external activity in a new criterion is not encouraged because it would not follow the training score calculation scheme of our university).
+- University services, if they are of relevant concern, are external destinations linked from the hub; their account data and transactions remain with those services. 
+- AI recommendations are advisory and do not change any important information such as registrations or scores.
+
 # Schema design
 
 The schema uses one **User** entity for every student or staff member. Roles are assigned through **UserRole** and resolved through the **Role** and **RolePermission** reference data. A user can therefore act as both an organizer and a reviewer without duplicate accounts or separate person tables. Role checks grant access to a workflow; ownership checks still restrict a student to their own records and an organizer to activities they manage.

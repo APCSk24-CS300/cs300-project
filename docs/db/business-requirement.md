@@ -115,13 +115,6 @@ The initial permission mapping is: students can manage their own profile and reg
 - Each `ActivityAnnouncement` belongs to exactly one `Activity` `(1, 1)` and has exactly one author `User` `(1, 1)`; each activity and each author may have `(0, N)` announcements.
 - Each `Notification` belongs to exactly one recipient `User` `(1, 1)` and may reference one `Activity` `(0, 1)`; each user and each activity may have `(0, N)` notifications.
 
-### Business rules
-
-- Application authorization checks both the role's permission and the scope of the target record.
-- Registration is allowed only while a published activity's registration window is open and its eligibility rules are met. Approved registrations cannot exceed capacity; overflow goes to the waiting list. Cancellation and promotion from the waiting list must be handled atomically.
-- Schedule conflict detection compares the sessions of a student's approved registrations. Scores are issued only after participation is verified. Score and appeal decisions retain the acting user and timestamps for traceability.
-- The AI assistant derives recommendations from UserInterest, activity category and schedule, registration history, and training-score gaps. A stored recommendation entity is unnecessary unless the product later needs to preserve recommendation history.
-
 ## Constraints
 
 ### Identity and access

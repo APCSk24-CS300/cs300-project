@@ -77,11 +77,34 @@ The initial permission mapping is: students can manage their own profile and reg
 
 ## Relationships and business rules
 
-- **User ↔ Role** is many-to-many through UserRole; **Role ↔ Permission** is many-to-many through RolePermission. Application authorization checks both the permission and the scope of the target record.
-- **Faculty → User**, **ActivityCategory → Activity**, and **Semester → Activity** are one-to-many. **User ↔ ActivityCategory** is many-to-many through UserInterest.
-- **Activity ↔ organizer User** is many-to-many through ActivityOrganizer. **Activity → ActivitySchedule**, **Activity → Registration**, and **Activity → ActivityAnnouncement** are one-to-many. **Activity ↔ Faculty** and **Activity ↔ ScoreCriterion** use ActivityEligibility and ActivityScore.
-- **User → Registration** is one-to-many; a user has at most one registration per activity. **Registration → Attendance** is one-to-many across its activity's sessions. **Registration → Participation** is zero-or-one. **Participation → TrainingScore** and **Recognition → TrainingScore** are one-to-many, with one score per criterion and exactly one source per score.
-- **User → Appeal** and **Appeal → AppealEvidence** are one-to-many. **Appeal → Recognition** is zero-or-one. A reviewer user may handle many appeals. **User → Notification** is one-to-many.
+### Cardinalities
+
+- Each `UserRole` links exactly one `User` `(1, 1)` and exactly one `Role` `(1, 1)`; each user may have `(0, N)` role assignments, and each role may be assigned to `(0, N)` users.
+- Each `RolePermission` links exactly one `Role` `(1, 1)` and exactly one `Permission` `(1, 1)`; each role may grant `(0, N)` permissions, and each permission may be granted by `(0, N)` roles.
+- Each `User` belongs to at most one `Faculty` `(0, 1)`; each faculty may have `(0, N)` users.
+- Each `UserInterest` links exactly one `User` `(1, 1)` and exactly one `ActivityCategory` `(1, 1)`; each user may select `(0, N)` categories, and each category may be selected by `(0, N)` users.
+- Each `Activity` has exactly one `ActivityCategory` `(1, 1)` and exactly one `Semester` `(1, 1)`; each category and semester may contain `(0, N)` activities.
+- Each `Activity` has exactly one creator `User` `(1, 1)`; each user may create `(0, N)` activities.
+- Each `ActivityOrganizer` links exactly one `Activity` `(1, 1)` and exactly one organizer `User` `(1, 1)`; each activity may have `(0, N)` assigned organizers, and each organizer may manage `(0, N)` activities.
+- Each `ActivitySchedule` belongs to exactly one `Activity` `(1, 1)`; each activity may have `(0, N)` scheduled sessions.
+- Each `ActivityEligibility` links exactly one `Activity` `(1, 1)` and exactly one `Faculty` `(1, 1)`; each activity may allow `(0, N)` faculties, and each faculty may be allowed for `(0, N)` activities.
+- Each `ActivityScore` links exactly one `Activity` `(1, 1)` and exactly one `ScoreCriterion` `(1, 1)`; each activity may offer `(0, N)` criteria, and each criterion may be offered by `(0, N)` activities.
+- Each `Registration` links exactly one `Activity` `(1, 1)` and exactly one student `User` `(1, 1)`; each activity and each student may have `(0, N)` registrations. Each student may register for a given activity at most once.
+- Each `Attendance` links exactly one `Registration` `(1, 1)` and exactly one `ActivitySchedule` `(1, 1)`; each registration and each session may have `(0, N)` attendance records. The registration and session must refer to the same activity.
+- Each `Participation` belongs to exactly one `Registration` `(1, 1)`; each registration may have `(0, 1)` participation result.
+- Each `TrainingScore` belongs to exactly one `ScoreCriterion` `(1, 1)` and exactly one `Semester` `(1, 1)`; each criterion and each semester may have `(0, N)` scores.
+- Each `TrainingScore` has either one `Participation` `(1, 1)` and no `Recognition` `(0, 0)`, or one `Recognition` `(1, 1)` and no `Participation` `(0, 0)`; each participation or recognition may support `(0, N)` scores, limited to one per criterion.
+- Each `ScoreChange` belongs to exactly one `TrainingScore` `(1, 1)` and may reference one `Appeal` `(0, 1)`; each score and each appeal may have `(0, N)` score changes.
+- Each `Appeal` is submitted by exactly one student `User` `(1, 1)` and may be reviewed by one reviewer `User` `(0, 1)`; each student may submit `(0, N)` appeals, and each reviewer may handle `(0, N)` appeals.
+- Each `Appeal` may reference one `Activity` `(0, 1)`, one `Registration` `(0, 1)`, and one `TrainingScore` `(0, 1)` according to its type; each of those records may be referenced by `(0, N)` appeals.
+- Each `AppealEvidence` belongs to exactly one `Appeal` `(1, 1)`; each appeal may include `(0, N)` evidence items.
+- Each `Recognition` belongs to exactly one approved `Appeal` `(1, 1)`, one student `User` `(1, 1)`, one `Semester` `(1, 1)`, and one `ScoreCriterion` `(1, 1)`; each appeal may produce `(0, 1)` recognition, while each student, semester, and criterion may be associated with `(0, N)` recognitions.
+- Each `ActivityAnnouncement` belongs to exactly one `Activity` `(1, 1)` and has exactly one author `User` `(1, 1)`; each activity and each author may have `(0, N)` announcements.
+- Each `Notification` belongs to exactly one recipient `User` `(1, 1)` and may reference one `Activity` `(0, 1)`; each user and each activity may have `(0, N)` notifications.
+
+### Business rules
+
+- Application authorization checks both the role's permission and the scope of the target record.
 - Registration is allowed only while a published activity's registration window is open and its eligibility rules are met. Approved registrations cannot exceed capacity; overflow goes to the waiting list. Cancellation and promotion from the waiting list must be handled atomically.
 - Schedule conflict detection compares the sessions of a student's approved registrations. Scores are issued only after participation is verified. Score and appeal decisions retain the acting user and timestamps for traceability.
 - The AI assistant derives recommendations from UserInterest, activity category and schedule, registration history, and training-score gaps. A stored recommendation entity is unnecessary unless the product later needs to preserve recommendation history.

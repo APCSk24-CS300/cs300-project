@@ -1,6 +1,4 @@
-export type CheckStatus = 'True' | 'False';
-
 export interface CheckResult {
-	up: CheckStatus,
+	up: Boolean,
 	[detail: string]: unknown
 }

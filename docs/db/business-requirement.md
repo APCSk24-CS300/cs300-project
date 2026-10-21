@@ -58,7 +58,7 @@ The schema uses one **User** entity for every student or staff member. `User.rol
 | **User** | `user_id` (PK), `role_id` (FK), `email` (UQ), `password_hash`, `full_name`, `student_number` (nullable, UQ), `faculty_id` (nullable FK), `avatar_url` (nullable), `is_active`, `created_at` | The sole account and profile entity. `role_id` is required. Student academic fields are populated when applicable; other staff may leave them null. Store only password hashes. |
 | **UserInterest** | `user_id` (FK), `category_id` (FK) | Composite PK (`user_id`, `category_id`). Optional preferences for discovery and recommendations. |
 
-The initial permission mapping is cumulative: `student` can manage personal profiles and registrations, view personal scores, and submit appeals; `organizer` adds management of assigned activities, registrations, attendance, announcements, participation results, and score adjustments; `reviewer` adds appeal review; `administrator` adds role assignment, criteria and settings management, and system-wide reports. Possessing a permission does not override record ownership or activity assignment.
+The initial permission mapping is cumulative, as in each higher role automatically includes all permissions granted to roles below it. `student` can manage personal profiles and registrations, view personal scores, and submit appeals; `organizer` adds management of assigned activities, registrations, attendance, announcements, participation results, and score adjustments; `reviewer` adds appeal review; `administrator` adds role assignment, criteria and settings management, and system-wide reports. 
 
 ## Activities and participation
 

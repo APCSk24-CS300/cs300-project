@@ -117,29 +117,26 @@ The initial permission mapping is: students can manage their own profile and reg
 
 ## Constraints
 
-### Identity and access
+### Explicit constraints
 
-- Each person has one `User` row. `email` is unique; a non-null `student_number` is unique. A user may hold several roles, but each (`user_id`, `role_id`) assignment occurs once.
-- Only active users may sign in or perform protected actions. A student must have the `student` role to register, submit an appeal, or receive a score. A student needs a faculty before registering for an activity restricted by faculty.
-- Authorization is evaluated from `UserRole → RolePermission → Permission`. An organizer must also be assigned to the activity they manage. Students may update their own profile, registrations, and appeals as the workflow permits, and may read their own scores; reviewers may act only on appeals assigned to or available to their review workflow.
-- Only administrators may assign privileged roles or change role permissions, score criteria, and service links. References to a user who made a decision remain intact even if that account is later deactivated.
+- All fields marked `UQ` in the entity tables are unique. 
+- `Registration(activity_id, user_id)` permits at most one registration per student per activity.
+- `TrainingScore(participation_id, criterion_id)` and `TrainingScore(recognition_id, criterion_id)` each permit at most one score award per source and criterion.
+- A `CHECK` on `TrainingScore` requires exactly one of `participation_id` and `recognition_id` to be non-null. Checks also restrict `status` and `type` columns to their allowed values.
+- Date checks require `Semester.starts_at < Semester.ends_at`, `Activity.registration_opens_at < Activity.registration_closes_at`, and `ActivitySchedule.starts_at < ActivitySchedule.ends_at`. 
+- Numeric checks require:
+    - Positive activity capacity
+    - Nonnegative criterion maximums, advertised points, awarded points, and score-change values. 
+    - Negative score for activity that results in training score deduction (violations).
 
-### Keys and valid values
+### Semantic constraints
 
-- All FKs must reference an existing row. Required IDs, names, timestamps, and status fields are non-null. Composite PKs and UQ constraints listed above prevent duplicate role assignments, registrations, attendance records, and score awards.
-- `status` and `type` fields accept only values defined for their workflow. The application must reject invalid status transitions, such as approving a cancelled registration or editing a resolved appeal without reopening it.
-- `Semester.starts_at < Semester.ends_at`, `Activity.registration_opens_at < Activity.registration_closes_at`, and `ActivitySchedule.starts_at < ActivitySchedule.ends_at`. Activity capacity is positive; advertised, awarded, and adjusted points are nonnegative and must respect the criterion's maximum.
-
-### Registration and participation
-
-- A student may register only for a published activity during its registration window and only if they meet its eligibility rules. A faculty-restricted activity requires a matching `ActivityEligibility` row. One student has at most one `Registration` row per activity, or, in other words, they can only register for an activity once.
-- The number of approved registrations must not exceed `Activity.capacity`. Approval, cancellation, and waiting-list promotion must update the count and status in one transaction so concurrent requests cannot overbook the activity.
-- An `Attendance` row must join a registration and a schedule for the same activity. Only an organizer assigned to that activity may record attendance or verify participation. A verified `Participation` requires an approved registration and sufficient attendance or other documented evidence.
-- Schedule conflict checks compare a student's approved activity sessions before approving another registration. A conflict must be surfaced to the student or organizer according to the registration workflow.
-
-### Scores and appeals
-
-- A `TrainingScore` has exactly one source: a verified `Participation` or an approved `Recognition`. Its semester must match that source. For internal activities, its criterion must be listed in `ActivityScore`; for recognition, it must match `Recognition.criterion_id`. A source receives at most one award per criterion.
-- An `Appeal` for participation correction must reference the student's own registration; a score correction must reference the student's own score. An outside-activity recognition request may have no existing activity or registration. Only an approved recognition appeal may create a `Recognition` row, and its student must be the appeal submitter.
-- A reviewed appeal records the reviewer, response, and review time. Score corrections record the previous value, new value, reason, actor, time, and related appeal when applicable in `ScoreChange`; the score update and history insert occur in one transaction.
+- Account creation and profile updates must prevent one real person from using multiple accounts. The university verifies a student's number and faculty before those details are used for eligibility. Only active users may sign in or perform protected actions.
+- Authorization uses `UserRole → RolePermission → Permission`. Only administrators have the authority to update one's role
+- Registration requires a role with registration permission, a published activity, an open registration window, and satisfied eligibility rules. For a faculty-restricted activity, the student's faculty must match an `ActivityEligibility` row. The application rejects invalid status transitions, including approval of a cancelled registration.
+- Approved registrations must stay within activity capacity. Approval, cancellation, and waiting-list promotion run in a transaction with concurrency control so simultaneous requests cannot overbook an activity. Schedule conflicts between approved registrations must be checked and surfaced in the registration workflow.
+- An attendance record must pair a registration and session from the same activity. Only an assigned organizer may record attendance or verify participation. Verification requires an approved registration and sufficient attendance or other documented evidence.
+- A score requires verified participation or approved recognition and a valid criterion. Advertised, awarded, and adjusted points must not exceed the linked criterion's maximum for each individual activity.
+- A participation correction appeal must reference the submitter's registration; a score correction appeal must reference the submitter's score. Only an approved recognition appeal may create a `Recognition`, whose student matches the appeal submitter. A resolved appeal cannot be changed without reopening it.
+- A completed review records its reviewer, response, and review time. Every score adjustment records the old and new points, reason, actor, time, and related appeal when applicable. The score update and `ScoreChange` insert occur in one transaction so the audit history remains complete.
 

@@ -15,7 +15,7 @@ export const healthCallback = async (req: Request, res: Response, next: NextFunc
     let response : ServiceResponse = new ServiceResponse;
 
     // Are BOTH server AND database healthy (not down)?
-    const bothHealthy = Object.values(checks).every(check => check.up !== 'False');
+    const bothHealthy = Object.values(checks).every(check => check.up !== false);
     if (bothHealthy) {
         const data = {
             status : 'healthy',

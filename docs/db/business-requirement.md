@@ -70,11 +70,11 @@ The initial permission mapping is: students can manage their own profile and reg
 | **ActivityOrganizer** | `activity_id` (FK), `user_id` (FK) | Composite PK (`activity_id`, `user_id`). Only users with the organizer role may be assigned. Supports multiple organizers per activity. |
 | **ActivitySchedule** | `schedule_id` (PK), `activity_id` (FK), `starts_at`, `ends_at`, `location` | One activity may have several sessions. Start precedes end; these intervals support calendar and conflict checks. |
 | **ActivityEligibility** | `activity_id` (FK), `faculty_id` (FK) | Composite PK (`activity_id`, `faculty_id`). If an activity has no rows here, it is open to all faculties; otherwise, only listed faculties are eligible. |
-| **ActivityScore** | `activity_id` (FK), `criterion_id` (FK), `points` | Composite PK (`activity_id`, `criterion_id`). Advertised score for verified participation; points are nonnegative and cannot exceed the criterion maximum. |
+| **ActivityScore** | `activity_id` (FK), `criterion_id` (FK), `points` | Composite PK (`activity_id`, `criterion_id`). Advertised score for verified participation; positive points award credit, while negative points mark a violation deduction. The point magnitude cannot exceed the criterion maximum. |
 | **Registration** | `registration_id` (PK), `activity_id` (FK), `user_id` (FK), `status`, `registered_at`, `decided_at` (nullable), `decided_by_user_id` (nullable FK) | UQ (`activity_id`, `user_id`) prevents duplicate applications. Status covers pending, approved, waitlisted, rejected, and cancelled. The registrant must have the student role. |
 | **Attendance** | `schedule_id` (FK), `registration_id` (FK), `status`, `recorded_by_user_id` (FK), `recorded_at` | Composite PK (`schedule_id`, `registration_id`). Status covers present, absent, and excused. The schedule and registration must belong to the same activity. |
 | **Participation** | `participation_id` (PK), `registration_id` (FK, UQ), `verified_by_user_id` (FK), `verified_at`, `status` | One final participation result per registration. Verification is based on attendance or other documented evidence; only approved registrations can become verified. |
-| **TrainingScore** | `score_id` (PK), `participation_id` (nullable FK), `recognition_id` (nullable FK), `criterion_id` (FK), `semester_id` (FK), `points_awarded`, `awarded_at`, `awarded_by_user_id` (FK) | Exactly one of `participation_id` and `recognition_id` is set. UQ (`participation_id`, `criterion_id`) and UQ (`recognition_id`, `criterion_id`) prevent duplicate awards. Internal scores use the activity's semester and advertised criterion; recognition scores use the approved recognition's semester and criterion. Points are nonnegative and within the criterion maximum. |
+| **TrainingScore** | `score_id` (PK), `participation_id` (nullable FK), `recognition_id` (nullable FK), `criterion_id` (FK), `semester_id` (FK), `points_awarded`, `awarded_at`, `awarded_by_user_id` (FK) | Exactly one of `participation_id` and `recognition_id` is set. UQ (`participation_id`, `criterion_id`) and UQ (`recognition_id`, `criterion_id`) prevent duplicate scores. Internal scores use the activity's semester and advertised criterion; recognition scores use the approved recognition's semester and criterion. Points may be negative for a violation deduction, with magnitude within the criterion maximum. |
 | **ScoreChange** | `change_id` (PK), `score_id` (FK), `appeal_id` (nullable FK), `old_points`, `new_points`, `changed_by_user_id` (FK), `changed_at`, `reason` | Audit trail for score adjustments. `old_points` must match the previous value; the history retains the original award and every change. |
 
 ## Appeals, updates, and services
@@ -119,24 +119,68 @@ The initial permission mapping is: students can manage their own profile and reg
 
 ### Explicit constraints
 
-- All fields marked `UQ` in the entity tables are unique. 
-- `Registration(activity_id, user_id)` permits at most one registration per student per activity.
-- `TrainingScore(participation_id, criterion_id)` and `TrainingScore(recognition_id, criterion_id)` each permit at most one score award per source and criterion.
-- A `CHECK` on `TrainingScore` requires exactly one of `participation_id` and `recognition_id` to be non-null. Checks also restrict `status` and `type` columns to their allowed values.
-- Date checks require `Semester.starts_at < Semester.ends_at`, `Activity.registration_opens_at < Activity.registration_closes_at`, and `ActivitySchedule.starts_at < ActivitySchedule.ends_at`. 
-- Numeric checks require:
-    - Positive activity capacity
-    - Nonnegative criterion maximums, advertised points, awarded points, and score-change values. 
-    - Negative score for activity that results in training score deduction (violations).
+- Every row has a non-null primary key.
+- Every non-null foreign key references an existing row.
+- Every field marked `UQ` in the entity tables rejects duplicate non-null values.
+- Each composite primary key in the entity tables rejects duplicate key tuples.
+- `Registration(activity_id, user_id)` is unique, including when the existing registration is cancelled or rejected.
+- `Participation.registration_id` is unique.
+- `Recognition.appeal_id` is unique.
+- `TrainingScore(participation_id, criterion_id)` is unique when `participation_id` is present.
+- `TrainingScore(recognition_id, criterion_id)` is unique when `recognition_id` is present.
+- A `TrainingScore` row has exactly one non-null source: `participation_id` or `recognition_id`.
+- `Activity.status` is one of `draft`, `published`, `cancelled`, or `completed`.
+- `Registration.status` is one of `pending`, `approved`, `waitlisted`, `rejected`, or `cancelled`.
+- `Attendance.status` is one of `present`, `absent`, or `excused`.
+- `Appeal.type` is one of `recognition`, `participation_correction`, or `score_correction`.
+- `Semester.starts_at` is earlier than `Semester.ends_at`.
+- `Activity.registration_opens_at` is earlier than `Activity.registration_closes_at`.
+- `ActivitySchedule.starts_at` is earlier than `ActivitySchedule.ends_at`.
+- `Activity.capacity` is greater than zero.
+- `ScoreCriterion.max_points` is at least zero.
 
 ### Semantic constraints
 
-- Account creation and profile updates must prevent one real person from using multiple accounts. The university verifies a student's number and faculty before those details are used for eligibility. Only active users may sign in or perform protected actions.
-- Authorization uses `UserRole → RolePermission → Permission`. Only administrators have the authority to update one's role
-- Registration requires a role with registration permission, a published activity, an open registration window, and satisfied eligibility rules. For a faculty-restricted activity, the student's faculty must match an `ActivityEligibility` row. The application rejects invalid status transitions, including approval of a cancelled registration.
-- Approved registrations must stay within activity capacity. Approval, cancellation, and waiting-list promotion run in a transaction with concurrency control so simultaneous requests cannot overbook an activity. Schedule conflicts between approved registrations must be checked and surfaced in the registration workflow.
-- An attendance record must pair a registration and session from the same activity. Only an assigned organizer may record attendance or verify participation. Verification requires an approved registration and sufficient attendance or other documented evidence.
-- A score requires verified participation or approved recognition and a valid criterion. Advertised, awarded, and adjusted points must not exceed the linked criterion's maximum for each individual activity.
-- A participation correction appeal must reference the submitter's registration; a score correction appeal must reference the submitter's score. Only an approved recognition appeal may create a `Recognition`, whose student matches the appeal submitter. A resolved appeal cannot be changed without reopening it.
-- A completed review records its reviewer, response, and review time. Every score adjustment records the old and new points, reason, actor, time, and related appeal when applicable. The score update and `ScoreChange` insert occur in one transaction so the audit history remains complete.
+- Before creating a `User`, account provisioning must check the verified university identity for an existing account and reuse it when found.
+- A student's `student_number` must be university-verified before the account is used for registration or appeals.
+- A student's `faculty_id` must be university-verified before it is used for activity eligibility.
+- A request from a user with `is_active = false` must be denied.
+- A protected action must match a `Permission` linked through one of the user's assigned roles.
+- Only a user with the administrator role may add or remove a `UserRole` assignment.
+- Only a user with the reviewer role may approve or reject an `Appeal`.
+- Only a user assigned through `ActivityOrganizer` may manage that activity or record its attendance.
+- A user may read or change a student-owned record only when it belongs to that user, unless a staff permission grants access to the relevant workflow.
+- A registration request must come from a user with registration permission.
+- An activity may be published only when it has at least one `ActivitySchedule` and one `ActivityOrganizer`.
+- A registration request must target an activity whose status is `published`.
+- A registration request at time `t` is accepted only when `registration_opens_at <= t < registration_closes_at`.
+- If an activity has `ActivityEligibility` rows, the student's `faculty_id` must match one of them.
+- A registration with status `cancelled` must not transition to `approved`.
+- The count of `approved` registrations for an activity must never exceed `Activity.capacity`.
+- Approval, cancellation, and waiting-list promotion must each lock or otherwise serialize the affected activity's registrations until the transaction commits.
+- Before approval, the application must report a schedule conflict when a new session starts before an approved session ends and the approved session starts before the new session ends.
+- An `Attendance` row may be created only when its registration and session belong to the same activity.
+- A `Participation` row may be verified only when its registration status is `approved`.
+- Before verifying participation, every scheduled session must have an `Attendance` result for the registration, or an approved correction appeal must document the missing attendance.
+- An internal `TrainingScore` may be created only for a verified `Participation`.
+- A recognition `TrainingScore` may be created only when its `Recognition` links to an approved `Appeal`.
+- An internal `TrainingScore.semester_id` must equal its activity's `semester_id`.
+- A recognition `TrainingScore.semester_id` must equal its `Recognition.semester_id`.
+- An internal `TrainingScore.criterion_id` must match an `ActivityScore` row for its activity.
+- A recognition `TrainingScore.criterion_id` must equal its `Recognition.criterion_id`.
+- The absolute value of `ActivityScore.points` must not exceed its `ScoreCriterion.max_points`.
+- The absolute value of `TrainingScore.points_awarded` must not exceed its `ScoreCriterion.max_points`.
+- An internal `TrainingScore.points_awarded` must have the same sign as its `ActivityScore.points`, or be zero.
+- A recognition `TrainingScore.points_awarded` must be nonnegative.
+- An appeal for a participation correction must reference a `Registration` owned by its submitter.
+- An appeal for a score correction must reference a `TrainingScore` earned by its submitter.
+- A `Recognition` may be created only from an approved recognition appeal.
+- `Recognition.student_user_id` must equal its appeal's `submitted_by_user_id`.
+- A resolved appeal must not be edited until it has been reopened through the review workflow.
+- When an appeal is resolved, `reviewed_by_user_id`, `response`, and `reviewed_at` must all be present.
+- Each score adjustment must create a `ScoreChange` with non-null `old_points`, `new_points`, `reason`, `changed_by_user_id`, and `changed_at`.
+- `ScoreChange.old_points` must equal `TrainingScore.points_awarded` immediately before the adjustment.
+- `ScoreChange.new_points` must equal `TrainingScore.points_awarded` immediately after the adjustment.
+- `ScoreChange.appeal_id` is required when the adjustment resolves an appeal.
+- Updating `TrainingScore.points_awarded` and inserting its `ScoreChange` must succeed or fail in the same transaction.
 

@@ -1,8 +1,5 @@
 # 6.Non-Functional Requirements
 
-
-
-
 <!-- [Provide non-functional requirements that globally affect the product features descrived in the previous section. 
 
 At a high level, list applicable standards, hardware, or platform requirements; performance requirements; and environmental requirements.
@@ -32,9 +29,19 @@ Define the priority of these other product requirements. Include, if useful, att
 ### I. Performance
 > an indicator of how efficiently a digital solution uses the resources needed to perform its features. In other words, it helps track how quickly the system responds to users’ requests.
 
-| NFR ID              | Requirement | Guildance |
-| :---------------- | :------: | ----: |
-| NFR-PER-01 |  |  |
+| NFR ID              | Requirement  |
+| :----------------: | :------  |
+| NFR-PER-01 | The overall response time from when a user sends request to receive the respond is less than 3 seconds |
+| NFR-PER-02 | The system shall load the main pages within 2 seconds under the stable connection |
+| NFR-PER-03 | If the system loads more than 1 second, the system shall show the loading indicators |
+| NFR-PER-04 | The errors rate of the system shall be less than 5 percents |
+| NFR-PER-05 | The errors rate of user making errors or having difficulties while completing a task be less than 10 percents |
+| NFR-PER-06 | The delay after clikcs, taps or keyboard inputs on the features(e.g., button) is immediately interactive within 0.01 second  |
+| NFR-PER-07| User cannot interact with the main page while the system in still in loading progress, response receiving,... |
+| NFR-PER-08| The system shall avoid repeating unnecessary database queries when retrieving the same data multiple times with a single user request  |
+
+
+
 
 ### II. Scalability
 > the ability of the system to demonstrate performance change in direct proportion to the growth of workloads. It allows you to check whether the program can perform its tasks as efficiently if the number of simultaneous visits increases.

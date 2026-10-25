@@ -21,9 +21,9 @@ services:
     env_file:
       - ./db/.env
     ports:
-            - "5432:5432"
+          - "5432:5432"
     volumes:
-            - postgres_data_myHCMUS:/var/lib/postgresql
+            - myHCMUS-db:/var/lib/postgresql
     healthcheck:
             test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
             interval: 5s
@@ -32,4 +32,4 @@ services:
 
 volumes:
   node_modules:
-  postgres_data_myHCMUS:
+  myHCMUS-db:

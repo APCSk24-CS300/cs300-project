@@ -15,12 +15,12 @@ Define the priority of these other product requirements. Include, if useful, att
 
 ## 6.1 Overview of Non-Functional Requirements
 
-**Purpose:** Provide non-functional requirements that globally affect the product features descrived in the previous section. 
-**Worker:** Nguyễn Khang Thịnh 
-**Reviewer(s):** Quách Thiên Lạc  
-**Editor(s):** Nguyễn Khang Thịnh
+**Purpose:** Provide non-functional requirements that globally affect the product features descrived in the previous section.  
+**Worker:** Nguyễn Khang Thịnh   
+**Reviewer(s):** Quách Thiên Lạc   
+**Editor(s):** Nguyễn Khang Thịnh  
 **Version:** Draft  
-**Amendment:** 2026/25/10
+**Amendment:** 2026/26/10
 
 <!-- Version: [v1.x / Draft / Final]  -->
 
@@ -41,10 +41,28 @@ Define the priority of these other product requirements. Include, if useful, att
 | NFR-PER-08| The system shall avoid repeating unnecessary database queries when retrieving the same data multiple times with a single user request  |
 
 
-
-
 ### II. Scalability
 > the ability of the system to demonstrate performance change in direct proportion to the growth of workloads. It allows you to check whether the program can perform its tasks as efficiently if the number of simultaneous visits increases.
+
+#### 1. Physical
+
+> Components that must scale, the feature that makes each scalable, the parameter to measure, and the target value.
+
+| NFR ID              | Requirement  |
+| :----------------: | :------  |
+| NFR-SCA-PHY-01 | The system shall operate at least 1,000 users (includings students, organizers) at normal condition and approximate 5,000 at peak |
+| NFR-SCA-PHY-02 | The system shall process over 200 requests per mininute for registration on a single event |
+| NFR-SCA-PHY-03 | The system never allows to accept the requests that exceed the capability of an event |
+| NFR-SCA-PHY-04 | The system shall store at least 3 years of an event history, including event information, registers, training score with no more than 10% slow down for searching & listing pages |
+| NFR-SCA-PHY-05 | The system shall send reminders & event notifications to at least 1,000 users within 15 minutes when appropriate events are uploaded officially |
+| NFR-SCA-PHY-06 | The AI-based assistant shall handle at least 200 concurrent requests, eahc answers within 30 seconds |
+| NFR-SCA-PHY-07 | The system storage shall be up to 400GB-500GB to store files, photos (appeal evidence, avatar) and the storage shall be extensible without interrupting the service |
+
+
+#### 2. Intangible
+
+> Business growth, not technology growth, for a university activity and training-score platform.
+
 
 ### III. Portability
 > a characteristic of a software product in terms of its portability from one environment to another. By the environment, in this case, we mean the operating system, the device used, the browser, and their versions.

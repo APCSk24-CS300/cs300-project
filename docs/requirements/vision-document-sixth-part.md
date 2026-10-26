@@ -103,6 +103,16 @@ Define the priority of these other product requirements. Include, if useful, att
 ### V. Reliability
 > the ability of the app to function smoothly for a specified time and under specified conditions.
 
+| NFR ID | Requirement |
+| :---: | :--- |
+| NFR-REL-01 | A failure shall never leave a partial record. A registration or cancellation shall be atomic (either fully completed or not recorded at all).  |
+| NFR-REL-02 | The waiting list shall be promoted in order (first come, first served) when a place becomes free, with no student skipped or counted twice. |
+| NFR-REL-03 | Training scores shall always equal the sum of verified participation records and approved adjustments. |
+| NFR-REL-04 | If an external service (email, AI assistant) is unavailable, the rest of the system shall keep working and the failed action shall be retried or reported to the user. |
+| NFR-REL-05 | The system shall show a clear, understandable message for every error and shall not show technical details to user. |
+| NFR-REL-06 | Failures shall be recorded in logs with time, user action and error type, so that the team can find the cause. |
+
+
 ### VI. Maintainability
 > the time it takes to restore the program functionality after an error occurs. The term MTTRS – Mean Time to Restore Service – is often used to measure this indicator.
 

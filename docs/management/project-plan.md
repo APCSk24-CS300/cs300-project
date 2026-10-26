@@ -50,8 +50,9 @@ The project is based on the following assumptions:
 4. Project timeline: The recommended five-sprint schedule will remain feasible given the course deadlines, team availability, and changes resulting from instructor or TA feedback.
 
 ## 3. Project Organization
-**Workers**: Phạm Vân Trang  
-**Reviewers**: Phan Minh Khôi
+**Worker**: Phạm Vân Trang  
+**Reviewer**: Phan Minh Khôi   
+**Editor**: Phạm Vân Trang  
 
 **Team Structure and Members' Role:**
 
@@ -64,7 +65,7 @@ In addition, the course instructor and teaching assistants provide feedback and 
 | UI/UX Manager | Nguyễn Khang Thịnh | Design application screens, oversee frontend development, and ensure UI/UX consistency. |
 | UI/UX Designer | Nguyễn Văn Tĩnh | Develop the application frontend and integrate it with the backend. |
 | Database Developer | Quách Thiên Lạc | Design the database schema, prepare data, and manage database structures. |
-| Backend Developer | Phan Minh Khôi | Develop the application server, implement backend functionality, and manage hosting. |
+| Backend Developer | Phan Minh Khôi | Develop the application server, implement backend functionality, manage hosting, and handle AI-related features. |
 | Tester | Phạm Vân Trang | Prepare test cases, test features, track defects, and verify fixes before each planned build. |
 
 Note: The roles above define each member's primary responsibilities rather than exclusive tasks. Due to the course's learning objectives and the team's small size, all members are expected to contribute as full-stack developers. 

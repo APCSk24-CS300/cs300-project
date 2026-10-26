@@ -1,6 +1,6 @@
 ## 4. Product Overview
 **Workers**: Phạm Vân Trang  
-**Reviewers**: Nguyễn Khang Thịnh 
+**Reviewers**: Nguyễn Khang Thịnh    
 **Editors**: Phạm Vân Trang  
 
 ### 4.1. Product Perspective

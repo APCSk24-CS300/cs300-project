@@ -1,6 +1,7 @@
-# 6.Non-Functional Requirements
+# 6. Non-Functional Requirements
 
-<!-- [Provide non-functional requirements that globally affect the product features descrived in the previous section. 
+<!-- 
+[Provide non-functional requirements that globally affect the product features descrived in the previous section. 
 
 At a high level, list applicable standards, hardware, or platform requirements; performance requirements; and environmental requirements.
 
@@ -62,6 +63,17 @@ Define the priority of these other product requirements. Include, if useful, att
 #### 2. Intangible
 
 > Business growth, not technology growth, for a university activity and training-score platform.
+
+| NFR ID | Requirement |
+| :---: | :--- |
+| NFR-SCA-INT-01 | The system shall allow the number of organizer units (faculties, clubs, departments) to grow from 15 in first development to at least 50 in later scale-up, with each unit managing its own activities and organizers without affecting other units. |
+| NFR-SCA-INT-02 | The system shall support growth from 500 to 2,000 activities per semester without changes to the organizer workflow. |
+| NFR-SCA-INT-03 | The system shall support growth from a pilot group of up to 1,000 students to 5,000-10,000 students without redesigning the system. |
+| NFR-SCA-INT-04 | Administrators shall be able to change training-score criteria, weights or score ranges within 1 day without code changes, and the change shall apply to the semesters selected. |
+| NFR-SCA-INT-05 | Administrators shall be able to add a new activity category or evaluation criterion within 1 hour without developer involvement. |
+| NFR-SCA-INT-06 | Old scoring rules shall be kept, so past semestesr' scores and history remain valid after rules change. |
+| NFR-SCA-INT-07 | The system shall allow adding a new interface language without changing the core features, with Vietnamese and English supported at launch. |
+| NFR-SCA-INT-08 | The system shall allow adding a new university service or a new notification channel (e.g., email or push) within 1 week of the request. |
 
 
 ### III. Portability

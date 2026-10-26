@@ -1,6 +1,8 @@
 ## 4. Product Overview
 **Workers**: Phạm Vân Trang  
 **Reviewers**: Nguyễn Khang Thịnh 
+**Editors**: Phạm Vân Trang  
+
 ### 4.1. Product Perspective
 
 myHCMUS is a web-based platform that centralizes extracurricular activity and student training-score management at Ho Chi Minh City University of Science (HCMUS). It enables students to discover and register for activities, track their participation and training scores, and submit requests. Organizers can manage activities and participation records, while administrators oversee system settings and reports.
@@ -31,7 +33,8 @@ The product depends on the following factors:
 
 ## 5. Product Features
 **Workers**: Phạm Vân Trang  
-**Reviewers**: Nguyễn Khang Thịnh 
+**Reviewers**: Nguyễn Khang Thịnh
+**Editors**: Phạm Vân Trang  
 
 myHCMUS provides the following features to support students, organizers, and administrators in managing extracurricular activities and training scores.
 

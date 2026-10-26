@@ -99,5 +99,6 @@ flowchart TD
     G -- Yes --> H[Update participation or training-score record]
     G -- No --> I[Record rejection and reason]
     I --> J[Notify student of the result]
+    H --> J
 
 ```

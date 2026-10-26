@@ -147,6 +147,19 @@ Define the priority of these other product requirements. Include, if useful, att
 
 > the degree of security of the entire system and the data stored in it from unauthorized access due to hacker attacks.
 
+| NFR ID | Requirement |
+| :---: | :--- |
+| NFR-SEC-01 | All communication between the user and the system shall be encrypted with HTTPS | 
+| NFR-SEC-02 | Every user shall log in with an account. Passwords shall be at least 8 characters and stored only as salted hashes, never as plain text | 
+| NFR-SEC-03 | Access shall be controlled by role (student, organizer, administrator). A user shall only see and do what their role allows, and this shall be checked on the server, not only on the screen | 
+| NFR-SEC-04 | A student shall only view and change their own personal data, registrations, scores and appeals | 
+| NFR-SEC-05 | (OPTIONAL) A session shall end after 30 minutes without activity, and an account shall be temporarily locked for 15 minutes after 5 failed login attempts | 
+| NFR-SEC-06 | Every score adjustment, appeal decision and change to system settings shall be recorded in an audit log (who, what, when, before and after values) that cannot be edited by normal users | 
+| NFR-SEC-07 | Uploaded evidence files shall be limited in type (PDF, JPG, PNG) and size (10 MB), checked before storing, and only visible to the student and authorized staff | 
+| NFR-SEC-08 | The system shall protect against common web attacks (e.g., SQL injection) and shall be checked carefully before deployment |
+| NFR-SEC-09 | Personal data shall be collected only as needed and handled according to Vietnam's personal data protection regulations |
+| NFR-SEC-10 | The AI Student Assistant shall only use the data of the student asking, and shall not show other students' personal data | 
+| NFR-SEC-11 | Secret such as passwords or API keys shall never be stored in the source repository | 
 
 ### IX. Localization
 > an indicator of how much a digital product is adapted to the specifics of a particular country. This can include interface and documentation translation, support for national standards, and more.

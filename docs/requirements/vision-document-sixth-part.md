@@ -95,9 +95,9 @@ Define the priority of these other product requirements. Include, if useful, att
 | :---: | :--- |
 | NFR-COM-01 | The system shall link to existing university platforms (Moodle, Student Portal, tuition payment) |
 | NFR-COM-02 | Reports and participation lists shall be exportable in common formats (PDF) that open in standard office software |
-| NFR-COM-03 | Registered activities shall be exportable in the iCalendar (.ics) format, so students can import them into Google Calendar or other calendar-management platforms. |
-| NFR-COM-04 | The system shall be able to import student and activity lists from CSV or XLSX files, and shall report which rows were rejected and why. |
-| NFR-COM-05 | The system shall send notifications by email in addition to in-app notifications, using standard email protocols. |
+| NFR-COM-03 | Registered activities shall be exportable in the iCalendar (.ics) format, so students can import them into Google Calendar or other calendar-management platforms |
+| NFR-COM-04 | The system shall be able to import student and activity lists from CSV or XLSX files, and shall report which rows were rejected and why |
+| NFR-COM-05 | The system shall send notifications by email in addition to in-app notifications, using standard email protocols |
 
 
 ### V. Reliability
@@ -105,12 +105,12 @@ Define the priority of these other product requirements. Include, if useful, att
 
 | NFR ID | Requirement |
 | :---: | :--- |
-| NFR-REL-01 | A failure shall never leave a partial record. A registration or cancellation shall be atomic (either fully completed or not recorded at all).  |
-| NFR-REL-02 | The waiting list shall be promoted in order (first come, first served) when a place becomes free, with no student skipped or counted twice. |
-| NFR-REL-03 | Training scores shall always equal the sum of verified participation records and approved adjustments. |
-| NFR-REL-04 | If an external service (email, AI assistant) is unavailable, the rest of the system shall keep working and the failed action shall be retried or reported to the user. |
-| NFR-REL-05 | The system shall show a clear, understandable message for every error and shall not show technical details to user. |
-| NFR-REL-06 | Failures shall be recorded in logs with time, user action and error type, so that the team can find the cause. |
+| NFR-REL-01 | A failure shall never leave a partial record. A registration or cancellation shall be atomic (either fully completed or not recorded at all)  |
+| NFR-REL-02 | The waiting list shall be promoted in order (first come, first served) when a place becomes free, with no student skipped or counted twice |
+| NFR-REL-03 | Training scores shall always equal the sum of verified participation records and approved adjustments |
+| NFR-REL-04 | If an external service (email, AI assistant) is unavailable, the rest of the system shall keep working and the failed action shall be retried or reported to the user |
+| NFR-REL-05 | The system shall show a clear, understandable message for every error and shall not show technical details to user |
+| NFR-REL-06 | Failures shall be recorded in logs with time, user action and error type, so that the team can find the cause |
 
 
 ### VI. Maintainability
@@ -120,20 +120,33 @@ Define the priority of these other product requirements. Include, if useful, att
 
 | NFR ID | Requirement |
 | :---: | :--- |
-| NFR-MAI-01 | A critical failure (system unavailable or registration  not working) shall be restored within 4 hours (MTTR <= 4 hours) during working days. |
-| NFR-MAI-02 | A non-critical defect shall be fixed within 3 working days after it is reported and confirmed. |
-| NFR-MAI-03 | The source code shall be divided into separate modules (e.g., authentication, activities, drs management) so that the change in one module does not require changes in the others. |
-| NFR-MAI-04 | All source code changes shall go through a pull request and a review by at least one other team member before merging. |
-| NFR-MAI-05 | Automated tests shall cover at least 60% of the core logic (registration, waiting list, score calculation) and shall pass before each deployment. |
-| NFR-MAI-06 | A new developer shall be able to run the system on their own machine within 2 hours by following the setup guide. It means that the guildance shall be straightforward with confusion |
+| NFR-MAI-01 | A critical failure (system unavailable or registration  not working) shall be restored within 4 hours (MTTR <= 4 hours) during working days |
+| NFR-MAI-02 | A non-critical defect shall be fixed within 3 working days after it is reported and confirmed |
+| NFR-MAI-03 | The source code shall be divided into separate modules (e.g., authentication, activities, drs management) so that the change in one module does not require changes in the others |
+| NFR-MAI-04 | All source code changes shall go through a pull request and a review by at least one other team member before merging |
+| NFR-MAI-05 | Automated tests shall cover at least 60% of the core logic (registration, waiting list, score calculation) and shall pass before each deployment |
+| NFR-MAI-06 | A new developer shall be able to run the system on their own machine within 2 hours by following the setup guide. It means that the guildance shall be straightforward without confusion |
 
 
 ### VII. Availability
 
 > the ratio of the time when the system is available to users and the downtime due to failures. A quality app is characterized by rapid recoverability; ideally, this process should be automated.
 
+
+| NFR ID | Requirement |
+| :---: | :--- |
+| NFR-AVA-01 | In the first release, the system shall be available at least 98% of the time per month (maybe 12 hours of downtime). This target shall be raised to 99.5% for official deployment |
+| NFR-AVA-02 | During registration periods and the appeal period, the system shall be available at least 99% of the time (reduce the downtime to less than 30 minutes-1 hour) |
+| NFR-AVA-03 | Planned maintenance shall be announced to users at least 24 hours in advance, shall take place outside peak hours (e.g., 23:00 05:00) |
+| NFR-AVA-04 | Data shall be backed up automatically at least once a day, and backups shall be kept for at least 30 days |
+| NFR-AVA-05 | After a failure, the system shall be restored with no more than 24 hours of lost data (RPO <= 24 hours). The restore procedure shall be tested at least once per semester |
+| NFR-AVA-06 | While the system is under maintenance or unavailable, users shall see a notice with the expected time of return instead of an error page (e.g., `503 Service Unvailable`). |
+
+
 ### VIII. Security
+
 > the degree of security of the entire system and the data stored in it from unauthorized access due to hacker attacks.
+
 
 ### IX. Localization
 > an indicator of how much a digital product is adapted to the specifics of a particular country. This can include interface and documentation translation, support for national standards, and more.

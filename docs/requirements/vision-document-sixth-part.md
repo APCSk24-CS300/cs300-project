@@ -79,6 +79,15 @@ Define the priority of these other product requirements. Include, if useful, att
 ### III. Portability
 > a characteristic of a software product in terms of its portability from one environment to another. By the environment, in this case, we mean the operating system, the device used, the browser, and their versions.
 
+| NFR ID | Requirement |
+| :---: | :--- |
+| NFR-POR-01 | The system shall run in the latest stable versions of Chrome, Edge, Firefox browsers without loss of any feature. |
+| NFR-POR-02 | The system shall be usable on Windows, macOS, Android and iOS through a web browser, with no app installation required. |
+| NFR-POR-03 | The interface shall adapt to screen widths from 360 px (phone) to 1920 px (desktop) without hidden functions. |
+| NFR-POR-04 | The system shall be deployable to another hosting environment (e.g., the university's own servers) in no more than 1 working day, using documented steps and configuration files, with no code changes. |
+| NFR-POR-05 | All secrect environment-specific settings (database address, keys, URLs) shall be not kept in the source code. |
+
+
 ### IV. Compability
 > the ability of software to interact with other system components: apps, and processes in the current environment.
 

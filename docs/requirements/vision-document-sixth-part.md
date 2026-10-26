@@ -175,4 +175,17 @@ Define the priority of these other product requirements. Include, if useful, att
 
 
 ### X. Usability
+
 >  the degree of ease of access to the program functions through the user interface. This indicator determines how many user actions  will be needed to achieve the goal.
+
+| NFR ID | Requirement |
+| :---: | :--- |
+| NFR-USA-01 | A first-time student shall be able to find an activity and register for it within 2 minutes without any training |
+| NFR-USA-02 | The main student tasks (view activities, register, check score) shall be reachable within 3 clicks or taps from the home page / darshboard |
+| NFR-USA-03 | The interface shall be consistent across pages (same layout, button positions, colors, wording for the same action) |
+| NFR-USA-04 | The system shall ask for confirmation before actions that cannot be reversed (cancelling a registration or submitting an appeal) and shall show a clear success or failure message after each action |
+| NFR-USA-05 | Forms shall show which fields are wrong and how to correct them, and shall keep the data the user has already entered |
+| NFR-USA-06 | The appeal button shall be disabled outside the appeal period with a message that explains why, and activity cards shall show capacity, score value and deadline before the student registers |
+| NFR-USA-07 | A usability test with at least 5 students shall reach a specific score (score of at least 70 in SUS - system usability scale) before official deployment |
+| NFR-USA-08 | The system shall provide an online help page (FAQ and short guide for students, organizers and administrators) |
+| NFR-USA-09 | The system shall provide a friendly UI Dashboard that contains the overall information of users, activities and allows user to direct ot their intended features without difficulties or confused behaviors |

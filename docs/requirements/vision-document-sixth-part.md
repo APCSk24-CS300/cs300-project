@@ -164,5 +164,15 @@ Define the priority of these other product requirements. Include, if useful, att
 ### IX. Localization
 > an indicator of how much a digital product is adapted to the specifics of a particular country. This can include interface and documentation translation, support for national standards, and more.
 
+| NFR ID | Requirement |
+| :---: | :--- |
+| NFR-LOC-01 | The interface shall be available in Vietnamese (default) and English, and users shall be able to switch language at any time |
+| NFR-LOC-02 | The system shall display and store Vietnamese text with full diacritics (UTF-8) correctly, including in search, notifications, exports and PDF files |
+| NFR-LOC-03 | Search shall find activities whether or not the user types Vietnamese diacritics (e.g., "hoat dong" finds "hoạt động") |
+| NFR-LOC-04 | Dates shall be shown as dd/MM/yyyy, time in 24-hour format, and all times in Vietnam time (UTC+7) |
+| NFR-LOC-05 | Semesters, academic years, faculties and training-score criteria shall follow the university's own terms and structure |
+| NFR-LOC-06 | All text shown to users shall be stored separately from the code (e.g., in language files) so that a language can be added or corrected without changing features |
+
+
 ### X. Usability
 >  the degree of ease of access to the program functions through the user interface. This indicator determines how many user actions  will be needed to achieve the goal.

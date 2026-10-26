@@ -114,9 +114,22 @@ Define the priority of these other product requirements. Include, if useful, att
 
 
 ### VI. Maintainability
+
 > the time it takes to restore the program functionality after an error occurs. The term MTTRS – Mean Time to Restore Service – is often used to measure this indicator.
 
+
+| NFR ID | Requirement |
+| :---: | :--- |
+| NFR-MAI-01 | A critical failure (system unavailable or registration  not working) shall be restored within 4 hours (MTTR <= 4 hours) during working days. |
+| NFR-MAI-02 | A non-critical defect shall be fixed within 3 working days after it is reported and confirmed. |
+| NFR-MAI-03 | The source code shall be divided into separate modules (e.g., authentication, activities, drs management) so that the change in one module does not require changes in the others. |
+| NFR-MAI-04 | All source code changes shall go through a pull request and a review by at least one other team member before merging. |
+| NFR-MAI-05 | Automated tests shall cover at least 60% of the core logic (registration, waiting list, score calculation) and shall pass before each deployment. |
+| NFR-MAI-06 | A new developer shall be able to run the system on their own machine within 2 hours by following the setup guide. It means that the guildance shall be straightforward with confusion |
+
+
 ### VII. Availability
+
 > the ratio of the time when the system is available to users and the downtime due to failures. A quality app is characterized by rapid recoverability; ideally, this process should be automated.
 
 ### VIII. Security

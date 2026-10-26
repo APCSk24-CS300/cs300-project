@@ -81,15 +81,24 @@ Define the priority of these other product requirements. Include, if useful, att
 
 | NFR ID | Requirement |
 | :---: | :--- |
-| NFR-POR-01 | The system shall run in the latest stable versions of Chrome, Edge, Firefox browsers without loss of any feature. |
-| NFR-POR-02 | The system shall be usable on Windows, macOS, Android and iOS through a web browser, with no app installation required. |
-| NFR-POR-03 | The interface shall adapt to screen widths from 360 px (phone) to 1920 px (desktop) without hidden functions. |
-| NFR-POR-04 | The system shall be deployable to another hosting environment (e.g., the university's own servers) in no more than 1 working day, using documented steps and configuration files, with no code changes. |
-| NFR-POR-05 | All secrect environment-specific settings (database address, keys, URLs) shall be not kept in the source code. |
+| NFR-POR-01 | The system shall run in the latest stable versions of Chrome, Edge, Firefox browsers without loss of any feature |
+| NFR-POR-02 | The system shall be usable on Windows, macOS, Android and iOS through a web browser, with no app installation required |
+| NFR-POR-03 | The interface shall adapt to screen widths from 360 px (phone) to 1920 px (desktop) without hidden functions |
+| NFR-POR-04 | The system shall be deployable to another hosting environment (e.g., the university's own servers) in no more than 1 working day, using documented steps and configuration files, with no code changes |
+| NFR-POR-05 | All secrect environment-specific settings (database address, keys, URLs) shall be not kept in the source code |
 
 
 ### IV. Compability
 > the ability of software to interact with other system components: apps, and processes in the current environment.
+
+| NFR ID | Requirement |
+| :---: | :--- |
+| NFR-COM-01 | The system shall link to existing university platforms (Moodle, Student Portal, tuition payment) |
+| NFR-COM-02 | Reports and participation lists shall be exportable in common formats (PDF) that open in standard office software |
+| NFR-COM-03 | Registered activities shall be exportable in the iCalendar (.ics) format, so students can import them into Google Calendar or other calendar-management platforms. |
+| NFR-COM-04 | The system shall be able to import student and activity lists from CSV or XLSX files, and shall report which rows were rejected and why. |
+| NFR-COM-05 | The system shall send notifications by email in addition to in-app notifications, using standard email protocols. |
+
 
 ### V. Reliability
 > the ability of the app to function smoothly for a specified time and under specified conditions.

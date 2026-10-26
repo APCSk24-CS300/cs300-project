@@ -32,6 +32,7 @@ The product depends on the following factors:
 ## 5. Product Features
 **Workers**: Phạm Vân Trang  
 **Reviewers**: Nguyễn Khang Thịnh 
+
 myHCMUS provides the following features to support students, organizers, and administrators in managing extracurricular activities and training scores.
 
 1. **Authentication:** Users can log in and log out of the system using their accounts. The system identifies their roles and grants access to the appropriate features and information. This feature ensures that students, organizers, and administrators can access the system according to their permissions.

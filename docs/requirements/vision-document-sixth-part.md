@@ -179,3 +179,9 @@
 | NFR-USA-07 | Student | A usability test with at least 5 students shall reach a specific score (score of at least 70 in SUS - system usability scale) before official deployment |
 | NFR-USA-08 | All users | The system shall provide an online help page (FAQ and short guide for students, organizers and administrators) |
 | NFR-USA-09 | All users | The system shall provide a friendly UI dashboard that contains the overall information of users, activities and allows users to direct to their intended features without difficulties or confused behaviors |
+| NFR-USA-09 | All users | The system shall provides a clear messages when a user inputs invalid information |
+| NFR-USA-10 | Organizer | The system shall clearly display activity status, participant information, and pending actions to help organizers manage activities efficiently |
+| NFR-USA-11 | Organizer | After having 30-minute training session, organizers can create the activity within 10 minutes|
+| NFR-USA-12 | Organizer | The system shall distinguish clearly between draft, published, ongoing, completed or cancelled actitivies |
+| NFR-USA-13 | Administrator | The system shall clearly display a user's current role and permission status before an administrator modifies them |
+| NFR-USA-13 | Administrator | The system shall clearly display a confirmation before administrators deciding to alter the criteria |

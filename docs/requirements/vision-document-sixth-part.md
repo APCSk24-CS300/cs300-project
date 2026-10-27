@@ -2,12 +2,12 @@
 
 ## 6.1 Overview of Non-Functional Requirements
 
-**Purpose:** Provide non-functional requirements that globally affect the product features descrived in the previous section.  
+**Purpose:** Provide non-functional requirements that globally affect the product features described in the previous section.  
 **Worker:** Nguyễn Khang Thịnh   
 **Reviewer(s):** Quách Thiên Lạc   
 **Editor(s):** Nguyễn Khang Thịnh  
 **Version:** v1.0  
-**Amendment:** 2026/26/10
+**Amendment:** 2026/10/27
 
 ## 6.2 Detailed Requirements
 
@@ -17,12 +17,12 @@
 
 | NFR ID              | Requirement  |
 | :----------------: | :------  |
-| NFR-PER-01 | The overall response time from when a user sends request to receive the respond is less than 3 seconds |
-| NFR-PER-02 | The system shall load the main pages within 2 seconds under the stable connection |
+| NFR-PER-01 | The overall response time from when a user sends request to receive the response is less than 3 seconds |
+| NFR-PER-02 | The system shall load the main pages within 2 seconds under a stable connection |
 | NFR-PER-03 | If the system loads more than 1 second, the system shall show the loading indicators |
 | NFR-PER-04 | The errors rate of the system shall be less than 5 percents of system requests |
-| NFR-PER-05 | The errors rate of user making errors or having difficulties while completing a task be less than 10 percents |
-| NFR-PER-06 | The delay after clicks, taps or keyboard inputs on the features(e.g., button) is immediately interactive within 0.01 second  |
+| NFR-PER-05 | The errors rate of users making errors or having difficulties while completing a task shall be less than 10 percents |
+| NFR-PER-06 | The delay after clicks, taps or keyboard inputs on the features (e.g., button) is immediately interactive within 0.01 second  |
 | NFR-PER-07| User cannot interact with the main page while the system in still in loading progress, response receiving,... |
 | NFR-PER-08| The system shall avoid repeating unnecessary database queries when retrieving the same data multiple times with a single user request  |
 
@@ -71,10 +71,10 @@
 | NFR-POR-02 | The system shall be usable on Windows, macOS, Android and iOS through a web browser, with no app installation required |
 | NFR-POR-03 | The interface shall adapt to screen widths from 360 px (phone) to 1920 px (desktop) without hidden functions |
 | NFR-POR-04 | The system shall be deployable to another hosting environment (e.g., the university's own servers) in no more than 1 working day, using documented steps and configuration files, with no code changes |
-| NFR-POR-05 | All secrect environment-specific settings (database address, keys, URLs) shall be not kept in the source code |
+| NFR-POR-05 | All secret environment-specific settings (database address, keys, URLs) shall be not kept in the source code |
 
 
-### IV. Compability
+### IV. Compatibility
 
 > the ability of software to interact with other system components: apps, and processes in the current environment.
 
@@ -113,7 +113,7 @@
 | NFR-MAI-03 | The source code shall be divided into separate modules (e.g., authentication, activities, drs management) so that the change in one module does not require changes in the others |
 | NFR-MAI-04 | All source code changes shall go through a pull request and a review by at least one other team member before merging |
 | NFR-MAI-05 | Automated tests shall cover at least 90% of the core logic (registration, waiting list, score calculation) and shall pass before each deployment |
-| NFR-MAI-06 | A new developer shall be able to run the system on their own machine within 2 hours by following the setup guide. It means that the guildance shall be straightforward without confusion |
+| NFR-MAI-06 | A new developer shall be able to run the system on their own machine within 2 hours by following the setup guide. It means that the guidance shall be straightforward without confusion |
 | NFR-MAI-07 | After the administrator change training-score criteria, weights or score ranges, the change shall apply to the semesters selected within 1 day. |
 
 
@@ -126,10 +126,10 @@
 | :---: | :--- |
 | NFR-AVA-01 | In the first release, the system shall be available at least 98% of the time per month (maybe 12 hours of downtime). This target shall be raised to 99.5% for official deployment |
 | NFR-AVA-02 | During registration periods and the appeal period, the system shall be available at least 99% of the time (reduce the downtime to less than 30 minutes-1 hour) |
-| NFR-AVA-03 | Planned maintenance shall be announced to users at least 24 hours in advance, shall take place outside peak hours (e.g., 23:00 05:00) |
+| NFR-AVA-03 | Planned maintenance shall be announced to users at least 24 hours in advance, shall take place outside peak hours (e.g., 23:00 - 05:00) |
 | NFR-AVA-04 | Data shall be backed up automatically at least once a day, and backups shall be kept for at least 30 days |
 | NFR-AVA-05 | After a failure, the system shall be restored with no more than 24 hours of lost data (RPO <= 24 hours). The restore procedure shall be tested at least once per semester |
-| NFR-AVA-06 | While the system is under maintenance or unavailable, users shall see a notice with the expected time of return instead of an error page (e.g., `503 Service Unvailable`). |
+| NFR-AVA-06 | While the system is under maintenance or unavailable, users shall see a notice with the expected time of return instead of an error page (e.g., `503 Service Unavailable`). |
 
 
 ### VIII. Security
@@ -148,7 +148,7 @@
 | NFR-SEC-08 | The system shall protect against common web attacks (e.g., SQL injection) and shall be checked carefully before deployment |
 | NFR-SEC-09 | Personal data shall be collected only as needed and handled according to Vietnam's personal data protection regulations |
 | NFR-SEC-10 | The AI Student Assistant shall only use the data of the student asking, and shall not show other students' personal data | 
-| NFR-SEC-11 | Secret such as passwords or API keys shall never be stored in the source repository | 
+| NFR-SEC-11 | Secrets such as passwords or API keys shall never be stored in the source repository | 
 
 ### IX. Localization
 
@@ -178,4 +178,4 @@
 | NFR-USA-06 | The appeal button shall be disabled outside the appeal period with a message that explains why, and activity cards shall show capacity, score value and deadline before the student registers |
 | NFR-USA-07 | A usability test with at least 5 students shall reach a specific score (score of at least 70 in SUS - system usability scale) before official deployment |
 | NFR-USA-08 | The system shall provide an online help page (FAQ and short guide for students, organizers and administrators) |
-| NFR-USA-09 | The system shall provide a friendly UI Dashboard that contains the overall information of users, activities and allows user to direct ot their intended features without difficulties or confused behaviors |
+| NFR-USA-09 | The system shall provide a friendly UI dashboard that contains the overall information of users, activities and allows user to direct to their intended features without difficulties or confused behaviors |

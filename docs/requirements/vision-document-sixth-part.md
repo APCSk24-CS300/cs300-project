@@ -20,9 +20,9 @@
 | NFR-PER-01 | The overall response time from when a user sends request to receive the respond is less than 3 seconds |
 | NFR-PER-02 | The system shall load the main pages within 2 seconds under the stable connection |
 | NFR-PER-03 | If the system loads more than 1 second, the system shall show the loading indicators |
-| NFR-PER-04 | The errors rate of the system shall be less than 5 percents |
+| NFR-PER-04 | The errors rate of the system shall be less than 5 percents of system requests |
 | NFR-PER-05 | The errors rate of user making errors or having difficulties while completing a task be less than 10 percents |
-| NFR-PER-06 | The delay after clikcs, taps or keyboard inputs on the features(e.g., button) is immediately interactive within 0.01 second  |
+| NFR-PER-06 | The delay after clicks, taps or keyboard inputs on the features(e.g., button) is immediately interactive within 0.01 second  |
 | NFR-PER-07| User cannot interact with the main page while the system in still in loading progress, response receiving,... |
 | NFR-PER-08| The system shall avoid repeating unnecessary database queries when retrieving the same data multiple times with a single user request  |
 
@@ -37,13 +37,13 @@
 
 | NFR ID              | Requirement  |
 | :----------------: | :------  |
-| NFR-SCA-PHY-01 | The system shall operate at least 1,000 users (includings students, organizers) at normal condition and approximate 5,000 at peak |
-| NFR-SCA-PHY-02 | The system shall process over 200 requests per mininute for registration on a single event |
+| NFR-SCA-PHY-01 | The system shall handle at least 1,000 users (including students and organizers) under normal conditions|
+| NFR-SCA-PHY-02 | The system shall process over 200 requests per minute for registration on a single event |
 | NFR-SCA-PHY-03 | The system never allows to accept the requests that exceed the capability of an event |
 | NFR-SCA-PHY-04 | The system shall store at least 3 years of an event history, including event information, registers, training score with no more than 10% slow down for searching & listing pages |
-| NFR-SCA-PHY-05 | The system shall send reminders & event notifications to at least 1,000 users within 15 minutes when appropriate events are uploaded officially |
-| NFR-SCA-PHY-06 | The AI-based assistant shall handle at least 200 concurrent requests, eahc answers within 30 seconds |
-| NFR-SCA-PHY-07 | The system storage shall be up to 400GB-500GB to store files, photos (appeal evidence, avatar) and the storage shall be extensible without interrupting the service |
+| NFR-SCA-PHY-05 | With an event notification triggered for 1,000 users, at least 95% must be successfully delivered to them. |
+| NFR-SCA-PHY-06 | The AI-based assistant shall handle at least 200 concurrent requests, each answers within 30 seconds |
+| NFR-SCA-PHY-07 | The system storage shall be up to 400GB-500GB to store files, photos (appeal evidence, avatar) and the storage shall be extensible without interrupting the services |
 
 
 #### 2. Intangible
@@ -57,7 +57,7 @@
 | NFR-SCA-INT-03 | The system shall support growth from a pilot group of up to 1,000 students to 5,000-10,000 students without redesigning the system. |
 | NFR-SCA-INT-04 | Administrators shall be able to change training-score criteria, weights or score ranges within 1 day without code changes, and the change shall apply to the semesters selected. |
 | NFR-SCA-INT-05 | Administrators shall be able to add a new activity category or evaluation criterion within 1 hour without developer involvement. |
-| NFR-SCA-INT-06 | Old scoring rules shall be kept, so past semestesr' scores and history remain valid after rules change. |
+| NFR-SCA-INT-06 | Old scoring rules shall be kept, so past semesters' scores and history remain valid after rules change. |
 | NFR-SCA-INT-07 | The system shall allow adding a new interface language without changing the core features, with Vietnamese and English supported at launch. |
 | NFR-SCA-INT-08 | The system shall allow adding a new university service or a new notification channel (e.g., email or push) within 1 week of the request. |
 
@@ -113,7 +113,7 @@
 | NFR-MAI-02 | A non-critical defect shall be fixed within 3 working days after it is reported and confirmed |
 | NFR-MAI-03 | The source code shall be divided into separate modules (e.g., authentication, activities, drs management) so that the change in one module does not require changes in the others |
 | NFR-MAI-04 | All source code changes shall go through a pull request and a review by at least one other team member before merging |
-| NFR-MAI-05 | Automated tests shall cover at least 60% of the core logic (registration, waiting list, score calculation) and shall pass before each deployment |
+| NFR-MAI-05 | Automated tests shall cover at least 90% of the core logic (registration, waiting list, score calculation) and shall pass before each deployment |
 | NFR-MAI-06 | A new developer shall be able to run the system on their own machine within 2 hours by following the setup guide. It means that the guildance shall be straightforward without confusion |
 
 
@@ -171,10 +171,10 @@
 | NFR ID | Requirement |
 | :---: | :--- |
 | NFR-USA-01 | A first-time student shall be able to find an activity and register for it within 2 minutes without any training |
-| NFR-USA-02 | The main student tasks (view activities, register, check score) shall be reachable within 3 clicks or taps from the home page / darshboard |
+| NFR-USA-02 | The main student tasks (view activities, register, check score) shall be reachable within 3 clicks or taps from the home page / dashboard |
 | NFR-USA-03 | The interface shall be consistent across pages (same layout, button positions, colors, wording for the same action) |
 | NFR-USA-04 | The system shall ask for confirmation before actions that cannot be reversed (cancelling a registration or submitting an appeal) and shall show a clear success or failure message after each action |
-| NFR-USA-05 | Forms shall show which fields are wrong and how to correct them, and shall keep the data the user has already entered |
+| NFR-USA-05 | Forms shall show which fields are wrong and how to correct them, keep the data the user has already entered and shall show which fields are required or optional  |
 | NFR-USA-06 | The appeal button shall be disabled outside the appeal period with a message that explains why, and activity cards shall show capacity, score value and deadline before the student registers |
 | NFR-USA-07 | A usability test with at least 5 students shall reach a specific score (score of at least 70 in SUS - system usability scale) before official deployment |
 | NFR-USA-08 | The system shall provide an online help page (FAQ and short guide for students, organizers and administrators) |

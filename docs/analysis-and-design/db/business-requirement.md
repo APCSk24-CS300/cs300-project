@@ -1,5 +1,13 @@
 # Business requirements analysis
 
+**Worker:** Quách Thiên Lạc  
+**Reviewer(s):** Trần Tôn Minh Kỳ  
+**Editor(s):** Quách Thiên Lạc
+
+**Version:** 1.0.0  
+**Amendment:** 2026/21/10
+
+---
 This document describes the business purpose, actors, data entities, relationships, assumptions, and constraints of myHCMUS. It draws on the [project proposal](../management/project-proposal.md) and [product survey](../survey/existing-apps-survey.md).
 
 # Business purpose

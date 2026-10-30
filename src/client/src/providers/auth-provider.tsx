@@ -1,4 +1,4 @@
-
+"use client";   
 
 import { AuthContext } from "@/contexts/auth-context";
 import { authService } from "@/services/auth.service";

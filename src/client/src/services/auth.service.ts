@@ -2,7 +2,7 @@
 import { api } from "@/lib/api-client";
 import type {
   AuthResponse, ChangePasswordRequest, ForgotPasswordRequest, 
-  LoginRequest, MessageResponse, ResetPasswordRequest, } from "../dtos/auth.dto";
+  LoginRequest, MessageResponse, ResetPasswordRequest, } from "@/types/dtos/auth.dto";
 
 import type { SessionUser } from "@/types";
 

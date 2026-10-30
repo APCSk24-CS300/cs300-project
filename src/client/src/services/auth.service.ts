@@ -8,7 +8,7 @@ import type { SessionUser } from "@/types";
 
 const BASE = "/auth";
 
-export class AuthService {
+ class AuthService {
   login(data: LoginRequest): Promise<AuthResponse> {
     return api.post<AuthResponse>(`${BASE}/login`, data);
   }

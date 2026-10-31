@@ -82,3 +82,9 @@ The team will review risks during sprint planning and update mitigation actions 
 | **Schedule Delays** | Medium | High | Late completion of dependent tasks may reduce the time available for integration, testing, and correction before submission. | Break down large tasks into smaller, manageable tasks with clear deadlines. Monitor progress through Jira and regular Scrum meetings. Prioritize critical features and reserve time for integration and testing before the final sprint. |
 | **Data or authorization errors** | Medium | High | Incorrect participation records, training scores, or access permissions may affect system correctness. | Use role-based authorization, validate inputs and business rules, test critical workflows, and use sample or authorized data during development. |
 
+## 4. Project Plan
+**Workers** : Trần Tôn Minh Kỳ  
+**Reviewers**: 
+**Editors**: Trần Tôn Minh Kỳ  
+
+The project follows the **Scrum framework** and is divided into five sprints (PA1 to PA5), each lasting approximately 2–3 weeks. At the beginning of each Sprint, the team conducts a planning meeting to identify tasks, assign responsibilities, and establish deadlines. Each task is assigned to precisely one primary member and reviewed by other members to ensure the quality of the deliverables.

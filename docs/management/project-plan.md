@@ -84,10 +84,12 @@ The team will review risks during sprint planning and update mitigation actions 
 
 ## 4. Project Plan
 **Workers** : Trần Tôn Minh Kỳ  
-**Reviewers**: 
+**Reviewers**: Trần Tôn Minh Kỳ, Phạm Vân Trang, Phan Minh Khôi, Nguyễn Khang Thịnh, Nguyễn Văn Tĩnh, Quách Thiên Lạc  
 **Editors**: Trần Tôn Minh Kỳ  
 
 The project follows the **Scrum framework** and is divided into five sprints (PA1 to PA5), each lasting approximately 2–3 weeks. At the beginning of each Sprint, the team conducts a planning meeting to identify tasks, assign responsibilities, and establish deadlines. Each task is assigned to precisely one primary member and reviewed by other members to ensure the quality of the deliverables.
+
+![future-tasks](../assets/project-plan-future-tasks.png)
 
 ### 4.1. Sprint 1: PA1
 
@@ -150,7 +152,7 @@ The project follows the **Scrum framework** and is divided into five sprints (PA
 
 **Duration:** 18/10 – 04/11
 
-**Sprint Goal:** [Describe the main objective.]
+**Sprint Goal:** Vision document, project plan, and basic setup of Spec Kit in repository
 
 **Planned Tasks:**
 

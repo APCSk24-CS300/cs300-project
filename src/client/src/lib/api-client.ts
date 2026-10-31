@@ -28,11 +28,7 @@ async function apiRequest<T>(endpoint: string, method: string, options: RequestO
         }
    }
 
-   const response = await fetch(url, {
-        ...options,
-        headers,
-        body
-   });
+   const response = await fetch(url, {...options,headers,body});
 
    if (!response.ok) {
         const errorText = await response.text();

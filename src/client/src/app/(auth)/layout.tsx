@@ -6,7 +6,7 @@ interface AuthLayoutPropes{
 export default function AuthLayout({ children }: AuthLayoutPropes) {
   return (
     <html lang="en">
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body>{children}</body>
     </html>
   );
 }

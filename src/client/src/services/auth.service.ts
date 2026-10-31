@@ -9,27 +9,27 @@ import type { SessionUser } from "@/types";
 const BASE = "/auth";
 
  class AuthService {
-  login(data: LoginRequest): Promise<AuthResponse> {
+  async login(data: LoginRequest): Promise<AuthResponse> {
     return api.post<AuthResponse>(`${BASE}/login`, data);
   }
 
-  logout(): Promise<void> {
+  async logout(): Promise<void> {
     return api.post<void>(`${BASE}/logout`);
   }
 
-  getMe(): Promise<SessionUser> {
+  async getMe(): Promise<SessionUser> {
     return api.get<SessionUser>(`${BASE}/me`);
   }
 
-  forgotPassword(data: ForgotPasswordRequest): Promise<MessageResponse> {
+  async forgotPassword(data: ForgotPasswordRequest): Promise<MessageResponse> {
     return api.post<MessageResponse>(`${BASE}/forgot-password`, data);
   }
 
-  resetPassword(data: ResetPasswordRequest): Promise<MessageResponse> {
+  async resetPassword(data: ResetPasswordRequest): Promise<MessageResponse> {
     return api.post<MessageResponse>(`${BASE}/reset-password`, data);
   }
 
-  changePassword(data: ChangePasswordRequest): Promise<MessageResponse> {
+  async changePassword(data: ChangePasswordRequest): Promise<MessageResponse> {
     return api.post<MessageResponse>(`${BASE}/change-password`, data);
   }
 }

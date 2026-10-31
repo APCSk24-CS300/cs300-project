@@ -2,6 +2,7 @@
 
 import { AuthContext } from "@/contexts/auth-context";
 import { authService } from "@/services/auth.service";
+import { mockAuthService } from "@/services/mock.auth.service";
 import { SessionUser } from "@/types";
 import { useState, useCallback, useEffect } from "react";
 
@@ -15,10 +16,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<SessionUser | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
+    const authServiceInstance = mockAuthService;
+
     const login = async (email: string, password: string) => {
         try {
             setIsLoading(true);
-            const response = await authService.login({ email, password });
+            const response = await authServiceInstance.login({ email, password });
             if (response.user != null) {
                 setUser(response.user);
             }
@@ -38,7 +41,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         try {
             setIsLoading(true);
 
-            await authService.logout();
+            await authServiceInstance.logout();
             setUser(null);
         }
         catch (error) {
@@ -54,9 +57,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const refreshUser = useCallback(async () => {
         try {
+            console.log("Refreshing user...");
             setIsLoading(true);
 
-            const response = await authService.getMe();
+            const response = await authServiceInstance.getMe();
             if (response){
                 setUser(response);
             }
@@ -77,6 +81,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const initializeUser = async () => {
             try {
                 await refreshUser();
+
+                console.log("User initialized:", user);
             }
             catch (error) {
                 console.error("Failed to initialize user", error);

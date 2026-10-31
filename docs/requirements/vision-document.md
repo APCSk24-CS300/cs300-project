@@ -43,7 +43,7 @@ This introduction provides an overview of the Vision document, including its pur
 # 4. Product Overview
 ## 4.1. Product Perspective
 
-myHCMUS is a web-based platform that centralizes extracurricular activity and student training-score management at Ho Chi Minh City University of Science (HCMUS). It enables students to discover and register for activities, track their participation and training scores, and submit requests. Organizers can manage activities and participation records, while administrators oversee system settings and reports.
+myHCMUS is a web-based platform that centralizes extracurricular activity and student training-score management at VNU-HCM University of Science. It enables students to discover and register for activities, track their participation and training scores, and submit requests. Organizers can manage activities and participation records, while administrators oversee system settings and reports.
 
 The platform is designed as an independent web application rather than a replacement for existing university systems. It may provide links to university services but does not require direct integration with official university databases. An AI assistant supports activity recommendations and information retrieval as an additional feature.
 

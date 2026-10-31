@@ -3,10 +3,10 @@
 
 import { SubmitEvent } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 
-export default function LoginForm() {
+ function LoginForm() {
     const router = useRouter();
 
     // take user input
@@ -22,6 +22,7 @@ export default function LoginForm() {
             await authContext.login(email, password);
 
             if (authContext.isAuthenticated) {
+                console.log('User is authenticated, redirecting to {role}/dashboard...')
                 router.push('/{role}/dashboard');
             }
         }
@@ -40,3 +41,5 @@ export default function LoginForm() {
         </form>
     );
 }
+
+export default LoginForm;   

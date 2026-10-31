@@ -4,21 +4,33 @@
 import { SubmitEvent } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import type { LoginSchemaType } from "@/schemas/login.schema";
+import { LoginSchema } from "@/schemas/login.schema";
+import { SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-
- function LoginForm() { 
+function LoginForm() {
     const router = useRouter();
     const authContext = useAuth();
+    const form = useForm<LoginSchemaType>({
+        resolver: zodResolver(LoginSchema)
+    })
+    const email = useWatch({
+        control: form.control,
+        name: 'email',
+        defaultValue: '',
+    });
 
-    async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-        event.preventDefault();
+    const password = useWatch({
+        control: form.control,
+        name: 'password',
+        defaultValue: '',
+    });
+    const isDisabled = !email || !password ;
 
-        const formData = new FormData(event.target);
-        const email = formData.get("email") as string;
-        const password = formData.get("password") as string;
-
+    const onSubmit: SubmitHandler<LoginSchemaType> = async (data) => {
         try {
-            await authContext.login(email, password);
+            await authContext.login(data.email, data.password);
 
             if (authContext.isAuthenticated) {
                 console.log('User is authenticated, redirecting to {role}/dashboard...')
@@ -33,12 +45,21 @@ import { useRouter } from "next/navigation";
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input type="email" name="email" placeholder="Enter your email" required />
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+            <input type="email"   {...form.register("email")} placeholder="Enter your email"  />
+            {form.formState.errors.email && (
+                <p>{form.formState.errors.email.message}</p>
+            )}
+
             <hr />
-            <input type="password" name="password" placeholder="Enter your password" required />
+            <input type="password"  {...form.register("password")} placeholder="Enter your password"  />
+            {form.formState.errors.password && (
+                <p>{form.formState.errors.password.message}</p>
+            )}
             <hr />
-            <button type="submit">Button Login</button>
+            <button type="submit" disabled={isDisabled}>
+                {form.formState.isSubmitting ? "Logging in..." : "Button Login"}
+            </button>
         </form>
     );
 }

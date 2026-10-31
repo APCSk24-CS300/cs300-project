@@ -1,5 +1,5 @@
 // Login, Logout, Forgot Password, Reset Password, Change Password, Get current user
-import { api } from "@/lib/api-client";
+import { api } from "@/libs/api-client";
 import type {
   AuthResponse, ChangePasswordRequest, ForgotPasswordRequest, 
   LoginRequest, MessageResponse, ResetPasswordRequest, } from "@/types/dtos/auth.dto";

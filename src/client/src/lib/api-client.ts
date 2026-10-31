@@ -51,5 +51,6 @@ export const api = {
     get: <T>(endpoint: string) => apiRequest<T>(endpoint, 'GET'),
     post: <T>(endpoint: string, body?: any) => apiRequest<T>(endpoint, 'POST', { body }),
     put: <T>(endpoint: string, body?: any) => apiRequest<T>(endpoint, 'PUT', { body }),
+    patch: <T>(endpoint: string, body?: any) => apiRequest<T>(endpoint, 'PATCH', { body }),
     delete: <T>(endpoint: string) => apiRequest<T>(endpoint, 'DELETE'),
 }

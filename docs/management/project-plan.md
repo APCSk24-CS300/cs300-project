@@ -156,25 +156,25 @@ The project follows the **Scrum framework** and is divided into five sprints (PA
 
 | ID | Task Description | Assignee | Reviewer | Due Date |
 |---|---|---|---|---|
-| SCRUM-32 | Implement `/health` endpoint | Phan Minh Khoi | | Oct 22, 2026 |
-| SCRUM-34 | Export git log after all documents are finalized | Pham Van Trang | | Oct 18, 2026 |
-| SCRUM-56 | Design the application core user flow | Nguyen Van Tinh | | Oct 18, 2026 |
-| SCRUM-57 | Design the application core screens | Nguyen Van Thinh | | Nov 1, 2026 |
-| SCRUM-58 | Outline the database business requirements | Quach Thien Lac | | Oct 25, 2026 |
-| SCRUM-63 | Set up PostgreSQL | Quach Thien Lac | | Oct 25, 2026 |
-| SCRUM-64 | Implement server response callback functions | Phan Minh Khoi | | Oct 25, 2026 |
-| SCRUM-65 | Compose documentation on how to build the application with Docker | Tran Ton Minh Ky | | Oct 25, 2026 |
-| SCRUM-70 | Write section 1, 2, 3 in project plan | Pham Van Trang | | Oct 27, 2026 |
-| SCRUM-71 | Listing tasks for current and future sprints | Tran Ton Minh Ky | | Oct 27, 2026 |
-| SCRUM-72 | Product overview and features for vision document | Pham Van Trang | | Oct 27, 2026 |
-| SCRUM-73 | Introduction, positioning, and actors for vision document | Quach Thien Lac | | Oct 27, 2026 |
-| SCRUM-74 | Non-functional requirements for vision document | Nguyen Van Thinh | | Oct 27, 2026 |
-| SCRUM-75 | Initialize Spec Kit in repository | Quach Thien Lac | | Oct 28, 2026 |
-| SCRUM-76 | Write planning meeting report for PA2 | Tran Ton Minh Ky | | Oct 27, 2026 |
-| SCRUM-77 | Addition of conventions into team contract | Tran Ton Minh Ky | | Oct 27, 2026 |
-| SCRUM-87 | Write weekly report 1 for PA2 | Tran Ton Minh Ky | | Oct 31, 2026 |
-| SCRUM-88 | Write weekly report 2 for PA2 | Tran Ton Minh Ky | | Oct 31, 2026 |
-| SCRUM-89 | Write review report for PA2 | Tran Ton Minh Ky | | Oct 31, 2026 |
+| SCRUM-32 | Implement `/health` endpoint | Khôi | Kỳ | Oct 22, 2026 |
+| SCRUM-34 | Export git log after all documents are finalized | Trang | Kỳ | Oct 18, 2026 |
+| SCRUM-56 | Design the application core user flow | Tĩnh | Kỳ | Oct 18, 2026 |
+| SCRUM-57 | Design the application core screens | Thịnh | Kỳ | Nov 1, 2026 |
+| SCRUM-58 | Outline the database business requirements | Lạc | Kỳ | Oct 25, 2026 |
+| SCRUM-63 | Set up PostgreSQL | Lạc | Kỳ | Oct 25, 2026 |
+| SCRUM-64 | Implement server response callback functions | Khôi | Kỳ | Oct 25, 2026 |
+| SCRUM-65 | Compose documentation on how to build the application with Docker | Kỳ | Kỳ | Oct 25, 2026 |
+| SCRUM-70 | Write section 1, 2, 3 in project plan | Trang | Khôi | Oct 27, 2026 |
+| SCRUM-71 | Listing tasks for current and future sprints | Kỳ | Kỳ, Khôi, Tĩnh, Lạc, Trang, Thịnh | Oct 27, 2026 |
+| SCRUM-72 | Product overview and features for vision document | Trang | Thịnh | Oct 27, 2026 |
+| SCRUM-73 | Introduction, positioning, and actors for vision document | Lạc | Tĩnh | Oct 27, 2026 |
+| SCRUM-74 | Non-functional requirements for vision document | Thịnh | Lạc | Oct 27, 2026 |
+| SCRUM-75 | Initialize Spec Kit in repository | Lạc | Khôi | Oct 28, 2026 |
+| SCRUM-76 | Write planning meeting report for PA2 | Kỳ | Kỳ, Khôi, Tĩnh, Lạc, Trang, Thịnh | Oct 27, 2026 |
+| SCRUM-77 | Addition of conventions into team contract | Kỳ | Thịnh | Oct 27, 2026 |
+| SCRUM-87 | Write weekly report 1 for PA2 | Kỳ | Kỳ, Khôi, Tĩnh, Lạc, Trang, Thịnh | Oct 31, 2026 |
+| SCRUM-88 | Write weekly report 2 for PA2 | Kỳ | Kỳ, Khôi, Tĩnh, Lạc, Trang, Thịnh | Oct 31, 2026 |
+| SCRUM-89 | Write review report for PA2 | Kỳ | Kỳ, Khôi, Tĩnh, Lạc, Trang, Thịnh | Oct 31, 2026 |
 
 **Expected Deliverables:**
 - System design documents

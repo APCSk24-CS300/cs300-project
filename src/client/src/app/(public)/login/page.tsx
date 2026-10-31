@@ -3,7 +3,10 @@ import LoginForm from '@/components/forms/LoginForm';
  function LoginPage() {
     return (
         <div className='login-page'>
-            <LoginForm/>
+            <h1>Login</h1>
+            <div>
+                <LoginForm/>
+            </div>
         </div>
     );
 }

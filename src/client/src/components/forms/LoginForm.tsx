@@ -6,13 +6,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 
- function LoginForm() {
+ function LoginForm() { 
     const router = useRouter();
     const authContext = useAuth();
-    // take user input
+
     async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
-        
 
         const formData = new FormData(event.target);
         const email = formData.get("email") as string;
@@ -36,8 +35,10 @@ import { useRouter } from "next/navigation";
     return (
         <form onSubmit={handleSubmit}>
             <input type="email" name="email" placeholder="Enter your email" required />
+            <hr />
             <input type="password" name="password" placeholder="Enter your password" required />
-            <button type="submit">Login</button>
+            <hr />
+            <button type="submit">Button Login</button>
         </form>
     );
 }

@@ -3,10 +3,10 @@ import React from "react";
 interface AuthLayoutPropes{
     children: React.ReactNode;
 }
-export default function AuthLayout({ children }: AuthLayoutPropes) {
+export default function PublicLayout({ children }: AuthLayoutPropes) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>{children}</body> 
     </html>
   );
 }

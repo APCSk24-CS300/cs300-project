@@ -89,8 +89,6 @@ The team will review risks during sprint planning and update mitigation actions 
 
 The project follows the **Scrum framework** and is divided into five sprints (PA1 to PA5), each lasting approximately 2–3 weeks. At the beginning of each Sprint, the team conducts a planning meeting to identify tasks, assign responsibilities, and establish deadlines. Each task is assigned to precisely one primary member and reviewed by other members to ensure the quality of the deliverables.
 
-![future-tasks](../assets/project-plan-future-tasks.png)
-
 ### 4.1. Sprint 1: PA1
 
 **Duration:** 3/10 – 17/10
@@ -184,6 +182,9 @@ The project follows the **Scrum framework** and is divided into five sprints (PA
 - UI/UX prototype
 - Initial application build
 - PA2 report
+
+Here is a backlog of all tasks for future sprints until PA5.
+![future-tasks](../assets/project-plan-future-tasks.png)
 
 ### 4.3. Build and Release Plan
 

@@ -93,7 +93,7 @@ The project follows the **Scrum framework** and is divided into five sprints (PA
 
 ### 4.1. Sprint 1: PA1
 
-**Duration:** 2/10 – 17/10
+**Duration:** 3/10 – 17/10
 
 **Sprint Goal:** A proposal of the project, alongside additional management documents
 
@@ -150,7 +150,7 @@ The project follows the **Scrum framework** and is divided into five sprints (PA
 
 ### 4.2. Sprint 2: PA2
 
-**Duration:** 18/10 – 04/11
+**Duration:** 17/10 – 31/10
 
 **Sprint Goal:** Vision document, project plan, and basic setup of Spec Kit in repository
 
@@ -191,9 +191,9 @@ The team plans to produce three major builds, with one build associated with eac
 
 | Build | Sprint | Expected Date | Purpose |
 |---|---|---|---|
-| Build 1 | Sprint 1 | [Date] | Verify project setup and initial application structure |
-| Build 2 | Sprint 2 | [Date] | Validate architecture and initial components |
-| Build 3 | Sprint 3 | [Date] | Test integrated core functionality |
+| Build 1 | Sprint 3 | 14/11 | Implementation of 1 functional group |
+| Build 2 | Sprint 4 | 28/11 | Implementation of 3 functional groups |
+| Build 3 | Sprint 5 | 12/12 | Complete implementation |
 
 Each build will undergo appropriate testing before being accepted. Identified bugs will be recorded in Jira and prioritized for resolution.
 

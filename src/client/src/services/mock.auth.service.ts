@@ -5,6 +5,7 @@ import type {
 
 import type { SessionUser, StudentSessionUser } from "@/types";
 import { Session } from "inspector/promises";
+import { ROLE_CODES } from "@/libs/roles";
 
 
  class MockAuthService {
@@ -12,7 +13,7 @@ import { Session } from "inspector/promises";
     console.log("MockAuthService.login called with data:", data);
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
 
-    if (data.email == "khangthinh111555@gmail.com" && data.password == "123456") {
+    if (data.role == ROLE_CODES[0] &&  data.email == "khangthinh111555@gmail.com" && data.password == "123456") {
         const user: StudentSessionUser = {
             studentNumber: "123456789",
             email: data.email,
@@ -25,7 +26,7 @@ import { Session } from "inspector/promises";
         };
         return { user };
     }
-    throw new Error("Invalid email or password");
+    throw new Error("Invalid email or password or role");
   }
 
   

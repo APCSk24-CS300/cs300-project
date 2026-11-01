@@ -1,6 +1,8 @@
+import { RoleCode } from "@/libs/roles";
 import type { SessionUser } from "@/types/auth";
 
 export interface LoginRequest {
+  role: RoleCode;
   email: string;
   password: string;
 }

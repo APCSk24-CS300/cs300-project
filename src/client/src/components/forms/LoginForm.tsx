@@ -13,8 +13,20 @@ function LoginForm() {
     const router = useRouter();
     const authContext = useAuth();
     const form = useForm<LoginSchemaType>({
-        resolver: zodResolver(LoginSchema)
+        resolver: zodResolver(LoginSchema),
+        defaultValues: {
+            role: 'student' ,
+            email: '',
+            password: '',
+        },
     })
+    
+    const role = useWatch({
+        control: form.control,
+        name: 'role',
+        defaultValue: 'student',
+    })
+
     const email = useWatch({
         control: form.control,
         name: 'email',
@@ -30,7 +42,7 @@ function LoginForm() {
 
     const onSubmit: SubmitHandler<LoginSchemaType> = async (data) => {
         try {
-            await authContext.login(data.email, data.password);
+            await authContext.login(data.role, data.email, data.password);
 
             if (authContext.isAuthenticated) {
                 const user_role = authContext.user?.role;
@@ -53,6 +65,14 @@ function LoginForm() {
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
+            <select {...form.register("role")}>
+                <option value="student">Student</option>
+                <option value="organizer">Organizer</option>
+                <option value="admin">Admin</option>
+            </select>
+            <hr />
+            <p>Selected role: {role}</p>
+            <hr />
             <input type="email"   {...form.register("email")} placeholder="Enter your email"  />
             {form.formState.errors.email && (
                 <p>{form.formState.errors.email.message}</p>

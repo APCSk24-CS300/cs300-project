@@ -2,6 +2,7 @@
 // provide a context for authentication state and methods
 
 
+import { RoleCode } from '@/libs/roles';
 import { SessionUser } from '@/types';
 import  { createContext } from 'react';
 
@@ -10,7 +11,7 @@ export interface AuthContextValue {
     isAuthenticated: boolean;
     isLoading: boolean;
 
-    login: (email: string, password: string) => Promise<void>;
+    login: (role: RoleCode, email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
 }

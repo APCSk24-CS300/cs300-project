@@ -1,6 +1,7 @@
 "use client";   
 
 import { AuthContext } from "@/contexts/auth-context";
+import { RoleCode } from "@/libs/roles";
 import { authService } from "@/services/auth.service";
 import { mockAuthService } from "@/services/mock.auth.service";
 import { SessionUser } from "@/types";
@@ -18,10 +19,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const authServiceInstance = mockAuthService;
 
-    const login = async (email: string, password: string) => {
+    const login = async (role: RoleCode, email: string, password: string) => {
         try {
             setIsLoading(true);
-            const response = await authServiceInstance.login({ email, password });
+            const response = await authServiceInstance.login({ role, email, password });
             if (response.user != null) {
                 setUser(response.user);
             }

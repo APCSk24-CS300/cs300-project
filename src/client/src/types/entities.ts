@@ -1,17 +1,8 @@
-/**
- * myHCMUS domain entities.
- * Conventions:
- *  - IDs are surrogate numeric keys (swap to string if you use UUIDs).
- *  - Timestamps are ISO-8601 strings (what crosses the API boundary).
- *  - Nullable DB columns are `T | null`.
- *  - Enums are `as const` arrays + derived unions, so you can reuse them
- *    for runtime validation (zod: z.enum(ROLE_CODES)).
- */
+import { RoleCode } from "@/libs/roles";
 
 export type ID = number;
 export type ISODateString = string;
-export const ROLE_CODES = ["student", "organizer", "administrator"] as const;
-export type RoleCode = (typeof ROLE_CODES)[number];
+
 
 export const PERMISSION_CODES = [
   "registration.create",

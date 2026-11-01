@@ -33,8 +33,15 @@ function LoginForm() {
             await authContext.login(data.email, data.password);
 
             if (authContext.isAuthenticated) {
-                console.log('User is authenticated, redirecting to {role}/dashboard...')
-                // router.push('/{role}/dashboard');
+                const user_role = authContext.user?.role;
+                if(user_role){
+                    console.log(`User is authenticated, redirecting to ${user_role}/dashboard...`)
+                    router.push(`/${user_role}/dashboard`);
+                }
+                else {
+                    console.error("User role is undefined");
+                    alert("Login failed. User role is undefined.");
+                }
             }
         }
         catch (error) {

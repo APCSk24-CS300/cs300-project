@@ -38,7 +38,7 @@ import { Session } from "inspector/promises";
     console.log("MockAuthService.getMe called");
     return {
         userId: 1,
-        email: '',
+        email: 'asdasdasdasd@sdasd',
         fullName: "Test Student",
         role: "student",
         permissions: [],

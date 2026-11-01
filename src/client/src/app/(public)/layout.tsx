@@ -5,8 +5,6 @@ interface AuthLayoutPropes{
 }
 export default function PublicLayout({ children }: AuthLayoutPropes) {
   return (
-    <html lang="en">
-      <body>{children}</body> 
-    </html>
+      <>{children}</> 
   );
 }

@@ -1,6 +1,6 @@
-"use client";   
+"use client";
 
-import { AuthContext } from "@/contexts/auth-context";
+import { AuthContext } from "@/contexts/auth.context";
 import { RoleCode } from "@/libs/roles";
 import { authService } from "@/services/auth.service";
 import { mockAuthService } from "@/services/mock.auth.service";
@@ -36,7 +36,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setIsLoading(false);
         }
     }
-    ;
+        ;
 
     const logout = async () => {
         try {
@@ -62,7 +62,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setIsLoading(true);
 
             const response = await authServiceInstance.getMe();
-            if (response){
+            if (response) {
                 setUser(response);
             }
         }
@@ -94,8 +94,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }, [refreshUser]);
 
     return (
-        <AuthContext.Provider value = {{ user, isAuthenticated: user !== null, isLoading, login, logout, refreshUser}}>
+        <AuthContext.Provider value={{ user, isAuthenticated: user !== null, isLoading, login, logout, refreshUser }}>
             {children}
         </AuthContext.Provider>
-      );
+    );
 }

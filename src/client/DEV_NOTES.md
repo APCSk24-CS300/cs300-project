@@ -27,6 +27,27 @@
 - [x] Add role selection to the login form.
 - [x] Add role-based redirection after login.
 
+
+### 1.4. UI/UX Design & Implementation
+
+#### Authentication Pages
+- [x] Finalize Login page UI.
+- [ ] Design loading, validation, and error states.
+
+#### Shared Application Layout
+- [ ] Establish the global design system.
+- [ ] Define typography, colors, spacing, and design tokens.
+- [ ] Build reusable UI components.
+
+#### Student Interface
+- [ ] Design Student Dashboard.
+
+#### Organizer Interface
+- [ ] Design Organizer Dashboard.
+
+#### Administrator Interface
+- [ ] Design Admin Dashboard.
+
 ---
 
 ## 2. Resolved Issues 
@@ -36,7 +57,6 @@
 
 ### 2.2. Next.js Proxy
 - Understood how Next.js Proxy works, including request interception, route matching, navigation, and authentication checks.
-
 
 
 ---
@@ -57,8 +77,7 @@
 | Navigation | Role-based navigation configuration |
 
 ### 3.1. Authentication API Contract
-
-**Current working assumption:**
+**Current working assumption:**  
 
 The login request includes:
 ```json
@@ -69,46 +88,22 @@ The login request includes:
 }
 ```
 
-**Pending confirmation from BE:**
-- Login endpoint and HTTP method.
-- Request and response schemas.
-- Session or JWT authentication mechanism.
-- Cookie configuration.
+**Pending confirmation from BE:**  
+- Login endpoint and HTTP method.  
+- Request and response schemas.  
+- Session or JWT authentication mechanism.  
+- Cookie configuration.  
 - Logout and session expiration behavior.
-- Current user endpoint.
+- Current user endpoint.  
 
 > The authentication contract has not been finalized. The current FE implementation should be treated as provisional until both teams agree on the contract.
 
 ---
 
-## 4. Upcoming Tasks
-
-
-### 4.1. UI/UX Design & Implementation
-
-#### Authentication Pages
-- [x] Finalize Login page UI.
-- [ ] Design loading, validation, and error states.
-
-#### Shared Application Layout
-- [ ] Establish the global design system.
-- [ ] Define typography, colors, spacing, and design tokens.
-- [ ] Build reusable UI components.
-
-
-#### Student Interface
-- [ ] Design Student Dashboard.
-
-#### Organizer Interface
-- [ ] Design Organizer Dashboard.
-
-#### Administrator Interface
-- [ ] Design Admin Dashboard.
-
 
 ---
 
-## 6. Development Log
+## 4. Development Log
 
 | Date | Activity |
 |---|---|
@@ -118,13 +113,3 @@ The login request includes:
 | 2026-11-02 | Continued Login form development, role selection, Zod validation, and API integration design. |
 
 ---
-
-## 7. Notes
-
-- Keep frontend UI components independent from backend implementation details.
-- Centralize API communication instead of scattering `fetch()` calls across components.
-- Keep authentication and authorization responsibilities clearly separated.
-- Treat UI-level role restrictions as usability features, not security enforcement.
-- Keep temporary API assumptions documented until the FE-BE contract is finalized.
-- Prefer reusable components and maintainable architecture as the application grows.
-

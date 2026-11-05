@@ -4,6 +4,7 @@
 
 import { RoleCode } from '@/libs/roles';
 import { SessionUser } from '@/types';
+import { LoginRequest } from '@/types/dtos/auth.dto';
 import  { createContext } from 'react';
 
 export interface AuthContextValue {
@@ -11,7 +12,7 @@ export interface AuthContextValue {
     isAuthenticated: boolean;
     isLoading: boolean;
 
-    login: (role: RoleCode, email: string, password: string) => Promise<void>;
+    login: (data: LoginRequest) => Promise<SessionUser>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
 }

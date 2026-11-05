@@ -10,6 +10,7 @@ import { SubmitHandler, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserIcon } from "../icons/UserIcon";
 import { UsersIcon } from "../icons/UsersIcon";
+import { LoginRequest } from "@/types/dtos/auth.dto";
 
 
 
@@ -72,21 +73,18 @@ function LoginForm() {
     //     router,
     // ]);
 
-    const onSubmit: SubmitHandler<LoginSchemaType> = async (data) => {
-        try {
-            setLoginError(null); 
-            await authContext.login(data.role, data.email, data.password);
+    const onSubmit: SubmitHandler<LoginSchemaType> = async (data: LoginRequest) => {
+        setLoginError(null); 
 
-            if (authContext.isAuthenticated) {
-                const user_role = authContext.user?.role;
-                if(user_role){
-                    console.log(`User is authenticated, redirecting to ${user_role}/dashboard...`)
-                    router.push(`/${user_role}/dashboard`);
-                }
-                else {
-                    console.error("User role is undefined");
-                    alert("Login failed. User role is undefined.");
-                }
+        try {
+            const user = await authContext.login(data);
+
+            if (user) {
+                const user_role = user.role;
+                router.push(`/${user_role}/dashboard`);
+            }
+            else {
+                setLoginError("Login failed. Please check your credentials.");
             }
         }
         catch (error) {

@@ -1,12 +1,7 @@
 import { RoleCode } from "@/libs/roles";
 import type { ID, PermissionCode } from "./entities";
 
-/** Cumulative: each role includes everything below it. */
-export const ROLE_RANK: Record<RoleCode, number> = {
-  student: 0,
-  organizer: 1,
-  admin: 2,
-};
+
 
 export type Session = {
   userId: string;

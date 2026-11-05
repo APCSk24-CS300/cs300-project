@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthContext } from "@/contexts/auth.context";
+import { AuthContext } from "@/contexts/AuthContext";
 import { RoleCode } from "@/libs/roles";
 import { authService } from "@/services/auth.service";
 import { mockAuthService } from "@/services/mock.auth.service";

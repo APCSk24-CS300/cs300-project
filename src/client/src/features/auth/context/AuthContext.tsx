@@ -3,9 +3,9 @@
 
 
 import { RoleCode } from '@/libs/roles';
-import { SessionUser } from '@/types';
-import { LoginRequest } from '@/types/dtos/auth.dto';
-import  { createContext } from 'react';
+import { SessionUser } from '@/features/auth/types/auth';
+import { LoginRequest } from '@/features/auth/types/auth.dto';
+import { createContext } from 'react';
 
 export interface AuthContextValue {
     user: SessionUser | null;

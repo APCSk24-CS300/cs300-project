@@ -4,13 +4,13 @@
 import { SubmitEvent, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import type { LoginSchemaType } from "@/schemas/login.schema";
-import { LoginSchema } from "@/schemas/login.schema";
+import type { LoginSchemaType } from "@/features/auth/schema/login.schema";
+import { LoginSchema } from "@/features/auth/schema/login.schema";
 import { SubmitHandler, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserIcon } from "../icons/UserIcon";
 import { UsersIcon } from "../icons/UsersIcon";
-import { LoginRequest } from "@/types/dtos/auth.dto";
+import { LoginRequest } from "@/features/auth/types/auth.dto";
 
 
 
@@ -38,12 +38,12 @@ function LoginForm() {
     const form = useForm<LoginSchemaType>({
         resolver: zodResolver(LoginSchema),
         defaultValues: {
-            role: 'student' ,
+            role: 'student',
             email: '',
             password: '',
         },
     })
-    
+
     const role = useWatch({
         control: form.control,
         name: 'role',
@@ -74,7 +74,7 @@ function LoginForm() {
     // ]);
 
     const onSubmit: SubmitHandler<LoginSchemaType> = async (data: LoginRequest) => {
-        setLoginError(null); 
+        setLoginError(null);
 
         try {
             const user = await authContext.login(data);
@@ -94,11 +94,12 @@ function LoginForm() {
                 error instanceof Error
                     ? error.message
                     : "Login failed. Please check your credentials."
-            );        }
+            );
+        }
     }
 
     return (
-         <form
+        <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="w-full"
         >
@@ -127,10 +128,9 @@ function LoginForm() {
                                     flex h-[53px] items-center justify-center
                                     gap-3 rounded-lg border-2 px-3
                                     text-xl font-semibold transition-colors
-                                    ${
-                                        isSelected
-                                            ? "border-[#1b4da5] text-[#1b4da5]"
-                                            : "border-[#b5b5b5] text-[#aaa] hover:border-[#1b4da5] hover:text-[#1b4da5]"
+                                    ${isSelected
+                                        ? "border-[#1b4da5] text-[#1b4da5]"
+                                        : "border-[#b5b5b5] text-[#aaa] hover:border-[#1b4da5] hover:text-[#1b4da5]"
                                     }
                                 `}
                             >

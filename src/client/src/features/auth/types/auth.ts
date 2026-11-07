@@ -1,5 +1,5 @@
 import { RoleCode } from "@/libs/roles";
-import type { ID, PermissionCode } from "./entities";
+import type { ID, PermissionCode } from "@/types/entities";
 
 
 

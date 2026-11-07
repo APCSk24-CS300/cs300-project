@@ -1,14 +1,15 @@
 // Login, Logout, Forgot Password, Reset Password, Change Password, Get current user
 import { api } from "@/libs/api-client";
 import type {
-  AuthResponse, ChangePasswordRequest, ForgotPasswordRequest, 
-  LoginRequest, MessageResponse, ResetPasswordRequest, } from "@/types/dtos/auth.dto";
+  AuthResponse, ChangePasswordRequest, ForgotPasswordRequest,
+  LoginRequest, MessageResponse, ResetPasswordRequest,
+} from "@/features/auth/types/auth.dto";
 
-import type { SessionUser } from "@/types";
+import type { SessionUser } from "@/features/auth/types";
 
 const BASE = "/auth";
 
- class AuthService {
+class AuthService {
   async login(data: LoginRequest): Promise<AuthResponse> {
     return api.post<AuthResponse>(`${BASE}/login`, data);
   }

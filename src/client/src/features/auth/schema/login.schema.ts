@@ -1,5 +1,5 @@
 import { ROLE_CODES } from '@/libs/roles';
-import { email, z } from 'zod'
+import {  z } from 'zod'
 
 export const LoginSchema = z.object({
         role: z.enum(ROLE_CODES, "Invalid role"),

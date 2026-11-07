@@ -1,7 +1,7 @@
 'use client';
 
 import "@/app/globals.css";
-import { AuthContext } from "@/contexts/AuthContext";
+import { AuthContext } from "@/features/auth/context/AuthContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -12,8 +12,8 @@ export default function DashboardPage() {
 
   const useContext = React.useContext(AuthContext);
   const user = useContext?.user;
-  
-  const handlogout = async () =>  {
+
+  const handlogout = async () => {
     console.log("Logging out...");
     try {
 
@@ -25,7 +25,7 @@ export default function DashboardPage() {
       console.error("Logout failed", error);
     }
   }
-  
+
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       <h1 className="text-2xl font-bold">Student Dashboard</h1>
@@ -34,7 +34,7 @@ export default function DashboardPage() {
       <button
         type="button"
         className="rounded bg-blue-500 px-50 py-1 0 text-black hover:bg-blue-600 text-3xl"
-        onClick={handlogout}>Log Out</button> 
+        onClick={handlogout}>Log Out</button>
 
     </div>
   );

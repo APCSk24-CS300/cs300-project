@@ -1,7 +1,7 @@
-import { AuthProvider} from "@/providers/AuthProvider";
+import { AuthProvider } from "@/features/auth/provider/AuthProvider";
 
 interface ProviderProps {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
 export function Provider({ children }: ProviderProps) {

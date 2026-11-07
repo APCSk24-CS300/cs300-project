@@ -1,11 +1,11 @@
 "use client";
 
-import { AuthContext } from "@/contexts/AuthContext";
+import { AuthContext } from "@/features/auth/context/AuthContext";
 import { RoleCode } from "@/libs/roles";
-import { authService } from "@/services/auth.service";
-import { mockAuthService } from "@/services/mock.auth.service";
-import { SessionUser } from "@/types";
-import { LoginRequest } from "@/types/dtos/auth.dto";
+import { authService } from "@/features/auth/services/auth.service";
+import { mockAuthService } from "@/features/auth/services/mock.auth.service";
+import { SessionUser } from "@/features/auth/types/auth";
+import { LoginRequest } from "@/features/auth/types/auth.dto";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { set } from "zod";
 
@@ -24,7 +24,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // (await cookies()).delete('session')
         setUser(null);
     }
-    const login =  useCallback(async (data: LoginRequest) => {
+    const login = useCallback(async (data: LoginRequest) => {
         try {
             setIsLoading(true);
             const response = await authServiceInstance.login(data);
@@ -50,7 +50,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setIsLoading(true);
             await authServiceInstance.logout();
             await removeUser();
-        
+
         }
         catch (error) {
             //placeholder for later error handling
@@ -104,7 +104,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const value = useMemo(
         () => ({ user, isAuthenticated: user !== null, login, logout, refreshUser, isLoading }),
         [user, login, logout],
-      );
+    );
     return (
         <AuthContext.Provider value={value}>
             {children}

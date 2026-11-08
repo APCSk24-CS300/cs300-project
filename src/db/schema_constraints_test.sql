@@ -104,4 +104,23 @@ SELECT expect_sqlstate('INSERT INTO "AppealEvidence" (appeal_id, file_url, conte
 SELECT expect_sqlstate('INSERT INTO "AppealEvidence" (appeal_id, file_url, content_type, file_size_bytes) VALUES (1, ''file.pdf'', ''application/pdf'', 0)', '23514');
 SELECT expect_sqlstate('INSERT INTO "AppealEvidence" (appeal_id, file_url, content_type, file_size_bytes) VALUES (1, ''file.pdf'', ''application/pdf'', 10485761)', '23514');
 -- End group 3.
+
+-- GROUP 4: communication and administration fixtures and invalid cases.
+INSERT INTO "ActivityAnnouncement" (activity_id, author_user_id, title, body)
+VALUES ('A1', 'U2', 'Update', 'Schedule confirmed');
+INSERT INTO "Notification" (recipient_user_id, activity_id, type, message, channel,
+    delivery_status, sent_at)
+VALUES ('U1', 'A1', 'registration', 'Approved', 'email', 'sent', CURRENT_TIMESTAMP);
+INSERT INTO "ServiceLink" (name, url) VALUES ('Library', 'https://library.example.edu');
+INSERT INTO "SystemSetting" (setting_key, setting_value, updated_by_user_id)
+VALUES ('appeal_window', 'open', 'U3');
+INSERT INTO "AuditLog" (actor_user_id, entity_type, entity_id, action, before_value, after_value)
+VALUES ('U3', 'SystemSetting', 'appeal_window', 'update', '"closed"', '"open"');
+SELECT expect_sqlstate('INSERT INTO "ActivityAnnouncement" (activity_id, author_user_id, title, body) VALUES (''A1'', ''U2'', '' '', ''Body'')', '23514');
+SELECT expect_sqlstate('INSERT INTO "Notification" (recipient_user_id, type, message, channel) VALUES (''U1'', ''registration'', ''Message'', ''push'')', '23514');
+SELECT expect_sqlstate('INSERT INTO "Notification" (recipient_user_id, type, message, delivery_status) VALUES (''U1'', ''registration'', ''Message'', ''sent'')', '23514');
+SELECT expect_sqlstate('INSERT INTO "ServiceLink" (name, url) VALUES ('' '', ''https://example.edu'')', '23514');
+SELECT expect_sqlstate('INSERT INTO "SystemSetting" (setting_key, setting_value) VALUES (''empty'', '' '')', '23514');
+SELECT expect_sqlstate('INSERT INTO "AuditLog" (entity_type, entity_id, action) VALUES ('' '', ''1'', ''update'')', '23514');
+-- End group 4.
 ROLLBACK;

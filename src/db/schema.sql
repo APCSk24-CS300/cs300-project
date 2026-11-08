@@ -246,45 +246,51 @@ CREATE TABLE "AppealEvidence" (
 CREATE TABLE "ActivityAnnouncement" (
     announcement_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     activity_id TEXT NOT NULL REFERENCES "Activity"(activity_id),
-    author_id TEXT NOT NULL REFERENCES "User"(user_id),
-    title TEXT NOT NULL,
-    body TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    author_user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    title TEXT NOT NULL CHECK (btrim(title) <> ''),
+    body TEXT NOT NULL CHECK (btrim(body) <> ''),
+    published_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "Notification" (
     notification_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    recipient_user_id TEXT NOT NULL REFERENCES "User"(user_id),
     activity_id TEXT REFERENCES "Activity"(activity_id),
-    title TEXT NOT NULL,
-    body TEXT NOT NULL,
+    type TEXT NOT NULL CHECK (btrim(type) <> ''),
+    message TEXT NOT NULL CHECK (btrim(message) <> ''),
     channel TEXT NOT NULL DEFAULT 'in_app' CHECK (channel IN ('in_app', 'email')),
-    delivery_status TEXT NOT NULL DEFAULT 'pending' CHECK (delivery_status IN ('pending', 'sent', 'failed')),
+    delivery_status TEXT NOT NULL DEFAULT 'pending'
+        CHECK (delivery_status IN ('pending', 'sent', 'failed')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     sent_at TIMESTAMPTZ,
-    read_at TIMESTAMPTZ
+    read_at TIMESTAMPTZ,
+    CHECK (sent_at IS NULL OR sent_at >= created_at),
+    CHECK (read_at IS NULL OR read_at >= created_at),
+    CHECK (delivery_status <> 'sent' OR sent_at IS NOT NULL)
 );
 
-CREATE TABLE "UniversityService" (
+CREATE TABLE "ServiceLink" (
     service_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL,
-    url TEXT NOT NULL,
+    name TEXT NOT NULL UNIQUE CHECK (btrim(name) <> ''),
+    url TEXT NOT NULL CHECK (btrim(url) <> ''),
+    description TEXT,
+    display_order INT NOT NULL DEFAULT 0,
     is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE "SystemSetting" (
-    setting_key TEXT PRIMARY KEY,
-    setting_value TEXT NOT NULL,
-    updated_by TEXT REFERENCES "User"(user_id),
+    setting_key TEXT PRIMARY KEY CHECK (btrim(setting_key) <> ''),
+    setting_value TEXT NOT NULL CHECK (btrim(setting_value) <> ''),
+    updated_by_user_id TEXT REFERENCES "User"(user_id),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "AuditLog" (
     audit_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    actor_id TEXT REFERENCES "User"(user_id),
-    entity_type TEXT NOT NULL,
-    entity_id TEXT NOT NULL,
-    action TEXT NOT NULL,
+    actor_user_id TEXT REFERENCES "User"(user_id),
+    entity_type TEXT NOT NULL CHECK (btrim(entity_type) <> ''),
+    entity_id TEXT NOT NULL CHECK (btrim(entity_id) <> ''),
+    action TEXT NOT NULL CHECK (btrim(action) <> ''),
     before_value JSONB,
     after_value JSONB,
     occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP

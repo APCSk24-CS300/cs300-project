@@ -1,4 +1,4 @@
-CREATE database "myHCMUS";
+CREATE DATABASE "myHCMUS";
 
 
 -------------------------------
@@ -6,70 +6,70 @@ CREATE database "myHCMUS";
 -------------------------------
 
 --------- USER AND INTEREST ---------
-create table "User" (
-    user_id text not null,
-    role_id int not null,
-    email text unique not null,
-    password_hash text not null, 
-    full_name text,
+CREATE TABLE "User" (
+    user_id TEXT NOT NULL,
+    role_id INT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL, 
+    full_name TEXT,
 
-    student_name text,
-    faculty_id text,
-    avatar_url text,
-    is_active boolean,
-    created_at timestamp,
+    student_name TEXT,
+    faculty_id TEXT,
+    avatar_url TEXT,
+    is_active BOOLEAN,
+    created_at TIMESTAMP,
 
-    constraint PK_User_user_id
-        primary key (user_id),
+    CONSTRAINT PK_User_user_id
+        PRIMARY KEY (user_id),
     
-    constraint FK_User_role_id
-        foreign key (role_id) references Role(role_id),
+    CONSTRAINT FK_User_role_id
+        FOREIGN KEY (role_id) REFERENCES Role(role_id),
     
-    constraint  FK_User_faculty_id
-        foreign key (faculty_id) references Faculty(faculty_id),
+    CONSTRAINT  FK_User_faculty_id
+        FOREIGN KEY (faculty_id) REFERENCES Faculty(faculty_id),
     
 );
 
-create table "UserInterest" (
-    user_id text, 
-    category_id int,
+CREATE TABLE "UserInterest" (
+    user_id TEXT, 
+    category_id INT,
 
-    constraint FK_UserInterest_user_id
-        foreign key (user_id) references "User"(user_id),
+    CONSTRAINT FK_UserInterest_user_id
+        FOREIGN KEY (user_id) REFERENCES "User"(user_id),
     
-    constraint FK_UserInterest_category_id 
-        foreign key (category_id) references Category(category_id),
+    CONSTRAINT FK_UserInterest_category_id 
+        FOREIGN KEY (category_id) REFERENCES Category(category_id),
 
 );
 
 --------- Activity and Participation ---------
 
-create table "Activity"(
-    activity_id text, 
-    title text,
-    "description" text,
-    eligibility_notes text,
-    category_id int,
-    semester_id int,
-    capacity int,
-    registration_opens_at timestamp,
-    registration_closes_at timestamp,
-    "status" int, 
-    creator_id text,
-    created_at timestamp,
+CREATE TABLE "Activity"(
+    activity_id TEXT, 
+    title TEXT,
+    "description" TEXT,
+    eligibility_notes TEXT,
+    category_id INT,
+    semester_id INT,
+    capacity INT,
+    registration_opens_at TIMESTAMP,
+    registration_closes_at TIMESTAMP,
+    "status" INT, 
+    creator_id TEXT,
+    created_at TIMESTAMP,
 
-    constraint PK_Activity_activity_id
-        primary key (activity_id),
+    CONSTRAINT PK_Activity_activity_id
+        PRIMARY KEY (activity_id),
 
-    constraint FK_Activity_category_id
-        foreign key (category_id) references "Category"(category_id),
+    CONSTRAINT FK_Activity_category_id
+        FOREIGN KEY (category_id) REFERENCES "Category"(category_id),
 
-    constraint FK_Activity_semester_id
-        foreign key (semster_id)
-        references "Semester"(semester_id),
+    CONSTRAINT FK_Activity_semester_id
+        FOREIGN KEY (semster_id)
+        REFERENCES "Semester"(semester_id),
     
-    constraint FK_Activity_creator_id
-        foreign key (creator_id)
-        references "User"(user_id)
+    CONSTRAINT FK_Activity_creator_id
+        FOREIGN KEY (creator_id)
+        REFERENCES "User"(user_id)
 
 );

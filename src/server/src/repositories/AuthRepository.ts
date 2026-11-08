@@ -13,4 +13,29 @@ interface User {
     userRole: number
 }
 
+interface UserRepository {
+    getByUserID(id: string): Promise< User | null >
+}
 
+class InMemoryUserRepository {
+    private db : User[] = [
+       { 
+        userID: "123",
+        data: {
+               name: "me",
+               phone: "0123",
+               email: "example@mail.com"
+           },
+        passwordHash: "676767",
+        signInTime: new Date(Date.now()),
+        userStatus: 2,
+        userRole: 1
+       }
+        
+    ]
+    constructor(db: DatabaseConnection) {}
+
+    public async getByUserID(id: string): Promise<User | null> {
+        return this.db[0];
+    }
+}

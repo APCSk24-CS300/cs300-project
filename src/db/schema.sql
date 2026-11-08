@@ -122,3 +122,28 @@ CREATE TABLE "ScoreAdjustment" (
     approved_by TEXT NOT NULL REFERENCES "User"(user_id),
     approved_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Recognition and appeal requests
+CREATE TABLE "StudentRequest" (
+    request_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    request_type TEXT NOT NULL CHECK (request_type IN ('recognition', 'appeal')),
+    activity_id TEXT REFERENCES "Activity"(activity_id),
+    registration_id BIGINT REFERENCES "Registration"(registration_id),
+    title TEXT NOT NULL,
+    details TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    reviewer_id TEXT REFERENCES "User"(user_id),
+    response TEXT,
+    submitted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at TIMESTAMPTZ
+);
+
+CREATE TABLE "RequestEvidence" (
+    evidence_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    request_id BIGINT NOT NULL REFERENCES "StudentRequest"(request_id),
+    file_url TEXT NOT NULL,
+    content_type TEXT NOT NULL CHECK (content_type IN ('application/pdf', 'image/jpeg', 'image/png')),
+    file_size_bytes BIGINT NOT NULL CHECK (file_size_bytes BETWEEN 1 AND 10485760),
+    uploaded_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

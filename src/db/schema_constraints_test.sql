@@ -47,4 +47,28 @@ SELECT expect_sqlstate('INSERT INTO "User" (user_id, role_id, email, password_ha
 SELECT expect_sqlstate('INSERT INTO "RolePermission" VALUES (1, 1)', '23505');
 SELECT expect_sqlstate('INSERT INTO "UserInterest" VALUES (''U1'', 1)', '23505');
 -- End group 1.
+
+-- GROUP 2: activities and enrollment fixtures and invalid cases.
+INSERT INTO "Activity" (activity_id, title, category_id, semester_id, capacity,
+    registration_opens_at, registration_closes_at, status, created_by_user_id)
+VALUES ('A1', 'Activity One', 1, 1, 1, '2026-10-01', '2026-10-02', 'published', 'U2'),
+       ('A2', 'Activity Two', 1, 1, 2, '2026-10-01', '2026-10-02', 'published', 'U2');
+INSERT INTO "ActivityOrganizer" VALUES ('A1', 'U2');
+INSERT INTO "ActivitySchedule" (activity_id, starts_at, ends_at, location)
+VALUES ('A1', '2026-10-03', '2026-10-04', 'Room One'),
+       ('A2', '2026-10-03', '2026-10-04', 'Room Two');
+INSERT INTO "ActivityEligibility" VALUES ('A1', 'F1');
+INSERT INTO "ActivityScore" VALUES ('A1', 1, 5);
+INSERT INTO "Registration" (activity_id, user_id, status)
+VALUES ('A1', 'U1', 'approved'), ('A2', 'U2', 'approved');
+INSERT INTO "Attendance" (schedule_id, registration_id, activity_id, status, recorded_by_user_id)
+VALUES (1, 1, 'A1', 'present', 'U2');
+SELECT expect_sqlstate('INSERT INTO "Activity" (activity_id, title, category_id, semester_id, capacity, registration_opens_at, registration_closes_at, created_by_user_id) VALUES (''BAD'', ''Bad'', 1, 1, 0, ''2026-10-01'', ''2026-10-02'', ''U2'')', '23514');
+SELECT expect_sqlstate('INSERT INTO "Activity" (activity_id, title, category_id, semester_id, capacity, registration_opens_at, registration_closes_at, created_by_user_id) VALUES (''BAD'', ''Bad'', 1, 1, 1, ''2026-10-02'', ''2026-10-01'', ''U2'')', '23514');
+SELECT expect_sqlstate('INSERT INTO "Activity" (activity_id, title, category_id, semester_id, capacity, registration_opens_at, registration_closes_at, created_by_user_id) VALUES (''BAD'', ''Bad'', 99, 1, 1, ''2026-10-01'', ''2026-10-02'', ''U2'')', '23503');
+SELECT expect_sqlstate('INSERT INTO "ActivitySchedule" (activity_id, starts_at, ends_at, location) VALUES (''A1'', ''2026-10-04'', ''2026-10-03'', ''Room'')', '23514');
+SELECT expect_sqlstate('INSERT INTO "Registration" (activity_id, user_id) VALUES (''A1'', ''U1'')', '23505');
+SELECT expect_sqlstate('INSERT INTO "Attendance" (schedule_id, registration_id, activity_id, status, recorded_by_user_id) VALUES (1, 2, ''A1'', ''present'', ''U2'')', '23503');
+SELECT expect_sqlstate('INSERT INTO "Attendance" (schedule_id, registration_id, activity_id, status, recorded_by_user_id) VALUES (2, 2, ''A2'', ''unknown'', ''U2'')', '23514');
+-- End group 2.
 ROLLBACK;

@@ -75,48 +75,80 @@ CREATE TABLE "UserInterest" (
     PRIMARY KEY (user_id, category_id)
 );
 
-CREATE TABLE "Category" (
-    category_id INT PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL
-);
-
 CREATE TABLE "Activity" (
-    activity_id TEXT PRIMARY KEY,
-    title TEXT NOT NULL,
+    activity_id TEXT PRIMARY KEY CHECK (btrim(activity_id) <> ''),
+    title TEXT NOT NULL CHECK (btrim(title) <> ''),
     description TEXT,
     eligibility_notes TEXT,
-    category_id INT REFERENCES "Category"(category_id),
-    semester_id INT REFERENCES "Semester"(semester_id),
-    faculty_id TEXT REFERENCES "Faculty"(faculty_id),
-    location TEXT,
-    starts_at TIMESTAMPTZ,
-    ends_at TIMESTAMPTZ,
-    capacity INT CHECK (capacity >= 0),
-    registration_opens_at TIMESTAMPTZ,
-    registration_closes_at TIMESTAMPTZ,
-    status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'ongoing', 'completed', 'cancelled')),
-    creator_id TEXT REFERENCES "User"(user_id),
+    category_id INT NOT NULL REFERENCES "ActivityCategory"(category_id),
+    semester_id INT NOT NULL REFERENCES "Semester"(semester_id),
+    capacity INT NOT NULL CHECK (capacity > 0),
+    registration_opens_at TIMESTAMPTZ NOT NULL,
+    registration_closes_at TIMESTAMPTZ NOT NULL,
+    status TEXT NOT NULL DEFAULT 'draft'
+        CHECK (status IN ('draft', 'published', 'cancelled', 'completed')),
+    created_by_user_id TEXT NOT NULL REFERENCES "User"(user_id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CHECK (ends_at IS NULL OR starts_at IS NULL OR ends_at >= starts_at),
-    CHECK (registration_closes_at IS NULL OR registration_opens_at IS NULL OR registration_closes_at >= registration_opens_at)
+    CHECK (registration_opens_at < registration_closes_at)
+);
+
+CREATE TABLE "ActivityOrganizer" (
+    activity_id TEXT NOT NULL REFERENCES "Activity"(activity_id),
+    user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    PRIMARY KEY (activity_id, user_id)
+);
+
+CREATE TABLE "ActivitySchedule" (
+    schedule_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    activity_id TEXT NOT NULL REFERENCES "Activity"(activity_id),
+    starts_at TIMESTAMPTZ NOT NULL,
+    ends_at TIMESTAMPTZ NOT NULL,
+    location TEXT NOT NULL CHECK (btrim(location) <> ''),
+    UNIQUE (schedule_id, activity_id),
+    CHECK (starts_at < ends_at)
+);
+
+CREATE TABLE "ActivityEligibility" (
+    activity_id TEXT NOT NULL REFERENCES "Activity"(activity_id),
+    faculty_id TEXT NOT NULL REFERENCES "Faculty"(faculty_id),
+    PRIMARY KEY (activity_id, faculty_id)
+);
+
+CREATE TABLE "ActivityScore" (
+    activity_id TEXT NOT NULL REFERENCES "Activity"(activity_id),
+    criterion_id BIGINT NOT NULL REFERENCES "ScoreCriterion"(criterion_id),
+    points NUMERIC(8, 2) NOT NULL,
+    PRIMARY KEY (activity_id, criterion_id)
 );
 
 CREATE TABLE "Registration" (
     registration_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     activity_id TEXT NOT NULL REFERENCES "Activity"(activity_id),
     user_id TEXT NOT NULL REFERENCES "User"(user_id),
-    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'waitlisted', 'rejected', 'cancelled')),
+    status TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'approved', 'waitlisted', 'rejected', 'cancelled')),
     registered_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    reviewed_by TEXT REFERENCES "User"(user_id),
-    reviewed_at TIMESTAMPTZ,
-    UNIQUE (activity_id, user_id)
+    decided_at TIMESTAMPTZ,
+    decided_by_user_id TEXT REFERENCES "User"(user_id),
+    UNIQUE (activity_id, user_id),
+    UNIQUE (registration_id, activity_id),
+    UNIQUE (registration_id, user_id),
+    CHECK ((decided_at IS NULL) = (decided_by_user_id IS NULL)),
+    CHECK (decided_at IS NULL OR decided_at >= registered_at)
 );
 
-CREATE TABLE "ActivityScore" (
-    activity_id TEXT NOT NULL REFERENCES "Activity"(activity_id),
-    criterion_id BIGINT NOT NULL REFERENCES "ScoreCriterion"(criterion_id),
-    points NUMERIC(8, 2) NOT NULL CHECK (points >= 0),
-    PRIMARY KEY (activity_id, criterion_id)
+CREATE TABLE "Attendance" (
+    schedule_id BIGINT NOT NULL,
+    registration_id BIGINT NOT NULL,
+    activity_id TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('present', 'absent', 'excused')),
+    recorded_by_user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    recorded_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (schedule_id, registration_id),
+    FOREIGN KEY (schedule_id, activity_id)
+        REFERENCES "ActivitySchedule"(schedule_id, activity_id),
+    FOREIGN KEY (registration_id, activity_id)
+        REFERENCES "Registration"(registration_id, activity_id)
 );
 
 CREATE TABLE "Participation" (

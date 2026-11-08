@@ -33,3 +33,26 @@ Sources: `docs/analysis-and-design/db/business-requirements.md` and `docs/requir
 | AuditLog | Required entity/action identifiers, actor/time and before/after fields | Append-only access and complete audit coverage |
 
 The first 25 entities are specified in the database business requirements. `SystemSetting` and `AuditLog` come from the product vision and were preserved from the prior schema.
+
+## Cross-record enforcement boundary
+
+| Rule family | Required condition | Boundary | Follow-on owner |
+| --- | --- | --- | --- |
+| Published readiness | At least one assigned organizer and one session; sessions fit the semester | Publish transaction | Activity service |
+| Capacity and waiting list | Approved count at most capacity; serialize seat changes; promote earliest eligible waitlist entry by registered_at then registration_id once | Seat transaction | Registration service |
+| Permission and ownership | Role grants action, activity is assigned, student data belongs to requester, inactive users are denied | Every protected command and query | Authorization service |
+| Participation and score provenance | Approved registration and complete attendance precede participation; scores use their source's semester and criterion | Verification and award transactions | Participation and score services |
+| Criterion history | Code, meaning, and maximum remain fixed after first award; new rules create new records | Criterion update | Criteria service |
+| Score adjustment | Old/new values match the award immediately before/after; history and update are atomic | Adjustment transaction | Score service |
+| Appeal and recognition | Only authorized review, approved source appeal, matching owner, and no duplicate prior-activity credit | Review and recognition transaction | Appeal service |
+| Audit and notification | Protected successful changes create immutable before/after events; delivery failure does not block core workflow | Mutation and delivery transactions | Audit and notification services |
+| Evidence | Actual file type/size checked; access limited to student and authorized staff; three-year retention after resolution | File boundary and retention job | Evidence service |
+
+The detailed action and rule list is in contracts/schema-contract.md. These are follow-on obligations; the bootstrap schema enforces only the direct keys, references, and row-level checks shown in the main table.
+
+## Reconciliation notes
+
+- The database business requirements govern stored names and statuses. The product vision's “ongoing” activity state is derived for presentation from published activity sessions.
+- Category becomes ActivityCategory, StudentRequest becomes Appeal and Recognition, and ScoreAward becomes TrainingScore with ScoreChange history. The populated-database mapping is documented in research.md.
+- SystemSetting and AuditLog remain because the product vision requires configuration and audit history even though the dedicated database entity list omits them.
+- All 27 current schema table names match the 27 audited entity rows. The complete regression suite includes valid fixtures for every table and 53 expected constraint rejections.

@@ -4,8 +4,6 @@
 CREATE DATABASE "myHCMUS" WITH ENCODING 'UTF8';
 \connect "myHCMUS"
 
-
-
 CREATE TABLE "Role" (
     role_id INT PRIMARY KEY,
     code TEXT NOT NULL UNIQUE CHECK (code IN ('student', 'organizer', 'reviewer', 'administrator')),
@@ -278,6 +276,7 @@ CREATE TABLE "ServiceLink" (
     is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+-- Product-wide administration and audit records required by the vision document.
 CREATE TABLE "SystemSetting" (
     setting_key TEXT PRIMARY KEY CHECK (btrim(setting_key) <> ''),
     setting_value TEXT NOT NULL CHECK (btrim(setting_value) <> ''),

@@ -152,52 +152,93 @@ CREATE TABLE "Attendance" (
 );
 
 CREATE TABLE "Participation" (
-    registration_id BIGINT PRIMARY KEY REFERENCES "Registration"(registration_id),
-    attended BOOLEAN NOT NULL DEFAULT FALSE,
-    verified_by TEXT REFERENCES "User"(user_id),
-    verified_at TIMESTAMPTZ,
-    notes TEXT
+    participation_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    registration_id BIGINT NOT NULL UNIQUE REFERENCES "Registration"(registration_id),
+    verified_by_user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    verified_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE "ScoreAward" (
-    registration_id BIGINT NOT NULL REFERENCES "Participation"(registration_id),
-    criterion_id BIGINT NOT NULL REFERENCES "ScoreCriterion"(criterion_id),
-    points NUMERIC(8, 2) NOT NULL CHECK (points >= 0),
-    awarded_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (registration_id, criterion_id)
-);
-
-CREATE TABLE "ScoreAdjustment" (
-    adjustment_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id TEXT NOT NULL REFERENCES "User"(user_id),
-    semester_id INT NOT NULL REFERENCES "Semester"(semester_id),
-    criterion_id BIGINT NOT NULL REFERENCES "ScoreCriterion"(criterion_id),
-    points NUMERIC(8, 2) NOT NULL,
-    reason TEXT NOT NULL,
-    approved_by TEXT NOT NULL REFERENCES "User"(user_id),
-    approved_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE "StudentRequest" (
-    request_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id TEXT NOT NULL REFERENCES "User"(user_id),
-    request_type TEXT NOT NULL CHECK (request_type IN ('recognition', 'appeal')),
+CREATE TABLE "Appeal" (
+    appeal_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    submitted_by_user_id TEXT NOT NULL REFERENCES "User"(user_id),
     activity_id TEXT REFERENCES "Activity"(activity_id),
-    registration_id BIGINT REFERENCES "Registration"(registration_id),
-    title TEXT NOT NULL,
-    details TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
-    reviewer_id TEXT REFERENCES "User"(user_id),
+    registration_id BIGINT,
+    score_id BIGINT,
+    type TEXT NOT NULL
+        CHECK (type IN ('recognition', 'participation_correction', 'score_correction')),
+    description TEXT NOT NULL CHECK (btrim(description) <> ''),
+    status TEXT NOT NULL DEFAULT 'submitted'
+        CHECK (status IN ('submitted', 'in_review', 'approved', 'rejected')),
+    reviewed_by_user_id TEXT REFERENCES "User"(user_id),
     response TEXT,
     submitted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    reviewed_at TIMESTAMPTZ
+    reviewed_at TIMESTAMPTZ,
+    UNIQUE (appeal_id, submitted_by_user_id),
+    FOREIGN KEY (registration_id, submitted_by_user_id)
+        REFERENCES "Registration"(registration_id, user_id),
+    CHECK (
+        (type = 'recognition' AND registration_id IS NULL AND score_id IS NULL)
+        OR (type = 'participation_correction' AND registration_id IS NOT NULL AND score_id IS NULL)
+        OR (type = 'score_correction' AND score_id IS NOT NULL AND registration_id IS NULL)
+    ),
+    CHECK (
+        status NOT IN ('approved', 'rejected')
+        OR (reviewed_by_user_id IS NOT NULL AND reviewed_at IS NOT NULL
+            AND response IS NOT NULL AND btrim(response) <> '')
+    ),
+    CHECK ((reviewed_by_user_id IS NULL) = (reviewed_at IS NULL)),
+    CHECK (reviewed_at IS NULL OR reviewed_at >= submitted_at)
 );
 
-CREATE TABLE "RequestEvidence" (
+CREATE TABLE "Recognition" (
+    recognition_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    appeal_id BIGINT NOT NULL UNIQUE,
+    student_user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    title TEXT NOT NULL CHECK (btrim(title) <> ''),
+    occurred_at TIMESTAMPTZ NOT NULL,
+    semester_id INT NOT NULL REFERENCES "Semester"(semester_id),
+    criterion_id BIGINT NOT NULL REFERENCES "ScoreCriterion"(criterion_id),
+    verified_by_user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    verified_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (appeal_id, student_user_id)
+        REFERENCES "Appeal"(appeal_id, submitted_by_user_id)
+);
+
+CREATE TABLE "TrainingScore" (
+    score_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    participation_id BIGINT REFERENCES "Participation"(participation_id),
+    recognition_id BIGINT REFERENCES "Recognition"(recognition_id),
+    criterion_id BIGINT NOT NULL REFERENCES "ScoreCriterion"(criterion_id),
+    semester_id INT NOT NULL REFERENCES "Semester"(semester_id),
+    points_awarded NUMERIC(8, 2) NOT NULL,
+    awarded_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    awarded_by_user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    UNIQUE (participation_id, criterion_id),
+    UNIQUE (recognition_id, criterion_id),
+    CHECK ((participation_id IS NOT NULL) <> (recognition_id IS NOT NULL))
+);
+
+ALTER TABLE "Appeal"
+    ADD CONSTRAINT appeal_score_fk FOREIGN KEY (score_id) REFERENCES "TrainingScore"(score_id);
+
+CREATE TABLE "ScoreChange" (
+    change_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    score_id BIGINT NOT NULL REFERENCES "TrainingScore"(score_id),
+    appeal_id BIGINT REFERENCES "Appeal"(appeal_id),
+    old_points NUMERIC(8, 2) NOT NULL,
+    new_points NUMERIC(8, 2) NOT NULL,
+    changed_by_user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    changed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reason TEXT NOT NULL CHECK (btrim(reason) <> '')
+);
+
+CREATE TABLE "AppealEvidence" (
     evidence_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    request_id BIGINT NOT NULL REFERENCES "StudentRequest"(request_id),
-    file_url TEXT NOT NULL,
-    content_type TEXT NOT NULL CHECK (content_type IN ('application/pdf', 'image/jpeg', 'image/png')),
+    appeal_id BIGINT NOT NULL REFERENCES "Appeal"(appeal_id),
+    file_url TEXT NOT NULL CHECK (btrim(file_url) <> ''),
+    description TEXT,
+    content_type TEXT NOT NULL
+        CHECK (content_type IN ('application/pdf', 'image/jpeg', 'image/png')),
     file_size_bytes BIGINT NOT NULL CHECK (file_size_bytes BETWEEN 1 AND 10485760),
     uploaded_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

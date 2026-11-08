@@ -71,4 +71,37 @@ SELECT expect_sqlstate('INSERT INTO "Registration" (activity_id, user_id) VALUES
 SELECT expect_sqlstate('INSERT INTO "Attendance" (schedule_id, registration_id, activity_id, status, recorded_by_user_id) VALUES (1, 2, ''A1'', ''present'', ''U2'')', '23503');
 SELECT expect_sqlstate('INSERT INTO "Attendance" (schedule_id, registration_id, activity_id, status, recorded_by_user_id) VALUES (2, 2, ''A2'', ''unknown'', ''U2'')', '23514');
 -- End group 2.
+
+-- GROUP 3: participation, appeals, recognition, and scoring fixtures.
+INSERT INTO "Participation" (registration_id, verified_by_user_id) VALUES (1, 'U2');
+INSERT INTO "Appeal" (submitted_by_user_id, type, description, status, reviewed_by_user_id, response, reviewed_at)
+VALUES ('U1', 'recognition', 'External activity', 'approved', 'U3', 'Approved', CURRENT_TIMESTAMP);
+INSERT INTO "Recognition" (appeal_id, student_user_id, title, occurred_at, semester_id,
+    criterion_id, verified_by_user_id)
+VALUES (1, 'U1', 'External activity', '2026-10-10', 1, 1, 'U3');
+INSERT INTO "TrainingScore" (participation_id, criterion_id, semester_id, points_awarded, awarded_by_user_id)
+VALUES (1, 1, 1, 5, 'U2');
+INSERT INTO "TrainingScore" (recognition_id, criterion_id, semester_id, points_awarded, awarded_by_user_id)
+VALUES (1, 1, 1, 3, 'U3');
+INSERT INTO "ScoreChange" (score_id, old_points, new_points, changed_by_user_id, reason)
+VALUES (1, 5, 4, 'U2', 'Corrected award');
+INSERT INTO "AppealEvidence" (appeal_id, file_url, content_type, file_size_bytes)
+VALUES (1, 'evidence.pdf', 'application/pdf', 10485760);
+INSERT INTO "Appeal" (submitted_by_user_id, registration_id, type, description)
+VALUES ('U1', 1, 'participation_correction', 'Attendance missing');
+INSERT INTO "Appeal" (submitted_by_user_id, score_id, type, description)
+VALUES ('U1', 1, 'score_correction', 'Score incorrect');
+SELECT expect_sqlstate('INSERT INTO "Participation" (registration_id, verified_by_user_id) VALUES (1, ''U2'')', '23505');
+SELECT expect_sqlstate('INSERT INTO "Appeal" (submitted_by_user_id, type, description) VALUES (''U1'', ''participation_correction'', ''Missing'')', '23514');
+SELECT expect_sqlstate('INSERT INTO "Appeal" (submitted_by_user_id, registration_id, type, description) VALUES (''U2'', 1, ''participation_correction'', ''Wrong owner'')', '23503');
+SELECT expect_sqlstate('INSERT INTO "Appeal" (submitted_by_user_id, type, description, status) VALUES (''U1'', ''recognition'', ''Missing review'', ''approved'')', '23514');
+SELECT expect_sqlstate('INSERT INTO "Recognition" (appeal_id, student_user_id, title, occurred_at, semester_id, criterion_id, verified_by_user_id) VALUES (2, ''U2'', ''Wrong owner'', ''2026-10-10'', 1, 1, ''U3'')', '23503');
+SELECT expect_sqlstate('INSERT INTO "TrainingScore" (criterion_id, semester_id, points_awarded, awarded_by_user_id) VALUES (1, 1, 1, ''U2'')', '23514');
+SELECT expect_sqlstate('INSERT INTO "TrainingScore" (participation_id, recognition_id, criterion_id, semester_id, points_awarded, awarded_by_user_id) VALUES (1, 1, 1, 1, 1, ''U2'')', '23514');
+SELECT expect_sqlstate('INSERT INTO "TrainingScore" (participation_id, criterion_id, semester_id, points_awarded, awarded_by_user_id) VALUES (1, 1, 1, 1, ''U2'')', '23505');
+SELECT expect_sqlstate('INSERT INTO "ScoreChange" (score_id, old_points, new_points, changed_by_user_id, reason) VALUES (1, 5, 4, ''U2'', '' '')', '23514');
+SELECT expect_sqlstate('INSERT INTO "AppealEvidence" (appeal_id, file_url, content_type, file_size_bytes) VALUES (1, ''file.txt'', ''text/plain'', 1)', '23514');
+SELECT expect_sqlstate('INSERT INTO "AppealEvidence" (appeal_id, file_url, content_type, file_size_bytes) VALUES (1, ''file.pdf'', ''application/pdf'', 0)', '23514');
+SELECT expect_sqlstate('INSERT INTO "AppealEvidence" (appeal_id, file_url, content_type, file_size_bytes) VALUES (1, ''file.pdf'', ''application/pdf'', 10485761)', '23514');
+-- End group 3.
 ROLLBACK;

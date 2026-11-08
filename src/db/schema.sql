@@ -67,3 +67,58 @@ CREATE TABLE "Activity" (
     CHECK (ends_at IS NULL OR starts_at IS NULL OR ends_at >= starts_at),
     CHECK (registration_closes_at IS NULL OR registration_opens_at IS NULL OR registration_closes_at >= registration_opens_at)
 );
+
+-- Registration, attendance, and training scores
+CREATE TABLE "Registration" (
+    registration_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    activity_id TEXT NOT NULL REFERENCES "Activity"(activity_id),
+    user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'waitlisted', 'rejected', 'cancelled')),
+    registered_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reviewed_by TEXT REFERENCES "User"(user_id),
+    reviewed_at TIMESTAMPTZ,
+    UNIQUE (activity_id, user_id)
+);
+
+CREATE TABLE "ScoreCriterion" (
+    criterion_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    valid_from DATE NOT NULL,
+    valid_until DATE,
+    CHECK (valid_until IS NULL OR valid_until >= valid_from)
+);
+
+CREATE TABLE "ActivityScore" (
+    activity_id TEXT NOT NULL REFERENCES "Activity"(activity_id),
+    criterion_id BIGINT NOT NULL REFERENCES "ScoreCriterion"(criterion_id),
+    points NUMERIC(8, 2) NOT NULL CHECK (points >= 0),
+    PRIMARY KEY (activity_id, criterion_id)
+);
+
+CREATE TABLE "Participation" (
+    registration_id BIGINT PRIMARY KEY REFERENCES "Registration"(registration_id),
+    attended BOOLEAN NOT NULL DEFAULT FALSE,
+    verified_by TEXT REFERENCES "User"(user_id),
+    verified_at TIMESTAMPTZ,
+    notes TEXT
+);
+
+CREATE TABLE "ScoreAward" (
+    registration_id BIGINT NOT NULL REFERENCES "Participation"(registration_id),
+    criterion_id BIGINT NOT NULL REFERENCES "ScoreCriterion"(criterion_id),
+    points NUMERIC(8, 2) NOT NULL CHECK (points >= 0),
+    awarded_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (registration_id, criterion_id)
+);
+
+CREATE TABLE "ScoreAdjustment" (
+    adjustment_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    semester_id INT NOT NULL REFERENCES "Semester"(semester_id),
+    criterion_id BIGINT NOT NULL REFERENCES "ScoreCriterion"(criterion_id),
+    points NUMERIC(8, 2) NOT NULL,
+    reason TEXT NOT NULL,
+    approved_by TEXT NOT NULL REFERENCES "User"(user_id),
+    approved_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

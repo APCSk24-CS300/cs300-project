@@ -1,17 +1,7 @@
-// assume user data is like this
-interface UserData {
-    name: string,
-    email: string,
-    phone: string,
-}
-interface User {
-    userID: string,
-    data: UserData,
-    passwordHash: string,
-    signInTime: Date,
-    userStatus: number,
-    userRole: number
-}
+import {User} from "../types/UserRegistrationData.ts";
+// import { Pool } from "pg";
+// import "dotenv/config";
+// import bcrypt from 'bcrypt';
 
 interface UserRepository {
     getByUserID(id: string): Promise< User | null >
@@ -24,7 +14,8 @@ class InMemoryUserRepository {
         data: {
                name: "me",
                phone: "0123",
-               email: "example@mail.com"
+               email: "example@mail.com",
+               passwordPlainText: "thisispw"
            },
         passwordHash: "676767",
         signInTime: new Date(Date.now()),
@@ -33,7 +24,7 @@ class InMemoryUserRepository {
        }
         
     ]
-    constructor(db: DatabaseConnection) {}
+    constructor(db: string) {}
 
     public async getByUserID(id: string): Promise<User | null> {
         return this.db[0];

@@ -1,40 +1,68 @@
--- Run this file with psql.\connect is a psql command.
+-- Initial schema for myHCMUS. Run with psql against a PostgreSQL server.
+-- See docs/analysis-and-design/db/business-requirements.md for business rules.
+-- This creates a new database; existing installations require a data migration.
 CREATE DATABASE "myHCMUS" WITH ENCODING 'UTF8';
 \connect "myHCMUS"
 
--- Reference data and users
+
+
 CREATE TABLE "Role" (
     role_id INT PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL
+    code TEXT NOT NULL UNIQUE CHECK (code IN ('student', 'organizer', 'reviewer', 'administrator')),
+    name TEXT NOT NULL CHECK (btrim(name) <> ''),
+    description TEXT
+);
+
+CREATE TABLE "Permission" (
+    permission_id INT PRIMARY KEY,
+    code TEXT NOT NULL UNIQUE CHECK (btrim(code) <> ''),
+    description TEXT
+);
+
+CREATE TABLE "RolePermission" (
+    role_id INT NOT NULL REFERENCES "Role"(role_id),
+    permission_id INT NOT NULL REFERENCES "Permission"(permission_id),
+    PRIMARY KEY (role_id, permission_id)
 );
 
 CREATE TABLE "Faculty" (
-    faculty_id TEXT PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL
+    faculty_id TEXT PRIMARY KEY CHECK (btrim(faculty_id) <> ''),
+    code TEXT NOT NULL UNIQUE CHECK (btrim(code) <> ''),
+    name TEXT NOT NULL CHECK (btrim(name) <> '')
 );
 
-CREATE TABLE "Category" (
+CREATE TABLE "ActivityCategory" (
     category_id INT PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL
+    name TEXT NOT NULL UNIQUE CHECK (btrim(name) <> ''),
+    description TEXT
 );
 
 CREATE TABLE "Semester" (
     semester_id INT PRIMARY KEY,
-    academic_year TEXT NOT NULL,
-    name TEXT NOT NULL,
+    academic_year TEXT NOT NULL CHECK (btrim(academic_year) <> ''),
+    term TEXT NOT NULL CHECK (btrim(term) <> ''),
     starts_at DATE NOT NULL,
     ends_at DATE NOT NULL,
-    UNIQUE (academic_year, name),
-    CHECK (ends_at >= starts_at)
+    UNIQUE (academic_year, term),
+    CHECK (starts_at < ends_at)
+);
+
+CREATE TABLE "ScoreCriterion" (
+    criterion_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    code TEXT NOT NULL UNIQUE CHECK (btrim(code) <> ''),
+    name TEXT NOT NULL CHECK (btrim(name) <> ''),
+    description TEXT,
+    max_points NUMERIC(8, 2) NOT NULL CHECK (max_points >= 0),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE "User" (
-    user_id TEXT PRIMARY KEY,
+    user_id TEXT PRIMARY KEY CHECK (btrim(user_id) <> ''),
     role_id INT NOT NULL REFERENCES "Role"(role_id),
-    email TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    full_name TEXT,
-    student_name TEXT,
+    email TEXT NOT NULL UNIQUE CHECK (btrim(email) <> ''),
+    password_hash TEXT NOT NULL CHECK (btrim(password_hash) <> ''),
+    full_name TEXT NOT NULL CHECK (btrim(full_name) <> ''),
+    student_number TEXT UNIQUE CHECK (student_number IS NULL OR btrim(student_number) <> ''),
     faculty_id TEXT REFERENCES "Faculty"(faculty_id),
     avatar_url TEXT,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
@@ -43,8 +71,13 @@ CREATE TABLE "User" (
 
 CREATE TABLE "UserInterest" (
     user_id TEXT NOT NULL REFERENCES "User"(user_id),
-    category_id INT NOT NULL REFERENCES "Category"(category_id),
+    category_id INT NOT NULL REFERENCES "ActivityCategory"(category_id),
     PRIMARY KEY (user_id, category_id)
+);
+
+CREATE TABLE "Category" (
+    category_id INT PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE "Activity" (
@@ -68,7 +101,6 @@ CREATE TABLE "Activity" (
     CHECK (registration_closes_at IS NULL OR registration_opens_at IS NULL OR registration_closes_at >= registration_opens_at)
 );
 
--- Registration, attendance, and training scores
 CREATE TABLE "Registration" (
     registration_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     activity_id TEXT NOT NULL REFERENCES "Activity"(activity_id),
@@ -78,15 +110,6 @@ CREATE TABLE "Registration" (
     reviewed_by TEXT REFERENCES "User"(user_id),
     reviewed_at TIMESTAMPTZ,
     UNIQUE (activity_id, user_id)
-);
-
-CREATE TABLE "ScoreCriterion" (
-    criterion_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name TEXT NOT NULL,
-    description TEXT,
-    valid_from DATE NOT NULL,
-    valid_until DATE,
-    CHECK (valid_until IS NULL OR valid_until >= valid_from)
 );
 
 CREATE TABLE "ActivityScore" (
@@ -123,7 +146,6 @@ CREATE TABLE "ScoreAdjustment" (
     approved_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Recognition and appeal requests
 CREATE TABLE "StudentRequest" (
     request_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES "User"(user_id),
@@ -148,7 +170,6 @@ CREATE TABLE "RequestEvidence" (
     uploaded_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Communication and administration
 CREATE TABLE "ActivityAnnouncement" (
     announcement_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     activity_id TEXT NOT NULL REFERENCES "Activity"(activity_id),

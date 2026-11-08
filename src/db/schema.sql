@@ -30,7 +30,7 @@ create table "User" (
     
 );
 
-create table UserInterest (
+create table "UserInterest" (
     user_id text, 
     category_id int,
 
@@ -40,6 +40,36 @@ create table UserInterest (
     constraint FK_UserInterest_category_id 
         foreign key (category_id) references Category(category_id),
 
-)
+);
 
 --------- Activity and Participation ---------
+
+create table "Activity"(
+    activity_id text, 
+    title text,
+    "description" text,
+    eligibility_notes text,
+    category_id int,
+    semester_id int,
+    capacity int,
+    registration_opens_at timestamp,
+    registration_closes_at timestamp,
+    "status" int, 
+    creator_id text,
+    created_at timestamp,
+
+    constraint PK_Activity_activity_id
+        primary key (activity_id),
+
+    constraint FK_Activity_category_id
+        foreign key (category_id) references "Category"(category_id),
+
+    constraint FK_Activity_semester_id
+        foreign key (semster_id)
+        references "Semester"(semester_id),
+    
+    constraint FK_Activity_creator_id
+        foreign key (creator_id)
+        references "User"(user_id)
+
+);

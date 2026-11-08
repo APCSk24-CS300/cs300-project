@@ -1,32 +1,27 @@
-import {User} from "../types/UserRegistrationData.ts";
-// import { Pool } from "pg";
-// import "dotenv/config";
-// import bcrypt from 'bcrypt';
+import type { User } from "../types/UserRegistrationData.ts";
 
-interface UserRepository {
-    getByUserID(id: string): Promise< User | null >
+export interface UserRepository {
+    getByUserID(id: string): Promise<User | null>;
 }
 
-class InMemoryUserRepository {
-    private db : User[] = [
-       { 
-        userID: "123",
-        data: {
-               name: "me",
-               phone: "0123",
-               email: "example@mail.com",
-               passwordPlainText: "thisispw"
-           },
-        passwordHash: "676767",
-        signInTime: new Date(Date.now()),
-        userStatus: 2,
-        userRole: 1
-       }
-        
-    ]
-    constructor(db: string) {}
+export class InMemoryUserRepository implements UserRepository {
+    private readonly db: User[] = [
+        {
+            userID: "123",
+            data: {
+                name: "me",
+                phone: "0123",
+                email: "example@mail.com",
+                passwordPlainText: "thisispw"
+            },
+            passwordHash: "676767",
+            signInTime: new Date(),
+            userStatus: 2,
+            userRole: 1
+        }
+    ];
 
     public async getByUserID(id: string): Promise<User | null> {
-        return this.db[0];
+        return this.db.find(user => user.userID === id) ?? null;
     }
 }

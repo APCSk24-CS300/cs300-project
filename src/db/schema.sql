@@ -147,3 +147,51 @@ CREATE TABLE "RequestEvidence" (
     file_size_bytes BIGINT NOT NULL CHECK (file_size_bytes BETWEEN 1 AND 10485760),
     uploaded_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Communication and administration
+CREATE TABLE "ActivityAnnouncement" (
+    announcement_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    activity_id TEXT NOT NULL REFERENCES "Activity"(activity_id),
+    author_id TEXT NOT NULL REFERENCES "User"(user_id),
+    title TEXT NOT NULL,
+    body TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE "Notification" (
+    notification_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    activity_id TEXT REFERENCES "Activity"(activity_id),
+    title TEXT NOT NULL,
+    body TEXT NOT NULL,
+    channel TEXT NOT NULL DEFAULT 'in_app' CHECK (channel IN ('in_app', 'email')),
+    delivery_status TEXT NOT NULL DEFAULT 'pending' CHECK (delivery_status IN ('pending', 'sent', 'failed')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    sent_at TIMESTAMPTZ,
+    read_at TIMESTAMPTZ
+);
+
+CREATE TABLE "UniversityService" (
+    service_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL,
+    url TEXT NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE "SystemSetting" (
+    setting_key TEXT PRIMARY KEY,
+    setting_value TEXT NOT NULL,
+    updated_by TEXT REFERENCES "User"(user_id),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE "AuditLog" (
+    audit_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    actor_id TEXT REFERENCES "User"(user_id),
+    entity_type TEXT NOT NULL,
+    entity_id TEXT NOT NULL,
+    action TEXT NOT NULL,
+    before_value JSONB,
+    after_value JSONB,
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

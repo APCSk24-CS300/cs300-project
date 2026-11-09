@@ -190,6 +190,13 @@ fix/login-validation
 chore/team-contract
 ```
 
+This will be further enforced via Jira cover colors, visible in tasks defined from PA2 onwards:
+- Gray -> Chore
+- Purple -> Bux fixes
+- Green gradient -> Frontend feats
+- Blue gradient -> Backend feats
+- Red gradient -> Database feats
+
 ### Commit Messages
 
 Commit messages should clearly describe the change.

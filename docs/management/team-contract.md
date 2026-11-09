@@ -10,6 +10,7 @@
 **Team Name:** debug docker vào 25h sáng  
 **Date Created:** 5/10/2026  
 **Contract Version:** v1.0
+<!-- TO-DO: UPDATE CONTRACT VERSION -->
 
 ### Team Members
 
@@ -172,14 +173,19 @@ The team will use the following branch naming convention:
 
 - `main` for the stable version.
 - `dev` for  shared development.
-- `feature/<feature-name>` for new features.
+- `feat/<module>/<feature-name>` for new features.
+    - `feat/frontend/<feature-name>` for new client-side features.
+    - `feat/backend/<feature-name>` for new server-side features.
+    - `feat/database/<feature-name>` for new database-side features.
 - `fix/<bug-name>` for bug fixes.
 - `chore/<bug-name>` for routine maintenance and configuration.
 
 Example:
 
 ```text
-feature/user-login
+feat/frontend/user-login-screen
+feat/backend/login-endpoint
+feat/database/concurrency-control
 fix/login-validation
 chore/team-contract
 ```

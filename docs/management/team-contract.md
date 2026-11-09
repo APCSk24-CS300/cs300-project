@@ -149,11 +149,11 @@ A task is considered complete only when:
 ### Technology Stack
 
 - **Frontend:** TBD
-- **Backend:** TBD
-- **Database:** TBD
+- **Backend:** TypeScript, express
+- **Database:** PostgreSQL
 - **Testing:** TBD
 - **Version Control:**  GitHub
-- **Other Tools:** TBD
+- **Other Tools:** Spec Kit
 
 ### Coding Standards
 

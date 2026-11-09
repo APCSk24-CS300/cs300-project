@@ -183,7 +183,7 @@ Admin -- UC33
 | UC-15 | Manage activity registrations | Activity Registration Management| Activity Manager |
 | UC-16 | View personal activity calendar | Calendar Management | Student |
 | UC-17 | Export activity calendar | NFR-COM-03 | Student |
-| UC-18 | Receive activity notifications | Notification Management / NFR-COM-05 | UC-028–029 | Student; external email channel |
+| UC-18 | Receive activity notifications | Notification Management / NFR-COM-05 | Student; external email channel |
 | UC-19 | Manage activities | Activity Management / NFR-COM-04 | Activity Manager |
 | UC-20 | Publish activity announcements | Activity Management | Activity Manager |
 | UC-21 | View activity statistics and reports | Activity Management | Activity Manager |

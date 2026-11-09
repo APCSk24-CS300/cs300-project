@@ -167,6 +167,15 @@ The team agrees to:
 - Add comments when the purpose or reasoning of the code is not obvious.
 - Avoid committing passwords, API keys, credentials, or other confidential information.
 
+### File Naming Standards
+For clarity in the codebase structures, members are expected to abide by the following file naming standards:
+- For documentation files, all markdown files are to be named in `kebab-case`, and the file name should clearly describe its content in a succinct manner.
+- For backend source files:
+    -  With the sole exception of `index.ts`, all TypeScript files must export precisely one entity (variable, object, class, function, interface, type, enum), and the file name must be its name. Variables, objects, and functions name should be in `camelCase`, whereas classes, interfaces, and enums name should be in `ProperCase`.
+    - JSON files pertaining to documentation and package configurations should be in `kebab-case`.
+    - Docker and environment variable files must abide by existing Docker conventions (`Dockerfile`, `docker-compose.yml`, `.env`, `.env.example`).
+- As we go, frontend source files conventions will be updated.
+
 ### Git Workflow
 
 The team will use the following branch naming convention:

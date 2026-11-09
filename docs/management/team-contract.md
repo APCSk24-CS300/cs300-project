@@ -173,7 +173,10 @@ For clarity in the codebase structures, members are expected to abide by the fol
     -  With the sole exception of `index.ts`, all TypeScript files must export precisely one entity (variable, object, class, function, interface, type, enum), and the file name must be its name. Variables, objects, and functions name should be in `camelCase`, whereas classes, interfaces, and enums name should be in `PascalCase`.
     - JSON files pertaining to documentation and package configurations should be in `kebab-case`.
     - Docker and environment variable files must abide by existing Docker conventions (`Dockerfile`, `docker-compose.yml`, `.env`, `.env.example`).
-- As we go, frontend source files conventions will be updated.
+- For frontend source files:
+    - Next.js special files must retain their predefined names (e.g., page.tsx, layout.tsx, loading.tsx, error.tsx).
+    - React components: `PascalCase`; Classes/Services: `PascalCase`; Hooks: `camelCase` with use prefix; Types/Interfaces: `PascalCase`; Folders: `kebab-case`;
+    - Maintain consistent naming conventions across the frontend codebase.
 
 ### Git Workflow
 

@@ -9,8 +9,7 @@
 **Project:** myHCMUS  
 **Team Name:** debug docker vào 25h sáng  
 **Date Created:** 5/10/2026  
-**Contract Version:** v1.0
-<!-- TO-DO: UPDATE CONTRACT VERSION -->
+**Contract Version:** v1.1
 
 ### Team Members
 

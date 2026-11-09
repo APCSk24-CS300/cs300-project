@@ -12,7 +12,10 @@ export class InMemoryUserRepository implements UserRepository {
                 name: "me",
                 phone: "0123",
                 email: "example@mail.com",
-                passwordPlainText: "thisispw"
+                passwordPlainText: "thisispw",
+                enrollmentYear: 2024,
+                majorID: 67,
+                facultyID: 69
             },
             passwordHash: "676767",
             signInTime: new Date(),

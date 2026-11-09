@@ -131,7 +131,7 @@ Manager -- UC23
 Manager -- UC24
 ```
 
-Managing training scores must honor the authorization and verification rules described in the Vision Document. The slide guidance does not support inventing an `include` relation merely to sequence attendance → verification → score update.
+Managing training scores must honor the authorization and verification rules described in the Vision Document.
 
 ### 3.4. Activity Recognition, Appeals, and Administration
 
@@ -221,10 +221,10 @@ Admin -- UC33
 
 | Relation | Extension point / condition | Reason |
 |---|---|---|
-| UC-14 `extend` UC-11 | During registration, when the selected activity has no remaining capacity **and** a waiting list is enabled. | Joining a waiting list is optional, not a mandatory step of every registration. |
+| UC-14 `extend` UC-11 | During registration, when the selected activity has no remaining capacity and a waiting list is enabled. | Joining a waiting list is optional, not a mandatory step of every registration. |
 | UC-17 `extend` UC-16 | While viewing the calendar, when the student requests an `.ics` export. | Export is an optional student goal available in the calendar context. |
 | Student, Activity Manager, University Administrator `generalize` User | Shared account functionality. | The three roles can access common functions without repeating every association. |
 
 There is **no** `include` relationship in this version. Checking capacity, verifying evidence, approving/rejecting a request, and updating state are normal basic/alternative-flow behavior; they are not independent reusable actor goals merely because the system executes them. For example, Approve Request and Reject Request are alternative outcomes within UC-30 Review and Resolve Requests and must not both be modeled as mandatory included use cases.
 
-**Rendering:** Mermaid native use-case syntax requires Mermaid 12.0.0 or newer and is still in beta. Use a renderer with `usecase-beta` support. If unavailable, the companion compatibility file is a preview-only approximation, not the formal UML use-case diagram.
+**Rendering:** Mermaid native use-case syntax requires Mermaid 12.0.0 or newer and is still in beta. Use a renderer with `usecase-beta` support.

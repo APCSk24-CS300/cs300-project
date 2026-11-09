@@ -1,5 +1,5 @@
 // assume user data is like this
-export interface UserData {
+export interface UserData { // data to be input as registration
     name: string,
     email: string,
     phone: string,
@@ -8,7 +8,8 @@ export interface UserData {
     majorID: number,
     facultyID: number
 }
-export interface User {
+
+export interface User { // data stored in db
     userID: string,
     data: UserData,
     passwordHash: string,

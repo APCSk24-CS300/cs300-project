@@ -1,18 +1,18 @@
-// assume user data is like this
-export interface UserData {
+// assume user registration data is like this
+export interface UserRegistrationData {
     name: string,
     email: string,
     phone: string,
     passwordPlainText: string,
     enrollmentYear: number,
     majorID: number,
-    facultyID: number
+    facultyID: number,
+    createdAt: Date,
 }
 export interface User {
     userID: string,
-    data: UserData,
+    data: UserRegistrationData,
     passwordHash: string,
-    signInTime: Date,
     userStatus: number,
-    userRole: number
+    userRole: number,
 }

@@ -1,7 +1,22 @@
 import type { User } from "../types/UserRegistrationData.ts";
 
 export interface UserRepository {
-    getByUserID(id: string): Promise<User | null>;
+    getActiveUserID(): Promise<number>;
+
+    getStudentUserID() : Promise<number>;
+
+    getActivityManagerID(): Promise<number>;
+
+    getAdminUserID(): Promise <number>;
+
+    insertUser(user: User): Promise<void>;
+
+    checkUserExist(id: string): Promise<boolean>;
+
+    getUserPasswordHash(id: string): Promise<string>;
+
+    updateUserSessionToken(id: string, newSessionToken: string): Promise<void>;
+
 }
 
 export class InMemoryUserRepository implements UserRepository {
@@ -15,16 +30,44 @@ export class InMemoryUserRepository implements UserRepository {
                 passwordPlainText: "thisispw",
                 enrollmentYear: 2024,
                 majorID: 67,
-                facultyID: 69
+                facultyID: 69,
+                createdAt: new Date('2024-09-16T14:30:00.000Z')
             },
             passwordHash: "676767",
-            signInTime: new Date(),
             userStatus: 2,
             userRole: 1
         }
     ];
 
-    public async getByUserID(id: string): Promise<User | null> {
-        return this.db.find(user => user.userID === id) ?? null;
+    public async getActiveUserID(): Promise<number> {
+        return 0;
+    }
+
+    public async getStudentUserID(): Promise<number> {
+        return 67;
+    }
+
+    public async getActivityManagerID(): Promise<number> {
+        return 68;
+    }
+
+    public async getAdminUserID(): Promise<number> {
+        return 69;
+    }
+
+    public async insertUser(user: User): Promise<void> {
+        // insert user to db
+    }
+
+    public async checkUserExist(id: string): Promise<boolean> {
+        return true;
+    }
+
+    public async getUserPasswordHash(id: string): Promise<string> {
+        return (this.db[0].userID ==  id) ? this.db[0].passwordHash : "no hash brown";
+    }
+
+    public async updateUserSessionToken(id: string, newSessionToken: string): Promise<void> {
+        // delete old session row in Session table and add a new one
     }
 }

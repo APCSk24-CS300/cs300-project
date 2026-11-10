@@ -11,7 +11,7 @@ export interface UserRepository {
 
     insertUser(user: User): Promise<void>;
 
-    checkUserExist(id: string): Promise<boolean>;
+    checkUserExists(id: string): Promise<boolean>;
 
     getUserPasswordHash(id: string): Promise<string>;
 
@@ -59,7 +59,7 @@ export class InMemoryUserRepository implements UserRepository {
         // insert user to db
     }
 
-    public async checkUserExist(id: string): Promise<boolean> {
+    public async checkUserExists(id: string): Promise<boolean> {
         return true;
     }
 
@@ -71,3 +71,4 @@ export class InMemoryUserRepository implements UserRepository {
         // delete old session row in Session table and add a new one
     }
 }
+

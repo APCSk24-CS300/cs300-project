@@ -170,7 +170,7 @@ Admin -- UC33
 | UC-02 | Log out | Authentication | All users |
 | UC-03 | Manage own profile | Profile Management | All users; student-only read-only academic information |
 | UC-04 | Discover activities | Activity Discovery | Student |
-| UC-05 | Follow an activity | Notification Management | Student; provisional |
+| UC-05 | Follow an activity | Activity Discovery / Notification Management | Student |
 | UC-06 | Get AI activity recommendations | AI Student Assistant | Student |
 | UC-07 | Ask AI Student Assistant | AI Student Assistant | Student |
 | UC-08 | Access university services | University Services Hub | All users |
@@ -179,7 +179,7 @@ Admin -- UC33
 | UC-11 | Register for an activity | Activity Registration Management | Student |
 | UC-12 | Cancel a registration | Activity Registration Management | Student |
 | UC-13 | Track registration status | Activity Registration Management| Student |
-| UC-14 | Join an activity waiting list | NFR-REL-02 | Student |
+| UC-14 | Join an activity waiting list | Activity Registration Management / NFR-REL-02 | Student |
 | UC-15 | Manage activity registrations | Activity Registration Management| Activity Manager |
 | UC-16 | View personal activity calendar | Calendar Management | Student |
 | UC-17 | Export activity calendar | NFR-COM-03 | Student |
@@ -196,9 +196,9 @@ Admin -- UC33
 | UC-28 | Appeal participation record or score | Requests System | Student |
 | UC-29 | Track submitted requests | Requests System | Student |
 | UC-30 | Review and resolve requests | Requests System | Activity Manager |
-| UC-31 | Manage users and permissions | System Administration / NFR-COM-04 | University Administrator |
-| UC-32 | Configure criteria and categories | System Administration / NFR-SCA-INT-04 | University Administrator |
-| UC-33 | View system reports | System Administration | University Administrator |
+| UC-31 | Manage users and permissions | University Administration / NFR-SEC-03. | University Administrator |
+| UC-32 | Configure criteria and categories | University Administration / NFR-SCA-INT-04 | University Administrator |
+| UC-33 | View system reports | University Administration | University Administrator |
 
 ### Coverage of the 12 feature groups
 
@@ -213,7 +213,7 @@ Admin -- UC33
 | 7. Calendar Management | UC-16, UC-17 |
 | 8. Notification Management | UC-05, UC-18 |
 | 9. Requests System | UC-27–UC-30 |
-| 10. System Administration | UC-31–UC-33 |
+| 10. University Administration | UC-31–UC-33 |
 | 11. University Services Hub | UC-08 |
 | 12. AI Student Assistant | UC-06, UC-07 |
 

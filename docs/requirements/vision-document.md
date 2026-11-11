@@ -37,7 +37,7 @@ This introduction provides an overview of the Vision document, including its pur
 ## 3.2 Users
 - **Students:** Search and filter available activities, register for activities, view registration and participation status, and monitor accumulated training scores.
 - **Activity managers:** Create and manage activities, communicate activity information, review registrations, record attendance, submit participation results, and handle students' requests.
-- **University administrators:** Review and moderate activities, manage users and records, verify participation data, and oversee the training-score process.
+- **University administrators:** Manage user roles and access permissions, configure system-wide settings such as training-score criteria, monitor reports and statistics on training activity, and oversee the management process.
 
 
 # 4. Product Overview

@@ -3,7 +3,7 @@
 **Reviewers:** Nguyễn Văn Tĩnh, Quách Thiên Lạc, Nguyễn Khang Thịnh  
 **Editors:** Quách Thiên Lạc, Phạm Vân Trang, Nguyễn Khang Thịnh  
 **Version:** 1.0.0  
-**Amendment:** 2026/31/10
+**Amendment:** 2026/11/11
 
 # 1. Introduction
 The purpose of this document is to collect, analyze, and define high-level needs and features of the app myHCMUS. It focuses on the capabilities needed by the stakeholders and the target users, and why these needs exist. The details of how myHCMUS fulfills these needs are detailed in the use-case and supplementary specifications.  
@@ -14,36 +14,36 @@ This introduction provides an overview of the Vision document, including its pur
 | Aspect | Description |
 |---|---|
 | The problem of | Discovering and keeping track of many training-score activities, monitoring training scores, and ensuring that activities reach their target audiences and receive engagement. |
-| Affects | University students, specifically undergraduates of VNU-HCM University of Science, and organizers of activities that award training scores. |
-| The impact of which is | Students have difficulty finding and registering for training-score activities, especially important ones. This consumes time and effort that could be spent on more productive tasks and may prevent students from achieving their required training scores. Organizers may also struggle to reach their target audience and achieve the desired level of engagement. |
-| A successful solution would be | Helping students conveniently search for potential training-score activities and manage their registrations, while helping organizers reach students more easily. |
+| Affects | University students, specifically undergraduates of VNU-HCM University of Science, and managers of activities that award training scores. |
+| The impact of which is | Students have difficulty finding and registering for training-score activities, especially important ones. This consumes time and effort that could be spent on more productive tasks and may prevent students from achieving their required training scores. Managers may also struggle to reach their target audience and achieve the desired level of engagement. |
+| A successful solution would be | Helping students conveniently search for potential training-score activities and manage their registrations, while helping managers reach students more easily. |
 ## 2.2 Product position statement
 | Aspect | Description |
 |---|---|
-| For | University students, specifically undergraduates of VNU-HCM University of Science, and organizers of activities that award training scores. |
+| For | University students, specifically undergraduates of VNU-HCM University of Science, and managers of activities that award training scores. |
 | Who | Are looking to optimize their training-score search and management process. |
 | The app | myHCMUS. |
 | Allows | A simpler way to manage extracurricular activities and student training scores. |
 | Unlike | The current HCMUS training-score tracking website and Facebook pages, which make the process fragmented and incoherent. |
-| Our product | Enables students to discover and register for activities, track their participation, and monitor their training scores, while providing organizers and administrators with tools to efficiently manage activities, attendance, and participation records. |
+| Our product | Enables students to discover and register for activities, track their participation, and monitor their training scores, while providing managers and administrators with tools to efficiently manage activities, attendance, and participation records. |
 
 # 3. Stakeholders and users description
 ## 3.1 Stakeholders
 - **University students**, especially undergraduate students of VNU-HCM University of Science, who need to discover training-score activities, register for them, track participation, and monitor their training scores.
-- **Activity organizers**, including student clubs, departments, and other groups that conduct activities awarding training scores. They need to publish activities, reach students, manage registrations, record attendance, and track engagement.
+- **Activity managers**, including student clubs, departments, and other groups that conduct activities awarding training scores. They need to publish activities, reach students, manage registrations, record attendance, and track engagement.
 - **University administrators**, who need to manage activities, verify participation records, oversee training-score data, and support reporting and policy enforcement.
 - **System administrators and developers**, who are responsible for maintaining the application's availability, authentication, security, and backend services.
 
 ## 3.2 Users
 - **Students:** Search and filter available activities, register for activities, view registration and participation status, and monitor accumulated training scores.
-- **Activity organizers:** Create and manage activities, communicate activity information, review registrations, record attendance, and submit participation results.
+- **Activity managers:** Create and manage activities, communicate activity information, review registrations, record attendance, submit participation results, and handle students' requests.
 - **University administrators:** Review and moderate activities, manage users and records, verify participation data, and oversee the training-score process.
 
 
 # 4. Product Overview
 ## 4.1. Product Perspective
 
-myHCMUS is a web-based platform that centralizes extracurricular activity and student training-score management at VNU-HCM University of Science. It enables students to discover and register for activities, track their participation and training scores, and submit requests. Organizers can manage activities and participation records, while administrators oversee system settings and reports.
+myHCMUS is a web-based platform that centralizes extracurricular activity and student training-score management at VNU-HCM University of Science. It enables students to discover and register for activities, track their participation and training scores, and submit requests. Managers can manage activities and participation records, while administrators oversee system settings and reports.
 
 The platform is designed as an independent web application rather than a replacement for existing university systems. It may provide links to university services but does not require direct integration with official university databases. An AI assistant supports activity recommendations and information retrieval as an additional feature.
 
@@ -54,7 +54,7 @@ The platform is designed as an independent web application rather than a replace
 The following assumptions are made regarding the product and its operating environment:
 
 1. Users have access to an internet connection and a supported web browser.
-2. Organizers provide and maintain accurate information about extracurricular activities.
+2. Managers provide and maintain accurate information about extracurricular activities.
 3. Users are assigned appropriate roles and permissions based on their responsibilities.
 4. Authorized staff are responsible for verifying participation records and reviewing training-score requests.
 5. Sample data and project-defined training-score criteria can be used for demonstration and testing without access to official university databases.
@@ -63,34 +63,34 @@ The following assumptions are made regarding the product and its operating envir
 
 The product depends on the following factors:
 
-1. **Activity Data:** Activity discovery, registration, and recommendations depend on the availability and accuracy of activity information provided by organizers.
+1. **Activity Data:** Activity discovery, registration, and recommendations depend on the availability and accuracy of activity information provided by managers.
 2. **Training-Score Criteria:** Training-score management depends on defined scoring criteria and approval procedures.
 3. **Database and Hosting:** The application requires a database for storing information and a hosting environment to make the system accessible.
 4. **AI Services:** AI-assisted features depend on the availability of the selected AI model or service and relevant input data.
 5. **External Service Links:** Access to linked university services depends on the availability and validity of their URLs.
 
 # 5. Product Features
-myHCMUS provides the following features to support students, organizers, and administrators in managing extracurricular activities and training scores.
+myHCMUS provides the following features to support students, managers, and administrators in managing extracurricular activities and training scores.
 
-1. **Authentication:** Users can log in and log out of the system using their accounts. The system identifies their roles and grants access to the appropriate features and information. This feature ensures that students, organizers, and administrators can access the system according to their permissions.
+1. **Authentication:** Users can log in and log out of the system using their accounts. The system identifies their roles and grants access to the appropriate features and information. This feature ensures that students, managers, and administrators can access the system according to their permissions.
    
 2. **Profile Management:** Users can update their personal information, change passwords, and manage profile pictures. Students can also view basic academic information, such as their student ID and faculty. This feature helps users maintain accurate account information and supports other features that require user details.
    
-3. **Activity Discovery:** Students can browse extracurricular activities and search or filter them by faculty, date, location, training-score criteria, and registration status. Each activity provides information such as its description, schedule, capacity, eligibility requirements, and registration deadline. This feature helps students find suitable activities without searching across multiple information sources.
+3. **Activity Discovery:** Students can browse extracurricular activities and search or filter them by faculty, date, location, training-score criteria, and registration status. Each activity provides information such as its description, schedule, capacity, eligibility requirements, and registration deadline. Students can also follow activities they are interested in without registering, allowing them to receive updates and revisit these activities later. This feature helps students find suitable activities without searching across multiple information sources and keep track of suitable activities. 
 
-4. **Activity Registration Management:** Students can register for activities, cancel registrations within the permitted period, and track their registration status. The system checks registration conditions such as deadlines, eligibility requirements, and available capacity. Organizers can view participant lists and review registrations when approval is required. This feature simplifies the registration process and supports organizers in managing participants.
+4. **Activity Registration Management:** Students can register for activities, join a waiting list, cancel registrations within the permitted period, and track their registration status. The system checks registration conditions such as deadlines, eligibility requirements, and available capacity. Managers can view participant lists and review registrations when approval is required. This feature simplifies the registration process and supports managers in managing participants.
    
-5. **Activity Management:** Organizers can create, edit, publish, and manage extracurricular activities, including their schedules, locations, participation requirements, capacity, and training-score criteria. They can also publish announcements, update activity information, and manage activity statuses. The system allows organizers to view participation statistics and export activity reports. This feature supports organizers in managing activities and communicating information to students.
+5. **Activity Management:** Managers can create, edit, publish, and manage extracurricular activities, including their schedules, locations, participation requirements, capacity, and training-score criteria. They can also publish announcements, update activity information, and manage activity statuses. The system allows managers to view participation statistics and export activity reports. This feature supports managers in managing activities and communicating information to students.
 
-6. **Participation and Training-Score Management:** Organizers can record attendance, verify participation, and manage training-score results for activities. They can update participation records and training scores, as well as import or export relevant data. Students can view their participation history and accumulated training scores by semester and evaluation criteria. This feature supports the management of participation records and allows students to monitor their training-score progress.
+6. **Participation and Training-Score Management:** Managers can record attendance, verify participation, and manage training-score results for activities. They can update participation records and training scores, as well as import or export relevant data. Students can view their participation history and accumulated training scores by semester and evaluation criteria. This feature supports the management of participation records and allows students to monitor their training-score progress.
 
 7.  **Calendar Management:** Students can view their registered activities in a personal calendar. The system identifies potential scheduling conflicts when activities have overlapping times. This feature helps students organize their schedules and avoid conflicts between activities.
 
-8.  **Notification Management:** Students can receive notifications about upcoming activities, registration deadlines, schedule changes, and registration updates. The system provides relevant notifications based on the activities students follow or register for. This feature helps students stay informed and reduces the risk of missing important activity updates.
+8.  **Notification Management:** Students can receive notifications about upcoming activities, registration deadlines, schedule changes, registration updates, and waiting-list promotions. The system provides relevant notifications based on the activities students follow or register for. This feature helps students stay informed and reduces the risk of missing important activity updates.
 
-9.  **Requests System:** Students can submit requests for recognition of activities held inside or outside the university by providing supporting evidence. They can also appeal missing or incorrect participation records and training scores. Authorized staff can review submitted requests, verify evidence, provide responses, and update request statuses. This feature provides a structured process for students to request recognition or corrections to their participation and training-score records.
+9.  **Requests System:** Students can submit requests for recognition of activities held inside or outside the university by providing supporting evidence. They can also appeal missing or incorrect participation records and training scores. Activity mangers can review submitted requests, verify evidence, provide responses, and update request statuses. This feature provides a structured process for students to request recognition or corrections to their participation and training-score records.
 
-10. **System Administration:** Administrators can manage user roles and permissions and configure system-wide settings, including training-score criteria. They can also access reports and statistics on activity participation, registration trends, and training-score distribution. This feature supports administrators in maintaining system settings and monitoring extracurricular activity management.
+10. **System Administration:** Administrators can assign user roles, manage access permissions, and configure system-wide settings, including training-score criteria and activity categories. They can also access reports and statistics on activity organization, registration trends, and training-score distribution. This feature supports administrators in maintaining system settings and monitoring extracurricular activity management.
 
 11. **University Services Hub:** Users can access frequently used university services, such as Moodle, Student Portal, and the university library, through a centralized dashboard. The system provides links to these services without replacing or directly integrating with them. This feature helps users find and access university services more conveniently.
 
@@ -103,43 +103,78 @@ The following workflows illustrate two important processes supported by myHCMUS:
 **Workflow 1: Activity Discovery and Registration**
 
 ```mermaid
+
 flowchart TD
     A[Student browses activities] --> B[Search or filter activities]
     B --> C[View activity details]
-    C --> D{Registration conditions satisfied?}
-    D -- No --> E[Registration unavailable]
-    D -- Yes --> F[Check schedule conflicts]
-    F --> G{Schedule conflict?}
-    G -- Yes --> H[Display conflict warning]
-    G -- No --> I[Submit registration]
-    H --> I
-    I --> J{Approval required?}
-    J -- Yes --> K[Organizer reviews registration]
-    K --> L{Approved?}
-    L -- No --> M[Registration rejected]
-    L -- Yes --> N[Registration confirmed]
-    J -- No --> N
-    N --> O[Update registration status and calendar]
+    C --> D{Student action?}
+
+    D -- Follow --> E[Follow activity]
+    E --> F[Receive activity updates]
+
+    D -- Register --> G{Registration conditions satisfied?}
+    G -- No --> H[Registration unavailable]
+    G -- Yes --> I{Capacity available?}
+
+    I -- Yes --> J[Check schedule conflicts]
+    J --> K{Schedule conflict?}
+    K -- Yes --> L[Display conflict warning]
+    K -- No --> M[Submit registration]
+    L --> M
+
+    M --> N{Approval required?}
+    N -- Yes --> O[Manager reviews registration]
+    O --> P{Approved?}
+    P -- No --> Q[Registration rejected]
+    P -- Yes --> R[Registration confirmed]
+    N -- No --> R
+    R --> S[Update registration status and calendar]
+
+    I -- No --> T{Join waiting list?}
+    T -- No --> U[Registration unavailable]
+    T -- Yes --> V[Add student to FIFO waiting list]
+    V --> W[Waiting for an available slot]
+
+    X[Registered student cancels registration] --> Y[Release available slot]
+    Y --> Z{Waiting list empty?}
+    Z -- Yes --> AA[Slot becomes available]
+    Z -- No --> AB[Select first student in FIFO order]
+    AB --> AC[Automatically promote student]
+    AC --> N
+
 ```
 
 **Workflow 2: Activity Recognition and Score Appeal**
 
 ```mermaid
+
 flowchart TD
-    A[Student opens Requests System] --> B{Request type}
-    B -- Activity recognition --> C[Enter activity details and upload evidence]
-    B -- Record or score appeal --> D[Select record and provide evidence]
+    A[Student opens Requests System] --> B{Request type?}
+
+    B -- Activity recognition --> C[Enter activity details and upload supporting evidence]
+    B -- Record or score appeal --> D[Select related activity and disputed record, then provide evidence]
+
     C --> E[Submit request]
     D --> E
-    E --> F[Authorized staff reviews request]
-    F --> G{Request approved?}
-    G -- Yes --> H[Update participation or training-score record]
-    G -- No --> I[Record rejection and reason]
-    I --> J[Notify student of the result]
-    H --> J
+
+    E --> F{Request type?}
+
+    F -- Activity recognition --> G[Assign to an authorized Manager in the Student Affairs Office]
+    F -- Record or score appeal --> H[Assign to the Manager responsible for the related activity]
+
+    G --> I[Assigned Manager reviews request and verifies evidence]
+    H --> I
+
+    I --> J{Request approved?}
+
+    J -- Yes --> K[Update participation or training-score record]
+    J -- No --> L[Record rejection and reason]
+
+    K --> M[Notify student of the decision]
+    L --> M
 
 ```
-
+**Note:** Appeals related to a specific activity are assigned to the Manager responsible for that activity. Activity recognition requests are assigned to authorized Managers in the Student Affairs Office, as only designated personnel within the office have permission to handle these requests.
 
 # 6. Non-Functional Requirements
 ## I. Performance
@@ -168,7 +203,7 @@ flowchart TD
 
 | NFR ID              | Requirement  |
 | :----------------: | :------  |
-| NFR-SCA-PHY-01 | The system shall handle at least 1,000 users (including students and organizers) under normal conditions and 5,000 at peak|
+| NFR-SCA-PHY-01 | The system shall handle at least 1,000 users (including students and managers) under normal conditions and 5,000 at peak|
 | NFR-SCA-PHY-02 | The system shall process over 200 requests per minute for registration on a single event |
 | NFR-SCA-PHY-03 | The system never allows to accept the requests that exceed the capability of an event |
 | NFR-SCA-PHY-04 | The system shall store at least 3 years of an event history, including event information, registers, training score with no more than 10% slow down for searching & listing pages |
@@ -183,8 +218,8 @@ flowchart TD
 
 | NFR ID | Requirement |
 | :---: | :--- |
-| NFR-SCA-INT-01 | The system shall allow the number of organizer units (faculties, clubs, departments) to grow from 15 in first development to at least 50 in later scale-up, with each unit managing its own activities and organizers without affecting other units. |
-| NFR-SCA-INT-02 | The system shall support growth from 500 to 2,000 activities per semester without changes to the organizer workflow. |
+| NFR-SCA-INT-01 | The system shall allow the number of manager units (faculties, clubs, departments) to grow from 15 in first development to at least 50 in later scale-up, with each unit managing its own activities and managers without affecting other units. |
+| NFR-SCA-INT-02 | The system shall support growth from 500 to 2,000 activities per semester without changes to the manager workflow. |
 | NFR-SCA-INT-03 | The system shall support growth from a pilot group of up to 1,000 students to 5,000-10,000 students without redesigning the system. |
 | NFR-SCA-INT-04 | Administrators shall be able to add a new activity category or evaluation criterion within 1 hour without developer involvement. |
 | NFR-SCA-INT-05 | Old scoring rules shall be kept, so past semesters' scores and history remain valid after rules change. |
@@ -271,7 +306,7 @@ flowchart TD
 | :---: | :--- |
 | NFR-SEC-01 | All communication between the user and the system shall be encrypted with HTTPS | 
 | NFR-SEC-02 | Every user shall log in with an account. Passwords shall be at least 8 characters and stored only as salted hashes, never as plain text | 
-| NFR-SEC-03 | Access shall be controlled by role (student, organizer, administrator). A user shall only see and do what their role allows, and this shall be checked on the server, not only on the screen | 
+| NFR-SEC-03 | Access shall be controlled by role (student, manager, administrator). A user shall only see and do what their role allows, and this shall be checked on the server, not only on the screen | 
 | NFR-SEC-04 | A student shall only view and change their own personal data, registrations, scores and appeals | 
 | NFR-SEC-05 | (OPTIONAL) A session shall end after 30 minutes without activity, and an account shall be temporarily locked for 15 minutes after 5 failed login attempts | 
 | NFR-SEC-06 | Every score adjustment, appeal decision and change to system settings shall be recorded in an audit log (who, what, when, before and after values) that cannot be edited by normal users | 
@@ -308,11 +343,11 @@ flowchart TD
 | NFR-USA-05 | Student | Forms shall show which fields are wrong and how to correct them, keep the data the user has already entered and shall show which fields are required or optional  |
 | NFR-USA-06 | Student | The appeal button shall be disabled outside the appeal period with a message that explains why, and activity cards shall show capacity, score value and deadline before the student registers |
 | NFR-USA-07 | Student | A usability test with at least 5 students shall reach a specific score (score of at least 70 in SUS - system usability scale) before official deployment |
-| NFR-USA-08 | All users | The system shall provide an online help page (FAQ and short guide for students, organizers and administrators) |
+| NFR-USA-08 | All users | The system shall provide an online help page (FAQ and short guide for students, managers and administrators) |
 | NFR-USA-09 | All users | The system shall provide a friendly UI dashboard that contains the overall information of users, activities and allows users to direct to their intended features without difficulties or confused behaviors |
 | NFR-USA-09 | All users | The system shall provides a clear messages when a user inputs invalid information |
-| NFR-USA-10 | Organizer | The system shall clearly display activity status, participant information, and pending actions to help organizers manage activities efficiently |
-| NFR-USA-11 | Organizer | After having 30-minute training session, organizers can create the activity within 10 minutes|
-| NFR-USA-12 | Organizer | The system shall distinguish clearly between draft, published, ongoing, completed or cancelled actitivies |
+| NFR-USA-10 | Manager | The system shall clearly display activity status, participant information, and pending actions to help managers manage activities efficiently |
+| NFR-USA-11 | Manager | After having 30-minute training session, managers can create the activity within 10 minutes|
+| NFR-USA-12 | Manager | The system shall distinguish clearly between draft, published, ongoing, completed or cancelled actitivies |
 | NFR-USA-13 | Administrator | The system shall clearly display a user's current role and permission status before an administrator modifies them |
 | NFR-USA-13 | Administrator | The system shall clearly display a confirmation before administrators deciding to alter the criteria |

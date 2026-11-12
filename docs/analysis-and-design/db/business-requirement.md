@@ -47,7 +47,7 @@ Each account has one role. Staff roles retain student actions for users who are 
 
 # Schema design
 
-The schema uses one **User** entity for every student or staff member. `User.role_id` selects one **Role** reference row, and **RolePermission** maps that role to allowed actions. Staff roles include the permissions needed for a student's personal actions. Activity assignment and record ownership narrow access to specific records.
+The schema uses one **User** account entity for every student or staff member, with exactly one role-specific subtype row. `User.role_id` selects one **Role** reference row, and **RolePermission** maps that role to allowed actions. Staff roles include the permissions needed for a student's personal actions. Activity assignment and record ownership narrow access to specific records.
 
 `PK` denotes a primary key, `FK` a foreign key, and `UQ` a unique constraint. IDs are surrogate keys unless an external identifier is explicitly named.
 
@@ -58,7 +58,8 @@ The schema uses one **User** entity for every student or staff member. `User.rol
 | **Role** | `role_id` (PK), `code` (UQ), `name`, `description` | Controlled values: `student`, `manager`, `administrator`. Each user has one role; the role's permissions determine available actions. |
 | **Permission** | `permission_id` (PK), `code` (UQ), `description` | Named actions such as `registration.create`, `registration.review`, `activity.manage`, `attendance.record`, `score.submit`, `score.adjust`, `appeal.submit`, `appeal.review`, `criteria.manage`, and `reports.view`. |
 | **RolePermission** | `role_id` (FK), `permission_id` (FK) | Composite PK (`role_id`, `permission_id`); defines which actions each role grants. Seeded and maintained by administrators. |
-| **Faculty** | `faculty_id` (PK), `code` (UQ), `name` | Academic unit used in profiles, activity filters, and eligibility rules. |
+| **Faculty** | `faculty_id` (PK), `code` (UQ), `name` | Academic unit for staff who belongs to any faculty. |
+| **Derpartment** | `department_id` (PK), `code` (UQ), `name` | Non-academic unit for staff who does not belong to any faculty. |
 | **ActivityCategory** | `category_id` (PK), `name` (UQ), `description` | Activity classification and student interest matching. |
 | **Semester** | `semester_id` (PK), `academic_year`, `term`, `starts_at`, `ends_at` | UQ (`academic_year`, `term`); score reporting period. `starts_at` must precede `ends_at`. |
 | **ScoreCriterion** | `criterion_id` (PK), `code` (UQ), `name`, `description`, `max_points`, `is_active` | Administrator-controlled training-score criterion. `max_points` is nonnegative. Once referenced by a score, its meaning and maximum are fixed; deactivation preserves historical links. |
@@ -67,8 +68,13 @@ The schema uses one **User** entity for every student or staff member. `User.rol
 
 | Entity | Main attributes | Purpose and constraints |
 | --- | --- | --- |
-| **User** | `user_id` (PK), `role_id` (FK), `email` (UQ), `password_hash`, `full_name`, `student_number` (nullable, UQ), `faculty_id` (nullable FK), `avatar_url` (nullable), `is_active`, `created_at` | The sole account and profile entity. `role_id` is required. Student academic fields are populated when applicable; other staff may leave them null. Store only password hashes. |
+| **User** | `user_id` (PK), `role_id` (FK), `status_id` (FK), `email` (UQ), `password_hash`, `full_name`, `avatar_url` (nullable), `created_at` | Shared account, identity, and contact fields. `role_id` is required. Verified academic identity remains available to staff who are also students; nonstudents may leave it null. Store only password hashes. UQ (`user_id`, `role_id`) supports subtype consistency FKs; a constraint can be added later to chek for mismatch between base and derived objects. |
+| **Student** | `user_id` (PK, FK), `role_id` (FK), `major_id` (FK), `faculty_id` (FK), `enrollment_year`| Role-specific student profile. `role_id` is fixed to the `student` Role row. |
+| **Manager** | `user_id` (PK, FK), `role_id` (FK), `faculty_id` (FK) (nullable), `department_id` (FK) (nullable),`position_title` (nullable) | Role-specific activity-manager profile. `role_id` is fixed to the `manager` Role row. |
+| **Administrator** | `user_id` (PK, FK), `role_id` (FK), `office_name` (nullable), `position_title` (nullable) | Role-specific system-administrator profile. `role_id` is fixed to the `administrator` Role row. |
 | **UserInterest** | `user_id` (FK), `category_id` (FK) | Composite PK (`user_id`, `category_id`). Optional preferences for discovery and recommendations. |
+
+In each subtype, (`user_id`, `role_id`) is a composite FK to `User(user_id, role_id)`; `user_id` is also its PK, so a user has at most one row in that subtype. Each subtype's `role_id` is constrained to the corresponding controlled Role value. Together, these constraints reject a subtype whose role differs from `User.role_id`, including a mismatched role update. Provisioning creates the `User` and its required subtype in one transaction. A deferred constraint trigger (or equivalent transactional enforcement) ensures every committed `User` has exactly one subtype row matching its role; foreign keys alone cannot guarantee subtype existence. Role changes replace the subtype row in the same transaction while preserving shared account fields.
 
 The initial permission mapping is cumulative, as in each higher role automatically includes all permissions granted to roles below it. `student` can manage personal profiles and registrations, view personal scores, and submit appeals; `manager` adds management of assigned activities, registrations, attendance, announcements, participation results, and score adjustments; `administrator` adds role assignment, criteria and settings management, and system-wide reports. 
 
@@ -101,6 +107,7 @@ The initial permission mapping is cumulative, as in each higher role automatical
 ## Relationships and cardinalities
 
 - Each `User` has exactly one `Role` `(1, 1)`; each role may be assigned to `(0, N)` users.
+- Each `User` has exactly one matching `Student`, `Manager`, or `Administrator` subtype row `(1, 1)` according to its role; each subtype row belongs to exactly one `User` `(1, 1)`.
 - Each `RolePermission` links exactly one `Role` `(1, 1)` and exactly one `Permission` `(1, 1)`; each role may grant `(0, N)` permissions, and each permission may be granted by `(0, N)` roles.
 - Each `User` belongs to at most one `Faculty` `(0, 1)`; each faculty may have `(0, N)` users.
 - Each `UserInterest` links exactly one `User` `(1, 1)` and exactly one `ActivityCategory` `(1, 1)`; each user may select `(0, N)` categories, and each category may be selected by `(0, N)` users.
@@ -133,6 +140,7 @@ The initial permission mapping is cumulative, as in each higher role automatical
 - Every non-null foreign key references an existing row.
 - Historical `Registration`, `Attendance`, `Participation`, `TrainingScore`, `Appeal`, and `ScoreChange` rows must not be cascade-deleted through their foreign keys.
 - `User.role_id` is non-null.
+- `Student.role_id`, `Manager.role_id`, and `Administrator.role_id` are non-null, fixed to their respective Role values, and must equal their parent `User.role_id` through composite foreign keys.
 - Every field marked `UQ` in the entity tables rejects duplicate non-null values.
 - Each composite primary key in the entity tables rejects duplicate key tuples.
 - `Registration(activity_id, user_id)` is unique, including when the existing registration is cancelled or rejected.

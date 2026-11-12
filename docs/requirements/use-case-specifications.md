@@ -3,7 +3,7 @@
 
 ## 1. Purpose and modeling conventions
 
-This document specifies **all 33 use cases** in the use case model document, ordered by ID and grouped by the same four areas. Each **Basic Flow** describes a main success path as a dialogue between actor and system; **Alternative Flows** identify variations, error states and exceptional cases. A step reference refers to the numbered step in the current use-case table. An alternative stops or returns to the relevant step as described. The use cases preserve the model’s `extend` relationships (UC-13 → UC-10, UC-16 → UC-15).
+This document specifies **all 31 use cases** in the use case model document, ordered by ID and grouped by the same four areas. Each **Basic Flow** describes a main success path as a dialogue between actor and system; **Alternative Flows** identify variations, error states and exceptional cases. A step reference refers to the numbered step in the current use-case table. An alternative stops or returns to the relevant step as described. The use cases preserve the model’s `extend` relationships (UC-13 → UC-10, UC-16 → UC-15).
 
 **Interpretation of completeness:** “All alternative flows” means reasonably identifiable domain paths, validation outcomes, permissions, concurrency conflicts, and service failures grounded in the current baseline.
 

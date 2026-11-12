@@ -4,17 +4,23 @@
 **Reviewer(s):** Trần Tôn Minh Kỳ  
 **Editor(s):** Quách Thiên Lạc
 
-**Version:** 1.0.0  
-**Amendment:** 2026/21/10
+**Version:** 1.1.0  
+**Amendment:** 12/11/2026
 
 ---
 This document describes the business purpose, actors, data entities, relationships, assumptions, and constraints of myHCMUS. It draws on the [project proposal](../management/project-proposal.md) and [product survey](../survey/existing-apps-survey.md).
 
 # Business purpose
 
-myHCMUS helps university students discover extracurricular activities and track participation and training scores in one web platform. Students can browse activities, check eligibility and schedules, register or cancel within the permitted period, follow registration updates, and view activities in a personal calendar. They can review scores by semester and criterion, receive reminders, and request recognition or correction when a participation record or score is missing or inaccurate.
+myHCMUS helps university students discover extracurricular activities and track participation and training scores in one web platform.  
 
-Activity organizers create activities, set capacity and eligibility, manage schedules and registrations, record attendance, and submit verified participation results. Staff reviewers decide appeals using submitted evidence. Administrators manage system-wide score criteria and use reports to monitor participation, registration trends, and score distribution. An account's role controls access to each workflow, while its profile holds the personal and academic information needed for that work.
+Students can browse activities, check eligibility and schedules, register or cancel within the permitted period, follow registration updates, and view activities in a personal calendar. They can review scores by semester and criterion, receive reminders, and request recognition or correction when a participation record or score is missing or inaccurate.
+
+Activity managers can create and manage activities, including schedules, locations, participation requirements, capacity, and training-score criteria. They can also publish announcements, track activity statistics, and export reports.   
+
+Administrators can assign user roles and manage access permissions, configure system-wide settings, such as training-score criteria and activity categories, and access reports and statistics on activity organization, registration trends, and training-score distribution.  
+
+An account's role controls access to each workflow, while its profile holds the personal and academic information needed for that work.
 
 The core record links **activity → registration → attendance → verified participation → training score**. Appeals and score-change history show how a missing or incorrect record was resolved. The platform also links to university services and recommends activities using students' interests, schedules, participation history, and score needs.
 
@@ -23,8 +29,7 @@ The core record links **activity → registration → attendance → verified pa
 | Actor | Role |
 | --- | --- |
 | **Student** | Maintains a profile; discovers activities; checks schedules, eligibility, and training-score criteria; registers or cancels within the allowed period; tracks registration, participation, and scores; and submits recognition requests or appeals with supporting evidence. The student also receives activity updates and recommendations. |
-| **Activity organizer** | Creates and manages activities, schedules, capacity, requirements, announcements, and participant lists; reviews applications and waiting lists; records attendance and verified participation; submits results for training scores; and views activity statistics or exports reports. |
-| **Staff reviewer** | Reviews requests to recognize activities and appeals about participation records or training scores, verifies submitted evidence, responds to students, and updates request status. |
+| **Activity manager** | Creates and manages activities, including schedules, locations, participation requirements, capacity, and training-score criteria; publishes announcements, tracks activity statistics, and exports reports.    |
 | **System administrator** | Configures system-wide settings and training-score criteria, and views reports and statistics covering activities, registrations, and score distribution. |
 
 Each account has one role. Staff roles retain student actions for users who are also students; assigned activities and record ownership still limit what they can access.
@@ -33,10 +38,9 @@ Each account has one role. Staff roles retain student actions for users who are 
 
 - One verified university identity maps to one `User` row and one assigned role. For example, student who is also a club board member, class monitor (or any role capable of posting activities) receives the role whose permission set covers those duties; that role also grants personal student actions.
 - The university verifies each student's number and faculty before they are used for registration or eligibility. A staff member who is not a student may leave those fields empty.
-- Administrators maintain faculties, semesters, score criteria, and role assignments. Organizers manage only assigned activities; reviewers decide appeals using submitted evidence.
-- Each `Activity` belongs to one semester. When evidence from an earlier activity qualifies for a later semester, the student requests recognition; no later-semester score is issued before approval.
-- Capacity counts approved registrations. Pending and waitlisted registrations do not reserve seats. The initial design sets no separate limit on the number of waitlisted registrations; organizers may review applications before approval.
-- Organizers record attendance by session and verify participation on their side before a score is issued (one way to do this is via a camera-only QR check with an on-site signature collection fallback). Attendance alone does not guarantee points.
+- Administrators maintain faculties, semesters, score criteria, and role assignments. Managers manage only assigned activities.
+- Each `Activity` belongs to one semester. When evidence from an earlier activity qualifies for a later semester, the student requests recognition; no later-semester score is issued before approval..
+- Managers record attendance by session and verify participation on their side before a score is issued (one way to do this is via a camera-only QR check with an on-site signature collection fallback). Attendance alone does not guarantee points.
 - Once a score criterion is used for an award, its meaning and maximum remain fixed. A changed policy uses a new criterion record so historical scores retain their original basis.
 - Recognition covers activities outside the registration workflow and earlier activities credited in a later semester.
 - The services hub stores links to external university systems, not their account data or transactions. AI recommendations are advisory and do not change registrations or scores.
@@ -51,7 +55,7 @@ The schema uses one **User** entity for every student or staff member. `User.rol
 
 | Entity | Main attributes | Purpose and constraints |
 | --- | --- | --- |
-| **Role** | `role_id` (PK), `code` (UQ), `name`, `description` | Controlled values: `student`, `organizer`, `reviewer`, `administrator`. Each user has one role; the role's permissions determine available actions. |
+| **Role** | `role_id` (PK), `code` (UQ), `name`, `description` | Controlled values: `student`, `manager`, `administrator`. Each user has one role; the role's permissions determine available actions. |
 | **Permission** | `permission_id` (PK), `code` (UQ), `description` | Named actions such as `registration.create`, `registration.review`, `activity.manage`, `attendance.record`, `score.submit`, `score.adjust`, `appeal.submit`, `appeal.review`, `criteria.manage`, and `reports.view`. |
 | **RolePermission** | `role_id` (FK), `permission_id` (FK) | Composite PK (`role_id`, `permission_id`); defines which actions each role grants. Seeded and maintained by administrators. |
 | **Faculty** | `faculty_id` (PK), `code` (UQ), `name` | Academic unit used in profiles, activity filters, and eligibility rules. |
@@ -66,14 +70,14 @@ The schema uses one **User** entity for every student or staff member. `User.rol
 | **User** | `user_id` (PK), `role_id` (FK), `email` (UQ), `password_hash`, `full_name`, `student_number` (nullable, UQ), `faculty_id` (nullable FK), `avatar_url` (nullable), `is_active`, `created_at` | The sole account and profile entity. `role_id` is required. Student academic fields are populated when applicable; other staff may leave them null. Store only password hashes. |
 | **UserInterest** | `user_id` (FK), `category_id` (FK) | Composite PK (`user_id`, `category_id`). Optional preferences for discovery and recommendations. |
 
-The initial permission mapping is cumulative, as in each higher role automatically includes all permissions granted to roles below it. `student` can manage personal profiles and registrations, view personal scores, and submit appeals; `organizer` adds management of assigned activities, registrations, attendance, announcements, participation results, and score adjustments; `reviewer` adds appeal review; `administrator` adds role assignment, criteria and settings management, and system-wide reports. 
+The initial permission mapping is cumulative, as in each higher role automatically includes all permissions granted to roles below it. `student` can manage personal profiles and registrations, view personal scores, and submit appeals; `manager` adds management of assigned activities, registrations, attendance, announcements, participation results, and score adjustments; `administrator` adds role assignment, criteria and settings management, and system-wide reports. 
 
 ## Activities and participation
 
 | Entity | Main attributes | Purpose and constraints |
 | --- | --- | --- |
 | **Activity** | `activity_id` (PK), `title`, `description`, `eligibility_notes` (nullable), `category_id` (FK), `semester_id` (FK), `capacity`, `registration_opens_at`, `registration_closes_at`, `status`, `created_by_user_id` (FK), `created_at` | An activity belongs to one category and semester. `eligibility_notes` describes any requirements beyond faculty membership. Status covers draft, published, cancelled, and completed. |
-| **ActivityOrganizer** | `activity_id` (FK), `user_id` (FK) | Composite PK (`activity_id`, `user_id`). An assigned user needs `activity.manage` permission. An activity may have several organizers. |
+| **Activitymanager** | `activity_id` (FK), `user_id` (FK) | Composite PK (`activity_id`, `user_id`). An assigned user needs `activity.manage` permission. An activity may have several managers. |
 | **ActivitySchedule** | `schedule_id` (PK), `activity_id` (FK), `starts_at`, `ends_at`, `location` | One activity may have several sessions. Start precedes end; these intervals support calendar and conflict checks. |
 | **ActivityEligibility** | `activity_id` (FK), `faculty_id` (FK) | Composite PK (`activity_id`, `faculty_id`). If an activity has no rows here, it is open to all faculties; otherwise, only listed faculties are eligible. |
 | **ActivityScore** | `activity_id` (FK), `criterion_id` (FK), `points` | Composite PK (`activity_id`, `criterion_id`). Advertised score for verified participation; positive points award credit, while negative points mark a violation deduction. The point magnitude cannot exceed the criterion maximum. |
@@ -87,10 +91,10 @@ The initial permission mapping is cumulative, as in each higher role automatical
 
 | Entity | Main attributes | Purpose and constraints |
 | --- | --- | --- |
-| **Appeal** | `appeal_id` (PK), `submitted_by_user_id` (FK), `activity_id` (nullable FK), `registration_id` (nullable FK), `score_id` (nullable FK), `type`, `description`, `status`, `reviewed_by_user_id` (nullable FK), `response` (nullable), `submitted_at`, `reviewed_at` (nullable) | Covers recognition, participation correction, or score correction. An earlier-semester recognition may link an existing activity; outside-activity recognition may have no activity FK. The submitter needs a verified student number, and the reviewer needs appeal-review permission. |
+| **Appeal** | `appeal_id` (PK), `submitted_by_user_id` (FK), `activity_id` (nullable FK), `registration_id` (nullable FK), `score_id` (nullable FK), `type`, `description`, `status`, `reviewed_by_user_id` (nullable FK), `response` (nullable), `submitted_at`, `reviewed_at` (nullable) | Covers recognition, participation correction, or score correction. An earlier-semester recognition may link an existing activity; outside-activity recognition may have no activity FK. The submitter needs a verified student number, and the manager needs appeal-review permission. |
 | **AppealEvidence** | `evidence_id` (PK), `appeal_id` (FK), `file_url`, `description`, `uploaded_at` | Supporting files or links for an appeal. An appeal can have multiple evidence items. |
 | **Recognition** | `recognition_id` (PK), `appeal_id` (FK, UQ), `student_user_id` (FK), `title`, `occurred_at`, `semester_id` (FK), `criterion_id` (FK), `verified_by_user_id` (FK), `verified_at` | An approved appeal creates one verified record for an external activity or a prior activity credited in a later semester. `semester_id` is the target scoring semester; the student matches the appeal submitter. |
-| **ActivityAnnouncement** | `announcement_id` (PK), `activity_id` (FK), `author_user_id` (FK), `title`, `body`, `published_at` | Organizer updates tied to an activity. |
+| **ActivityAnnouncement** | `announcement_id` (PK), `activity_id` (FK), `author_user_id` (FK), `title`, `body`, `published_at` | manager updates tied to an activity. |
 | **Notification** | `notification_id` (PK), `recipient_user_id` (FK), `activity_id` (nullable FK), `type`, `message`, `created_at`, `read_at` (nullable) | Delivery record for reminders, schedule changes, registration updates, and appeal outcomes. |
 | **ServiceLink** | `service_id` (PK), `name`, `url`, `description`, `display_order`, `is_active` | Administrator-managed links in the university services hub. |
 
@@ -103,7 +107,7 @@ The initial permission mapping is cumulative, as in each higher role automatical
 - Each `Activity` has exactly one `ActivityCategory` `(1, 1)`; each category may classify `(0, N)` activities.
 - Each `Activity` belongs to exactly one `Semester` `(1, 1)`; each semester may contain `(0, N)` activities.
 - Each `Activity` has exactly one creator `User` `(1, 1)`; each user may create `(0, N)` activities.
-- Each `ActivityOrganizer` links exactly one `Activity` `(1, 1)` and exactly one organizer `User` `(1, 1)`; each activity may have `(0, N)` assigned organizers, and each organizer may manage `(0, N)` activities.
+- Each `Activitymanager` links exactly one `Activity` `(1, 1)` and exactly one manager `User` `(1, 1)`; each activity may have `(0, N)` assigned managers, and each manager may manage `(0, N)` activities.
 - Each `ActivitySchedule` belongs to exactly one `Activity` `(1, 1)`; each activity may have `(0, N)` scheduled sessions.
 - Each `ActivityEligibility` links exactly one `Activity` `(1, 1)` and exactly one `Faculty` `(1, 1)`; each activity may allow `(0, N)` faculties, and each faculty may be allowed for `(0, N)` activities.
 - Each `ActivityScore` links exactly one `Activity` `(1, 1)` and exactly one `ScoreCriterion` `(1, 1)`; each activity may offer `(0, N)` criteria, and each criterion may be offered by `(0, N)` activities.
@@ -113,7 +117,7 @@ The initial permission mapping is cumulative, as in each higher role automatical
 - Each `TrainingScore` belongs to exactly one `ScoreCriterion` `(1, 1)` and exactly one `Semester` `(1, 1)`; each criterion and each semester may have `(0, N)` scores.
 - Each `TrainingScore` has either one `Participation` `(1, 1)` and no `Recognition` `(0, 0)`, or one `Recognition` `(1, 1)` and no `Participation` `(0, 0)`; each participation or recognition may support `(0, N)` scores, limited to one per criterion.
 - Each `ScoreChange` belongs to exactly one `TrainingScore` `(1, 1)` and may reference one `Appeal` `(0, 1)`; each score and each appeal may have `(0, N)` score changes.
-- Each `Appeal` is submitted by exactly one student `User` `(1, 1)` and may be reviewed by one reviewer `User` `(0, 1)`; each student may submit `(0, N)` appeals, and each reviewer may handle `(0, N)` appeals.
+- Each `Appeal` is submitted by exactly one student `User` `(1, 1)` and may be reviewed by one manager `User` `(0, 1)`; each student may submit `(0, N)` appeals, and each manager may handle `(0, N)` appeals.
 - Each `Appeal` may reference one `Activity` `(0, 1)`, one `Registration` `(0, 1)`, and one `TrainingScore` `(0, 1)` according to its type; each of those records may be referenced by `(0, N)` appeals.
 - Each `AppealEvidence` belongs to exactly one `Appeal` `(1, 1)`; each appeal may include `(0, N)` evidence items.
 - Each `Recognition` belongs to exactly one approved `Appeal` `(1, 1)`, one student `User` `(1, 1)`, one `Semester` `(1, 1)`, and one `ScoreCriterion` `(1, 1)`; each appeal may produce `(0, 1)` recognition, while each student, semester, and criterion may be associated with `(0, N)` recognitions.
@@ -137,7 +141,7 @@ The initial permission mapping is cumulative, as in each higher role automatical
 - `TrainingScore(participation_id, criterion_id)` is unique when `participation_id` is present.
 - `TrainingScore(recognition_id, criterion_id)` is unique when `recognition_id` is present.
 - A `TrainingScore` row has exactly one non-null source: `participation_id` or `recognition_id`.
-- `Role.code` is one of `student`, `organizer`, `reviewer`, or `administrator`.
+- `Role.code` is one of `student`, `manager`, or `administrator`.
 - `Activity.status` is one of `draft`, `published`, `cancelled`, or `completed`.
 - `Registration.status` is one of `pending`, `approved`, `waitlisted`, `rejected`, or `cancelled`.
 - `Attendance.status` is one of `present`, `absent`, or `excused`.
@@ -160,13 +164,13 @@ The initial permission mapping is cumulative, as in each higher role automatical
 - A student's `faculty_id` must be university-verified before it is used for activity eligibility.
 - A request from a user with `is_active = false` must be denied.
 - A protected action must match a `Permission` linked to the user's `role_id` through `RolePermission`.
-- The organizer permission set must include every student permission; the reviewer set must include every organizer permission; the administrator set must include every reviewer permission.
+- The manager permission set must include every student permission; the administrator set must include every manager permission.
 - Only a user with the administrator role may change `User.role_id` or edit `RolePermission`.
 - Only a user with `appeal.review` permission may approve or reject an `Appeal`.
-- Only a user assigned through `ActivityOrganizer` may manage that activity or record its attendance.
+- Only a user assigned through `Activitymanager` may manage that activity or record its attendance.
 - A user may read or change a student-owned record only when it belongs to that user, unless a staff permission grants access to the relevant workflow.
 - A registration request must come from a user with registration permission.
-- An activity may be published only when it has at least one `ActivitySchedule` and one `ActivityOrganizer`.
+- An activity may be published only when it has at least one `ActivitySchedule` and one `Activitymanager`.
 - Every `ActivitySchedule` must fall within its activity's `Semester` date range.
 - A registration request must target an activity whose status is `published`.
 - A registration request at time `t` is accepted only when `registration_opens_at <= t < registration_closes_at`.
@@ -190,7 +194,7 @@ The initial permission mapping is cumulative, as in each higher role automatical
 - An internal `TrainingScore.points_awarded` must have the same sign as its `ActivityScore.points`, or be zero.
 - A recognition `TrainingScore.points_awarded` must be nonnegative.
 - A `ScoreCriterion` referenced by a `TrainingScore` must not have its `code`, `name`, or `max_points` changed; a new policy requires a new criterion row.
-- An internal `TrainingScore` may be adjusted only by an assigned organizer with `score.adjust` permission or by a user with `appeal.review` permission applying an approved score appeal.
+- An internal `TrainingScore` may be adjusted only by an assigned manager with `score.adjust` permission or by a user with `appeal.review` permission applying an approved score appeal.
 - An appeal for a participation correction must reference a `Registration` owned by its submitter.
 - An appeal for a score correction must reference a `TrainingScore` earned by its submitter.
 - A `Recognition` may be created only from an approved recognition appeal.

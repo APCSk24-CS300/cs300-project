@@ -83,7 +83,7 @@ The initial permission mapping is cumulative, as in each higher role automatical
 | Entity | Main attributes | Purpose and constraints |
 | --- | --- | --- |
 | **Activity** | `activity_id` (PK), `title`, `description`, `eligibility_notes` (nullable), `category_id` (FK), `semester_id` (FK), `capacity`, `registration_opens_at`, `registration_closes_at`, `status`, `created_by_user_id` (FK), `created_at` | An activity belongs to one category and semester. `eligibility_notes` describes any requirements beyond faculty membership. Status covers draft, published, cancelled, and completed. |
-| **Activitymanager** | `activity_id` (FK), `user_id` (FK) | Composite PK (`activity_id`, `user_id`). An assigned user needs `activity.manage` permission. An activity may have several managers. |
+| **ActivityManage** | `activity_id` (FK), `user_id` (FK) | Composite PK (`activity_id`, `user_id`) for event managers. An assigned user needs `activity.manage` permission. An activity may have several managers. |
 | **ActivitySchedule** | `schedule_id` (PK), `activity_id` (FK), `starts_at`, `ends_at`, `location` | One activity may have several sessions. Start precedes end; these intervals support calendar and conflict checks. |
 | **ActivityEligibility** | `activity_id` (FK), `faculty_id` (FK) | Composite PK (`activity_id`, `faculty_id`). If an activity has no rows here, it is open to all faculties; otherwise, only listed faculties are eligible. |
 | **ActivityScore** | `activity_id` (FK), `criterion_id` (FK), `points` | Composite PK (`activity_id`, `criterion_id`). Advertised score for verified participation; positive points award credit, while negative points mark a violation deduction. The point magnitude cannot exceed the criterion maximum. |
@@ -140,7 +140,8 @@ The initial permission mapping is cumulative, as in each higher role automatical
 - Every non-null foreign key references an existing row.
 - Historical `Registration`, `Attendance`, `Participation`, `TrainingScore`, `Appeal`, and `ScoreChange` rows must not be cascade-deleted through their foreign keys.
 - `User.role_id` is non-null.
-- `Student.role_id`, `Manager.role_id`, and `Administrator.role_id` are non-null, fixed to their respective Role values, and must equal their parent `User.role_id` through composite foreign keys.
+- `Student.role_id`, `Manager.role_id`, and `Administrator.role_id` are non-null and fixed to their respective Role values.
+- For every subtype row, `subtype.role_id = User.role_id` for the same `user_id`. Enforce this with UQ `User(user_id, role_id)` and a composite FK from each subtype's (`user_id`, `role_id`) to `User(user_id, role_id)`; inserts or role changes that create a mismatch must be rejected.
 - Every field marked `UQ` in the entity tables rejects duplicate non-null values.
 - Each composite primary key in the entity tables rejects duplicate key tuples.
 - `Registration(activity_id, user_id)` is unique, including when the existing registration is cancelled or rejected.

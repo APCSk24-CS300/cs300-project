@@ -117,7 +117,6 @@ flowchart TD
     E --> F{Student action?}
 
     F -->|Follow| G[Follow activity]
-    G --> H[Receive activity updates]
 
     F -->|Register| I([Continue to Workflow 1.2])
     F -->|Continue browsing| A

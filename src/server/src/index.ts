@@ -10,6 +10,7 @@ import config from './config/config.ts';
 // import DbConnection from './connections/DbConnection.ts';
 
 // routes
+import AuthRoute from './routes/AuthRoute.ts';
 
 
 // callbacks
@@ -27,6 +28,7 @@ app.use(bodyParser.json());
 app.use(morgan('dev'));
 
 
+app.use('/api/auth', AuthRoute);
 app.get('/', rootCallback);
 app.get('/health', healthCallback);
 app.use(nonexistentRouteCallback);

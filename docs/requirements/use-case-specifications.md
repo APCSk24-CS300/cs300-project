@@ -16,7 +16,7 @@ This document specifies **all 31 use cases** in the use case model document, ord
 | UC-01 | Log in | User (Student, Activity Manager, University Administrator) |
 | UC-02 | Log out | User (Student, Activity Manager, University Administrator) |
 | UC-03 | Manage own profile | User (Student, Activity Manager, University Administrator) |
-| UC-04 | Discover activities | Student |
+| UC-04 | Discover activities | Student, Activity Manager |
 | UC-05 | Follow an activity | Student |
 | UC-06 | Chat with AI Student Assistant | Student |
 | UC-07 | Access university services | User (Student, Activity Manager, University Administrator) |

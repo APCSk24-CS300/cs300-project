@@ -83,7 +83,7 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 - Verified reduced motion in Chrome: `scroll-behavior` becomes `auto`, transitions collapse to `1e-05s`, and translation is `none`; added a global reduced-motion `translate: none !important` override because Tailwind hover lifts use the `translate` property.
 - Compared the rendered page with `docs/ui/landing-page-ui.png` and corrected the hero headline width, Help decoration overlap, guide-card fade, and contrast tokens.
 - Verified the guest build: header Log In resolves to `/login?redirectTo=%2F`; hero Get Started resolves to `/login`; five main content sections plus footer render; activity grouping is 2 featured + 3 compact; two locked service cards are inert with no href and are absent from tab order; two public service links are reachable.
-- Verified signed-in builds: student, organizer, and admin all show `Dashboard` and `Get Started` pointing at the correct role dashboard; organizer/admin show four service links and zero locked cards.
+- Verified signed-in builds: student, organizer, and admin all keep the header `Log In` action; hero `Get Started` still points at the correct role dashboard; organizer/admin show four service links and zero locked cards.
 - Verified all eight activity scenarios in Chrome: `success` (2+3), `partial` (1+3), `empty`, `error`, `delay` (skeleton then success), `single-list` (5 featured-only), `all-invalid` (error, no broken cards), and `long-content` (2+3, clamp, multi-day dates, image fallback). No scenario produced horizontal overflow; repeated `Try again` kept a single error node and moved focus to the section heading.
 - Verified navigation and drawer behavior: direct `/#services` scroll restores with the header offset and active nav; activities → help → Back → Forward restores hashes; brand returns to `#home`; selecting a drawer link closes the dialog, scrolls to the section, and focuses it.
 - Verified resilience and quickstart extras: metadata title/description/OG/Twitter tags render; one `h1`; copyright year is current; hero image failure renders the gradient fallback with text intact; activity image request failure swaps to the local placeholder; throttled conditions show the skeleton then 5 cards; no horizontal overflow.
@@ -244,7 +244,7 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 - T069–T075: services/role tests and implementation.
 - T076: guest services keyboard/pointer/AT gating verified against a guest build.
 - T077–T082: signed-in role tests and implementation.
-- T083: student/organizer/admin dashboard continuity verified against role builds.
+- T083: student/organizer/admin role flows verified against role builds; header remains login-only and hero Get Started uses the role dashboard.
 - T084–T093: scroll, mobile drawer, redirect, and integration tests/implementation.
 - T094: direct hashes, Back/Forward, brand-to-top, drawer selection, Escape/backdrop, and focus restoration.
 - T095–T105: boundary, metadata, copy, asset, login return-flow, composition, scope, lint, build, and test gates.
@@ -269,7 +269,8 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 9. **Footer copy is provisional.** Address/phone/email use public HCMUS-style placeholder content and must be confirmed.
 10. **Physical screen-reader pass not performed.** Keyboard focus, drawer containment, landmarks, headings, and automated axe checks are verified; a manual screen-reader pass is still recommended before release.
 11. **`metadataBase` and env naming:** `.env.local` currently uses `NEXT_PUBLIC_API_URL`, while the API client reads `NEXT_PUBLIC_API_BASE_URL`. Real API mode requires correcting local env configuration.
-12. **No commit was created.** All changes remain in the working tree.
+12. **Header auth action is intentionally login-only.** Per a later user request, `SiteHeader` always shows `Log In` and never exposes a Dashboard link, even when authenticated. This deviates from FR-008/spec language that expects a header Dashboard action; authenticated users still reach their dashboards through hero `Get Started`, login success, or direct routes.
+13. **No commit was created.** All changes remain in the working tree.
 
 ## Remaining Work and Recommended Next Steps
 

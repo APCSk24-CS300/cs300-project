@@ -17,9 +17,9 @@ export function HeroSection() {
       />
       <Container className="relative">
         <div className="max-w-xl lg:max-w-4xl">
-          <h1
+        <h1
             id="hero-heading"
-            className="text-4xl font-extrabold leading-tight tracking-tight text-accent-gold-strong drop-shadow-[0_2px_2px_rgba(0,0,0,0.35)] sm:text-5xl lg:text-6xl"
+            className="text-4xl font-extrabold leading-tight tracking-tight text-[#FFA800] [text-shadow:4px_4px_1px_rgba(0,0,0,0.9)] sm:text-5xl lg:text-6xl"
           >
             {HERO_CONTENT.headline}
           </h1>

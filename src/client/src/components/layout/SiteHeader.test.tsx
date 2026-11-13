@@ -111,12 +111,12 @@ describe("SiteHeader", () => {
   });
 
   it.each([
-    ["student", "/student/dashboard"],
-    ["organizer", "/organizer/dashboard"],
-    ["admin", "/admin/dashboard"],
-  ] satisfies [RoleCode, string][])(
-    "shows the %s dashboard path when authenticated",
-    (role, dashboardPath) => {
+    "student",
+    "organizer",
+    "admin",
+  ] satisfies RoleCode[])(
+    "still shows the Log In link for an authenticated %s",
+    (role) => {
       renderHeader(
         createAuthContextValue({
           user: createSessionUser(role),
@@ -125,15 +125,15 @@ describe("SiteHeader", () => {
         }),
       );
 
-      expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
+      expect(screen.getByRole("link", { name: "Log In" })).toHaveAttribute(
         "href",
-        dashboardPath,
+        "/login?redirectTo=%2F",
       );
-      expect(screen.queryByText("Log In")).not.toBeInTheDocument();
+      expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
     },
   );
 
-  it("reserves a loading placeholder without flashing Dashboard", () => {
+  it("reserves a loading placeholder without flashing the auth action", () => {
     renderHeader(
       createAuthContextValue({
         user: null,

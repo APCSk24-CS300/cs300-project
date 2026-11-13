@@ -14,7 +14,7 @@ import { Logo } from "@/components/layout/Logo";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { useAuth } from "@/hooks/useAuth";
-import { getDashboardPath, getLoginHref } from "@/libs/navigation";
+import { getLoginHref } from "@/libs/navigation";
 import { scrollToSection, useHashScroll, useScrollSpy } from "@/libs/scroll";
 import { cn } from "@/libs/cn";
 import type { NavigationLink } from "@/types/navigation";
@@ -27,7 +27,7 @@ const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export function SiteHeader({ links }: SiteHeaderProps) {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { isLoading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -39,10 +39,6 @@ export function SiteHeader({ links }: SiteHeaderProps) {
   const returnTo =
     activeSection && activeSection !== "home" ? `/#${activeSection}` : "/";
   const loginHref = getLoginHref(returnTo);
-  const authHref =
-    isAuthenticated && user
-      ? getDashboardPath(user.role)
-      : loginHref;
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -158,8 +154,8 @@ export function SiteHeader({ links }: SiteHeaderProps) {
       />
     </span>
   ) : (
-    <Button href={authHref} size="sm">
-      {isAuthenticated ? "Dashboard" : "Log In"}
+    <Button href={loginHref} size="sm">
+      Log In
     </Button>
   );
 
@@ -285,12 +281,12 @@ export function SiteHeader({ links }: SiteHeaderProps) {
                 authAction
               ) : (
                 <Button
-                  href={authHref}
+                  href={loginHref}
                   size="md"
                   className="w-full"
                   onClick={() => closeMenu(false)}
                 >
-                  {isAuthenticated ? "Dashboard" : "Log In"}
+                  Log In
                 </Button>
               )}
             </div>

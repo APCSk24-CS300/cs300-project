@@ -66,3 +66,5 @@ class AuthController {
 		.json(response.get());
 	}
 }
+
+export default new AuthController();

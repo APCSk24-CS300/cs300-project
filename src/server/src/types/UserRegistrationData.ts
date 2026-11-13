@@ -9,7 +9,8 @@ export interface UserRegistrationData {
     facultyID: number,
     createdAt: Date,
 }
-export interface User {
+
+export interface User { // data stored in db
     userID: string,
     data: UserRegistrationData,
     passwordHash: string,

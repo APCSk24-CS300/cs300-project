@@ -9,7 +9,7 @@
 **Project:** myHCMUS  
 **Team Name:** debug docker vào 25h sáng  
 **Date Created:** 5/10/2026  
-**Contract Version:** v1.0
+**Contract Version:** v1.1
 
 ### Team Members
 
@@ -147,12 +147,12 @@ A task is considered complete only when:
 
 ### Technology Stack
 
-- **Frontend:** TBD
-- **Backend:** TBD
-- **Database:** TBD
+- **Frontend:** NextJS, React, TypeScript, Tailwind CSS v4
+- **Backend:** TypeScript, express
+- **Database:** PostgreSQL
 - **Testing:** TBD
 - **Version Control:**  GitHub
-- **Other Tools:** TBD
+- **Other Tools:** Spec Kit
 
 ### Coding Standards
 
@@ -166,23 +166,47 @@ The team agrees to:
 - Add comments when the purpose or reasoning of the code is not obvious.
 - Avoid committing passwords, API keys, credentials, or other confidential information.
 
+### File Naming Standards
+For clarity in the codebase structures, members are expected to abide by the following file naming standards:
+- For documentation files, all markdown files are to be named in `kebab-case`, and the file name should clearly describe its content in a succinct manner.
+- For backend source files:
+    -  With the sole exception of `index.ts`, all TypeScript files must export precisely one entity (variable, object, class, function, interface, type, enum), and the file name must be its name. Variables, objects, and functions name should be in `camelCase`, whereas classes, interfaces, and enums name should be in `PascalCase`.
+    - JSON files pertaining to documentation and package configurations should be in `kebab-case`.
+    - Docker and environment variable files must abide by existing Docker conventions (`Dockerfile`, `docker-compose.yml`, `.env`, `.env.example`).
+- For frontend source files:
+    - Next.js special files must retain their predefined names (e.g., page.tsx, layout.tsx, loading.tsx, error.tsx).
+    - React components: `PascalCase`; Classes/Services: `PascalCase`; Hooks: `camelCase` with use prefix; Types/Interfaces: `PascalCase`; Folders: `kebab-case`;
+    - Maintain consistent naming conventions across the frontend codebase.
+
 ### Git Workflow
 
 The team will use the following branch naming convention:
 
 - `main` for the stable version.
 - `dev` for  shared development.
-- `feature/<feature-name>` for new features.
+- `feat/<module>/<feature-name>` for new features.
+    - `feat/frontend/<feature-name>` for new client-side features.
+    - `feat/backend/<feature-name>` for new server-side features.
+    - `feat/database/<feature-name>` for new database-side features.
 - `fix/<bug-name>` for bug fixes.
 - `chore/<bug-name>` for routine maintenance and configuration.
 
 Example:
 
 ```text
-feature/user-login
+feat/frontend/user-login-screen
+feat/backend/login-endpoint
+feat/database/concurrency-control
 fix/login-validation
 chore/team-contract
 ```
+
+This will be further enforced via Jira cover colors, visible in tasks defined from PA2 onwards:
+- Gray -> Chore
+- Purple -> Bux fixes
+- Green gradient -> Frontend feats
+- Blue gradient -> Backend feats
+- Red gradient -> Database feats
 
 ### Commit Messages
 

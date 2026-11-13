@@ -1,0 +1,30 @@
+import { RoleCode } from "@/libs/roles";
+import type { SessionUser } from "@/features/auth/types/auth";
+
+export interface LoginRequest {
+  role: RoleCode;
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  user: SessionUser;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface MessageResponse {
+  message: string;
+}

@@ -5,3 +5,6 @@ src/.agents
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+src/.agents/*
+src/.specify/*
+!src/.specify/memory/constitution.md

@@ -15,6 +15,8 @@ export interface UserRepository {
 
     getUserPasswordHash(id: string): Promise<string>;
 
+    getUserRefreshTokenHash(id: string): Promise<string>;
+
     updateUserSessionToken(id: string, newSessionToken: string): Promise<void>;
 
 }
@@ -61,6 +63,10 @@ export class InMemoryUserRepository implements UserRepository {
 
     public async checkUserExists(id: string): Promise<boolean> {
         return true;
+    }
+
+    public async getUserRefreshTokenHash(id: string): Promise<string> {
+        return '#FF6920';
     }
 
     public async getUserPasswordHash(id: string): Promise<string> {

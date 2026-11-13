@@ -1,19 +1,19 @@
-// assume user data is like this
-export interface UserData { // data to be input as registration
+// assume user registration data is like this
+export interface UserRegistrationData {
     name: string,
     email: string,
     phone: string,
     passwordPlainText: string,
     enrollmentYear: number,
     majorID: number,
-    facultyID: number
+    facultyID: number,
+    createdAt: Date,
 }
 
 export interface User { // data stored in db
     userID: string,
-    data: UserData,
+    data: UserRegistrationData,
     passwordHash: string,
-    signInTime: Date,
     userStatus: number,
-    userRole: number
+    userRole: number,
 }

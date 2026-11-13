@@ -96,93 +96,188 @@ myHCMUS provides the following features to support students, managers, and admin
 
 12. **AI Student Assistant:** The AI Student Assistant recommends extracurricular activities based on students' interests, schedules, participation history, and training-score needs. It also allows students to ask questions about activities and relevant university procedures. Students can use these suggestions and responses to identify suitable activities and obtain information more conveniently. This feature helps students make informed decisions about extracurricular participation and better understand university-related procedures.
 
-### Key User Workflows:
+## Key User Workflows:
 
 The following workflows illustrate two important processes supported by myHCMUS: activity registration and handling student recognition or appeal requests.
 
-**Workflow 1: Activity Discovery and Registration**
+### Workflow 1: Activity Discovery and Registration
+
+This workflow describes how students discover activities, follow activities, register for participation, join waiting lists, and receive registration outcomes. It is divided into four sub-diagrams for readability.
+
+#### 1.1. Activity Discovery and Following
+
+```mermaid
+flowchart TD
+    A[Student browses activities] --> B{Search or filter?}
+    B -->|Yes| C[Search or filter activities]
+    B -->|No| D[Select an activity]
+    C --> D
+
+    D --> E[View activity details]
+    E --> F{Student action?}
+
+    F -->|Follow| G[Follow activity]
+    G --> H[Receive activity updates]
+
+    F -->|Register| I([Continue to Workflow 1.2])
+    F -->|Continue browsing| A
+```
+
+Students can browse and select activities directly without searching or filtering. They may follow an activity to receive updates or proceed to registration.
+
+#### 1.2. Activity Registration
+
+```mermaid
+flowchart TD
+    A[Student selects Register] --> B{Registration conditions satisfied?}
+
+    B -->|No| C[Registration unavailable]
+    B -->|Yes| D{Capacity available?}
+
+    D -->|No| WL([Continue to Workflow 1.3])
+    D -->|Yes| E[Check schedule conflicts]
+
+    E --> F{Schedule conflict?}
+    F -->|Yes| G[Display conflict warning]
+    F -->|No| J[Submit registration]
+
+    G --> H{Continue registration?}
+    H -->|No| I[Cancel registration attempt]
+    H -->|Yes| J
+
+    J --> K{Approval required?}
+
+    K -->|Yes| L[Set Pending Approval status and reserve seat]
+    L --> M[Manager reviews registration]
+    M --> N{Approved?}
+
+    N -->|No| O[Registration rejected]
+    N -->|Yes| P[Registration confirmed]
+    K -->|No| P
+
+    O --> Q[Notify student and release reserved seat]
+    P --> R[Update registration status and calendar]
+    R --> S[Notify student of confirmation]
+```
+
+The system validates registration conditions, available capacity, and schedule conflicts. Students may continue despite a schedule conflict. Registrations requiring approval remain pending until the Activity Manager makes a decision.
+
+If the activity is full, students may proceed to the waiting-list enrollment workflow.
+
+#### 1.3. Waiting List Enrollment
+
+```mermaid
+flowchart TD
+    A([From Workflow 1.2: Activity Full])
+    A --> B{Join waiting list?}
+
+    B -->|No| C[Registration unavailable]
+    B -->|Yes| D[Check schedule conflicts]
+
+    D --> E{Schedule conflict?}
+
+    E -->|Yes| F[Display conflict warning]
+    E -->|No| I[Add student to FIFO waiting list]
+
+    F --> G{Continue joining waiting list?}
+    G -->|No| H[Do not join waiting list]
+    G -->|Yes| I
+
+    I --> J[Set status to Waiting List]
+    J --> K[Notify student of waiting-list status]
+    K --> L[Wait for an available slot or list closure]
+    L --> M([Continue to Workflow 1.4])
+```
+
+When an activity is full, eligible students may join its FIFO waiting list. Schedule conflicts are checked before enrollment, and students can choose whether to continue.
+
+The Waiting List status is temporary. Its eventual outcome is handled in Workflow 1.4.
+
+#### 1.4. Registration Cancellation and Waiting List Resolution
 
 ```mermaid
 
-
 flowchart TD
-    A[Student browses activities] --> B{Search or filter?}
-    B -- Yes --> C[Search or filter activities]
-    B -- No --> D[Select an activity]
-    C --> D
-    D --> V[View activity details]
-    V --> SA{Student action?}
+    A[Registered student cancels registration]
+    A --> B[Release reserved slot]
 
-    SA -- Follow --> E[Follow activity]
-    E --> F[Receive activity updates]
+    B --> C{Waiting list empty?}
+    C -->|Yes| D[Slot becomes available]
+    C -->|No| E[Select first student in FIFO order]
 
-    SA -- Register --> G{Registration conditions satisfied?}
-    G -- No --> H[Registration unavailable]
-    G -- Yes --> I{Capacity available?}
+    E --> F{Student still eligible?}
+    F -->|No| G[Remove student and notify]
+    G --> C
 
-    I -- Yes --> J[Check schedule conflicts]
-    J --> K{Schedule conflict?}
-    K -- Yes --> L[Display conflict warning]
-    K -- No --> M[Submit registration]
-    L --> L1{Continue registration?}
-    L1 -- Yes --> M
-    L1 -- No --> L2[Cancel registration attempt]
+    F -->|Yes| M{Approval required?}
 
-    M --> N{Approval required?}
-    N -- Yes --> O[Manager reviews registration]
+    M -->|Yes| N[Set Pending Approval status and reserve slot]
+    N --> O[Manager reviews registration]
     O --> P{Approved?}
-    P -- No --> Q[Registration rejected]
-    P -- Yes --> R[Registration confirmed]
-    N -- No --> R
+
+    P -->|No| Q[Registration rejected]
+    Q --> Q1[Notify student and release slot]
+    Q1 --> C
+
+    P -->|Yes| R[Registration confirmed]
+    M -->|No| R
+
     R --> S[Update registration status and calendar]
+    S --> T[Notify student of confirmation]
 
-    I -- No --> T{Join waiting list?}
-    T -- No --> U[Registration unavailable]
-    T -- Yes --> WL[Add student to FIFO waiting list]
-    WL --> W[Waiting for an available slot]
-
-    X[Registered student cancels registration] --> Y[Release available slot]
-    Y --> Z{Waiting list empty?}
-    Z -- Yes --> AA[Slot becomes available]
-    Z -- No --> AB[Select first eligible student in FIFO order]
-    AB --> AC[Promote student from waiting list]
-    AC --> N
-
+    U[Waiting list closes] --> V[Close remaining waiting-list entries]
+    V --> W[Set status to Registration Unavailable]
+    W --> X[Notify affected students]
 
 ```
 
-    
-**Workflow 2: Activity Recognition and Score Appeal**
+When a registered student cancels, the system releases the reserved slot and processes the waiting list in FIFO order. Eligibility and schedule conflicts are rechecked before promotion.
+Students selected for promotion may be confirmed directly or require Activity Manager approval. When the waiting list closes, remaining entries receive a final unavailable status and notification.
+
+### Workflow 2: Activity Recognition and Score Appeal
 
 ```mermaid
-
 flowchart TD
     A[Student opens Requests System] --> B{Request type?}
 
-    B -- Activity recognition --> C[Enter activity details and upload supporting evidence]
-    B -- Record or score appeal --> D[Select related activity and disputed record, then provide evidence]
+    B -->|Activity recognition| C[Enter activity details and upload supporting evidence]
+    B -->|Record or score appeal| D[Select related activity and disputed record, then provide evidence]
 
     C --> E[Submit request]
     D --> E
 
     E --> F{Request type?}
 
-    F -- Activity recognition --> G[Assign to an authorized Manager in the Student Affairs Office]
-    F -- Record or score appeal --> H[Assign to the Manager responsible for the related activity]
+    F -->|Activity recognition| G[Assign to an authorized Manager in the Student Affairs Office]
+    F -->|Record or score appeal| H[Assign to the Manager responsible for the related activity]
 
     G --> I[Assigned Manager reviews request and verifies evidence]
     H --> I
 
-    I --> J{Request approved?}
+    I --> J{Review decision?}
 
-    J -- Yes --> K[Update participation or training-score record]
-    J -- No --> L[Record rejection and reason]
+    J -->|Approve| K[Update participation or training-score record]
+    J -->|Reject| L[Record rejection and reason]
+    J -->|Request additional information| N[Provide comments and request additional evidence]
+
+    N --> O[Set status to Additional Information Required]
+    O --> P[Notify student]
+    P --> Q{Student action?}
+
+    Q -->|Edit and resubmit| R[Update request details or supporting evidence]
+    R --> S[Resubmit the same request]
+    S --> I
+
+    Q -->|Withdraw| T[Set status to Withdrawn]
 
     K --> M[Notify student of the decision]
     L --> M
+    T --> U[Notify student of withdrawal]
+
 
 ```
 **Note:** Appeals related to a specific activity are assigned to the Manager responsible for that activity. Activity recognition requests are assigned to authorized Managers in the Student Affairs Office, as only designated personnel within the office have permission to handle these requests.
+
 
 # 6. Non-Functional Requirements
 ## I. Performance

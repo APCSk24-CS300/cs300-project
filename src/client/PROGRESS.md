@@ -82,8 +82,9 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 - Allowed the hero headline to stay on one line at `lg` and above, matching the desktop reference.
 - Verified reduced motion in Chrome: `scroll-behavior` becomes `auto`, transitions collapse to `1e-05s`, and translation is `none`; added a global reduced-motion `translate: none !important` override because Tailwind hover lifts use the `translate` property.
 - Compared the rendered page with `docs/ui/landing-page-ui.png` and corrected the hero headline width, Help decoration overlap, guide-card fade, and contrast tokens.
-- Verified the guest build: header Log In resolves to `/login?redirectTo=%2F`; hero Get Started resolves to `/login`; five main content sections plus footer render; activity grouping is 2 featured + 3 compact; two locked service cards are inert with no href and are absent from tab order; two public service links are reachable.
-- Verified signed-in builds: student, organizer, and admin all keep the header `Log In` action; hero `Get Started` still points at the correct role dashboard; organizer/admin show four service links and zero locked cards.
+- Verified the guest build: header Log In resolves to `/login?redirectTo=%2F`; hero Get Started resolves to `/login`; five main content sections plus footer render; activity grouping is 2 featured + 3 compact.
+- Verified signed-in builds: student, organizer, and admin all keep the header `Log In` action; hero `Get Started` still points at the correct role dashboard.
+- Reworked HCMUS Services to six display-only cards (adding placeholder `HCMUS Library` and `IT Support`), all inert with no hrefs, behind a translucent gradient/blur overlay with a `Log in for more` CTA. Chrome checks at 1440 and 375 show 3x2 and 1x6 layouts, six inert cards, zero card links, full overlay coverage, and no horizontal overflow.
 - Verified all eight activity scenarios in Chrome: `success` (2+3), `partial` (1+3), `empty`, `error`, `delay` (skeleton then success), `single-list` (5 featured-only), `all-invalid` (error, no broken cards), and `long-content` (2+3, clamp, multi-day dates, image fallback). No scenario produced horizontal overflow; repeated `Try again` kept a single error node and moved focus to the section heading.
 - Verified navigation and drawer behavior: direct `/#services` scroll restores with the header offset and active nav; activities → help → Back → Forward restores hashes; brand returns to `#home`; selecting a drawer link closes the dialog, scrolls to the section, and focuses it.
 - Verified resilience and quickstart extras: metadata title/description/OG/Twitter tags render; one `h1`; copyright year is current; hero image failure renders the gradient fallback with text intact; activity image request failure swaps to the local placeholder; throttled conditions show the skeleton then 5 cards; no horizontal overflow.
@@ -190,6 +191,8 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 - `public/images/services/tuition.png`
 - `public/images/services/portal.png`
 - `public/images/services/website.png`
+- `public/images/services/library.svg`
+- `public/images/services/support.svg`
 
 ### Modified
 - `package.json`
@@ -213,7 +216,7 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 ### Verified
 - `npx tsc --noEmit` passes.
 - `npm run lint` passes with `0` errors and `2` pre-existing unrelated warnings (`proxy.ts` unused `ROLE_CODES`; student dashboard unused `user`).
-- `npm test` passes: **19 files / 111 tests**.
+- `npm test` passes: **19 files / 109 tests**.
 - `npm run build` passes. `/` is statically generated; `/login` is dynamic.
 - No remote Unsplash URLs remain in `src`.
 - The mock activity service is imported only by its factory in production code.
@@ -231,7 +234,7 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 - `tasks.md` has 112 of 112 tasks checked.
 
 ### Release dependencies not verifiable from the repository
-- Final two services, confirmed service URLs, guide destinations, activity detail route, hero/footer copy, and production metadata URL remain product/content decisions.
+- Confirmed service names/icons/destinations (two cards are placeholders), guide destinations, activity detail route, hero/footer copy, and production metadata URL remain product/content decisions.
 - A physical screen-reader pass was not performed; semantics, headings, landmarks, keyboard behavior, focus containment, and axe checks are verified.
 
 ## Task Status Summary
@@ -242,7 +245,7 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 - T051–T067: activity mapper/service/hook/grid/card/state tests and implementation.
 - T068: US2 eight-scenario activity matrix, repeated retry, single-list reflow, and clipping/overflow checks.
 - T069–T075: services/role tests and implementation.
-- T076: guest services keyboard/pointer/AT gating verified against a guest build.
+- T076: all six service cards are display-only and inert behind the login overlay; no service destination is keyboard/pointer/AT reachable.
 - T077–T082: signed-in role tests and implementation.
 - T083: student/organizer/admin role flows verified against role builds; header remains login-only and hero Get Started uses the role dashboard.
 - T084–T093: scroll, mobile drawer, redirect, and integration tests/implementation.
@@ -261,7 +264,7 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 1. **Build warning:** `metadataBase` is not set, so Next resolves OpenGraph images against `http://localhost:3000`. Set a production site URL or `metadataBase` before release.
 2. **Lint warnings remain in pre-existing unrelated files:** unused `ROLE_CODES` in `proxy.ts` and unused `user` in the student dashboard page. No new lint errors remain.
 3. **Service destinations are assumptions.** `Tuition Payment` points to the HCMUS root and `HCMUS Website` points to the HCMUS root; confirm final URLs before release.
-4. **Only four of six services are configured.** The two unnamed services were intentionally not invented. Requirement FR-041's final 3x2 count remains a product-content dependency.
+4. **Six service cards are configured, including two placeholders.** `HCMUS Library` and `IT Support` are display-only placeholders. Per a later user request, all six cards are intentionally inert behind a gradient/blur-login overlay, so service URLs are not currently reachable; confirm names/icons/URLs if the cards become active.
 5. **Guide destinations are unavailable.** All four guide cards render as non-interactive “Coming soon” cards until `/help` destinations are confirmed.
 6. **Activity detail route does not exist yet.** Activity cards link to `/activities/{id}`; this route is a release dependency.
 7. **Activity API contract is provisional.** Mock mode is the default; `NEXT_PUBLIC_DATA_SOURCE=api` should not be enabled until the endpoint, envelope, fields, and image host are confirmed.
@@ -270,13 +273,14 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 10. **Physical screen-reader pass not performed.** Keyboard focus, drawer containment, landmarks, headings, and automated axe checks are verified; a manual screen-reader pass is still recommended before release.
 11. **`metadataBase` and env naming:** `.env.local` currently uses `NEXT_PUBLIC_API_URL`, while the API client reads `NEXT_PUBLIC_API_BASE_URL`. Real API mode requires correcting local env configuration.
 12. **Header auth action is intentionally login-only.** Per a later user request, `SiteHeader` always shows `Log In` and never exposes a Dashboard link, even when authenticated. This deviates from FR-008/spec language that expects a header Dashboard action; authenticated users still reach their dashboards through hero `Get Started`, login success, or direct routes.
-13. **No commit was created.** All changes remain in the working tree.
+13. **Services are intentionally display-only.** The six cards are hidden from assistive technology and pointer/keyboard interaction, with a shared `Log in for more` overlay. This intentionally replaces the earlier public/authenticated service-link behavior.
+14. **No commit was created.** All changes remain in the working tree.
 
 ## Remaining Work and Recommended Next Steps
 
 All tasks in `tasks.md` are complete. Remaining work is release configuration and product content:
 
-1. Resolve release dependencies: activity detail route, confirmed service URLs and final two services, guide destinations, hero/footer copy, and production metadata URL.
+1. Resolve release dependencies: activity detail route, confirmed service names/icons (or replacement of the two placeholders), guide destinations, hero/footer copy, and production metadata URL.
 2. Set `metadataBase` to the production origin and reconcile `NEXT_PUBLIC_API_URL` with `NEXT_PUBLIC_API_BASE_URL` before enabling real API mode.
 3. Optionally run a physical screen-reader smoke test; automated accessibility, keyboard, focus, and responsive checks already pass.
 4. Re-run `npm test`, `npm run lint`, `npx tsc --noEmit`, and `npm run build` after resolving the content/config dependencies.

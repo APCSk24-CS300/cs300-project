@@ -49,7 +49,7 @@ export function ServiceCard({ service, locked }: ServiceCardProps) {
         inert
         className={cn(
           baseClasses,
-          "pointer-events-none select-none opacity-75 blur-[3px]",
+          "pointer-events-none select-none opacity-75",
         )}
       >
         {content}

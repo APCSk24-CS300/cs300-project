@@ -20,7 +20,7 @@ describe("ServiceCard", () => {
     expect(container.innerHTML).not.toContain(privateService.href);
     expect(card).toHaveAttribute("aria-hidden", "true");
     expect(card).toHaveAttribute("inert");
-    expect(card).toHaveClass("select-none", "blur-[3px]");
+    expect(card).toHaveClass("select-none");
     expect(screen.getByText("Tuition Payment")).toBeInTheDocument();
     expect(screen.getByText("Access")).toBeInTheDocument();
   });

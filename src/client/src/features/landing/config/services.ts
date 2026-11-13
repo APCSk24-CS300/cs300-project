@@ -16,6 +16,7 @@ export const SERVICES_CONTENT = {
   accessLabel: "Access",
   unavailableLabel: "Coming soon",
   externalLinkLabel: "opens in a new tab",
+  loginMoreLabel: "Log in for more",
 };
 
 export const SERVICES: ServiceEntry[] = [
@@ -50,5 +51,21 @@ export const SERVICES: ServiceEntry[] = [
     icon: { src: "/images/services/website.png", alt: "" },
     access: "authenticated",
     available: true,
+  },
+  {
+    id: "hcmus-library",
+    name: "HCMUS Library",
+    href: "https://hcmus.edu.vn/",
+    icon: { src: "/images/services/library.svg", alt: "" },
+    access: "authenticated",
+    available: false,
+  },
+  {
+    id: "it-support",
+    name: "IT Support",
+    href: "https://hcmus.edu.vn/",
+    icon: { src: "/images/services/support.svg", alt: "" },
+    access: "authenticated",
+    available: false,
   },
 ];

@@ -55,6 +55,7 @@ User -- UC03
 User -- UC07
 User -- UC08
 User -- UC09
+Manager -- UC04
 Student -- UC04
 Student -- UC05
 Student -- UC06
@@ -114,20 +115,18 @@ systemBoundary "myHCMUS — Activity, Attendance, and Training-Score Management"
   UC18("UC-18: Manage activities")
   UC19("UC-19: Publish activity announcements")
   UC20("UC-20: View activity statistics and reports")
-  UC21("UC-21: Record activity attendance")
-  UC22("UC-22: Manage participation records")
-  UC23("UC-23: Manage training-score results")
-  UC24("UC-24: View participation history")
-  UC25("UC-25: View training scores")
+  UC21("UC-21: Manage participation records")
+  UC22("UC-22: Manage training-score results")
+  UC23("UC-23: View participation history")
+  UC24("UC-24: View training scores")
 end
+Student -- UC23
 Student -- UC24
-Student -- UC25
 Manager -- UC18
 Manager -- UC19
 Manager -- UC20
 Manager -- UC21
 Manager -- UC22
-Manager -- UC23
 ```
 
 Managing training scores must honor the authorization and verification rules described in the Vision Document.
@@ -143,21 +142,21 @@ actor Student("Student")
 actor Manager("Activity Manager")
 actor Admin("University Administrator")
 systemBoundary "myHCMUS — Activity Recognition, Appeals, and Administration"
-  UC26("UC-26: Submit activity recognition request")
-  UC27("UC-27: Appeal participation record or score")
-  UC28("UC-28: Track submitted requests")
-  UC29("UC-29: Review and resolve requests")
-  UC30("UC-30: Manage users and permissions")
-  UC31("UC-31: Configure criteria and categories")
-  UC32("UC-32: View system reports")
+  UC25("UC-25: Submit activity recognition request")
+  UC26("UC-26: Appeal participation record or score")
+  UC27("UC-27: Track submitted requests")
+  UC28("UC-28: Review and resolve requests")
+  UC29("UC-29: Manage users and permissions")
+  UC30("UC-30: Configure criteria and categories")
+  UC31("UC-31: View system reports")
 end
+Student -- UC25
 Student -- UC26
 Student -- UC27
-Student -- UC28
-Manager -- UC29
+Manager -- UC28
+Admin -- UC29
 Admin -- UC30
 Admin -- UC31
-Admin -- UC32
 ```
 
 
@@ -168,8 +167,8 @@ Admin -- UC32
 | UC-01 | Log in | Authentication | All users |
 | UC-02 | Log out | Authentication | All users |
 | UC-03 | Manage own profile | Profile Management | All users; student-only read-only academic information |
-| UC-04 | Discover activities | Activity Discovery | Student |
-| UC-05 | Follow an activity | Notification Management | Student; provisional |
+| UC-04 | Discover activities | Activity Discovery | Student, Activity Manager |
+| UC-05 | Follow an activity | Notification Management | Student|
 | UC-06 | Chat with AI Student Assistant | AI Student Assistant | Student |
 | UC-07 | Access university services | University Services Hub | All users |
 | UC-08 | Change interface language | NFR-LOC-01 | All users|
@@ -185,18 +184,17 @@ Admin -- UC32
 | UC-18 | Manage activities | Activity Management / NFR-COM-04 | Activity Manager |
 | UC-19 | Publish activity announcements | Activity Management | Activity Manager |
 | UC-20 | View activity statistics and reports | Activity Management | Activity Manager |
-| UC-21 | Record activity attendance | Participation and Training-Score Management | Activity Manager |
-| UC-22 | Manage participation records | Participation and Training-Score Management | Activity Manager |
-| UC-23 | Manage training-score results | Participation and Training-Score Management | Activity Manager |
-| UC-24 | View participation history | Participation and Training-Score Management | Student |
-| UC-25 | View training scores | Participation and Training-Score Management | Student |
-| UC-26 | Submit activity recognition request | Requests System | Student |
-| UC-27 | Appeal participation record or score | Requests System | Student |
-| UC-28 | Track submitted requests | Requests System | Student |
-| UC-29 | Review and resolve requests | Requests System | Activity Manager |
-| UC-30 | Manage users and permissions | System Administration / NFR-COM-04 | University Administrator |
-| UC-31 | Configure criteria and categories | System Administration / NFR-SCA-INT-04 | University Administrator |
-| UC-32 | View system reports | System Administration | University Administrator |
+| UC-21 | Manage participation records | Participation and Training-Score Management | Activity Manager |
+| UC-22 | Manage training-score results | Participation and Training-Score Management | Activity Manager |
+| UC-23 | View participation history | Participation and Training-Score Management | Student |
+| UC-24 | View training scores | Participation and Training-Score Management | Student |
+| UC-25 | Submit activity recognition request | Requests System | Student |
+| UC-26 | Appeal participation record or score | Requests System | Student |
+| UC-27 | Track submitted requests | Requests System | Student |
+| UC-28 | Review and resolve requests | Requests System | Activity Manager |
+| UC-29 | Manage users and permissions | System Administration / NFR-COM-04 | University Administrator |
+| UC-30 | Configure criteria and categories | System Administration / NFR-SCA-INT-04 | University Administrator |
+| UC-31 | View system reports | System Administration | University Administrator |
 
 ### Coverage of the 12 feature groups
 
@@ -207,22 +205,22 @@ Admin -- UC32
 | 3. Activity Discovery | UC-04, UC-05 |
 | 4. Activity Registration Management | UC-10–UC-14 |
 | 5. Activity Management | UC-18–UC-20 |
-| 6. Participation and Training-Score Management | UC-21–UC-25 |
+| 6. Participation and Training-Score Management | UC-21–UC-24 |
 | 7. Calendar Management | UC-15, UC-16 |
 | 8. Notification Management | UC-17 |
-| 9. Requests System | UC-26–UC-29 |
-| 10. System Administration | UC-30–UC-32 |
-| 11. University Services Hub | UC-08 |
+| 9. Requests System | UC-25–UC-28 |
+| 10. System Administration | UC-29–UC-31 |
+| 11. University Services Hub | UC-07 |
 | 12. AI Student Assistant | UC-06 |
 
 ## 5. Extension Points and Relation Rationale
 
 | Relation | Extension point / condition | Reason |
 |---|---|---|
-| UC-14 `extend` UC-10 | During registration, when the selected activity has no remaining capacity and a waiting list is enabled. | Joining a waiting list is optional, not a mandatory step of every registration. |
-| UC-17 `extend` UC-16 | While viewing the calendar, when the student requests an `.ics` export. | Export is an optional student goal available in the calendar context. |
+| UC-13 `extend` UC-10 | During registration, when the selected activity has no remaining capacity and a waiting list is enabled. | Joining a waiting list is optional, not a mandatory step of every registration. |
+| UC-16 `extend` UC-15 | While viewing the calendar, when the student requests an `.ics` export. | Export is an optional student goal available in the calendar context. |
 | Student, Activity Manager, University Administrator `generalize` User | Shared account functionality. | The three roles can access common functions without repeating every association. |
 
-There is **no** `include` relationship in this version. Checking capacity, verifying evidence, approving/rejecting a request, and updating state are normal basic/alternative-flow behavior; they are not independent reusable actor goals merely because the system executes them. For example, Approve Request and Reject Request are alternative outcomes within UC-29 Review and Resolve Requests and must not both be modeled as mandatory included use cases.
+There is **no** `include` relationship in this version. Checking capacity, verifying evidence, approving/rejecting a request, and updating state are normal basic/alternative-flow behavior; they are not independent reusable actor goals merely because the system executes them. For example, Approve Request and Reject Request are alternative outcomes within UC-28 Review and Resolve Requests and must not both be modeled as mandatory included use cases.
 
 **Rendering:** Mermaid native use-case syntax requires Mermaid 12.0.0 or newer and is still in beta. Use a renderer with `usecase-beta` support.

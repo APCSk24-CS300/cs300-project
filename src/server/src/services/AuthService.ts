@@ -10,9 +10,13 @@ const SALT_ROUNDS: number = 10;
 // repository functions:
 // implement a function to get the active user ID
 // implement a function to get student user ID
-// implement a function to get organizer user ID
+// implement a function to get activity manager user ID
 // implement a function to get admin user ID
 // implement a function to insert user
+// implement a function to check if a user exists given their user ID
+// implement a function to get their password hash
+// implement a function to get a list of refresh token hashes given user ID
+// implement a function to insert a refresh token hash - user ID pair
 
 export class AuthService {
 	public async register(data: UserData): Promise<ServiceResponse> {

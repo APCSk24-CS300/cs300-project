@@ -296,7 +296,6 @@ CREATE TABLE "AuditLog" (
 );
 
 CREATE TABLE "RefreshToken" (
-    user_id TEXT NOT NULL REFERENCES "User"(user_id),
-    refresh_token_id CHAR(64) NOT NULL CHECK (btrim(refresh_token_id) <> '')
-    PRIMARY KEY (user_id, refresh_token_id)
+    refresh_token_id CHAR(60) PRIMARY KEY CHECK (btrim(refresh_token_id) <> ''),
+    user_id TEXT NOT NULL REFERENCES "User"(user_id)
 )

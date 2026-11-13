@@ -1,53 +1,84 @@
-
 import type {
-  AuthResponse, ChangePasswordRequest, ForgotPasswordRequest,
-  LoginRequest, MessageResponse, ResetPasswordRequest,
+  AuthResponse,
+  LoginRequest,
 } from "@/features/auth/types/auth.dto";
-
-import type { SessionUser, StudentSessionUser } from "@/features/auth/types";
-import { Session } from "inspector/promises";
+import type {
+  SessionUser,
+  StaffSessionUser,
+  StudentSessionUser,
+} from "@/features/auth/types";
 import { ROLE_CODES } from "@/libs/roles";
 
+type MockAuthScenario = "guest" | "student" | "organizer" | "admin";
+
+function getScenario(): MockAuthScenario {
+  const value = process.env.NEXT_PUBLIC_MOCK_AUTH_STATE;
+
+  if (value === "guest" || value === "organizer" || value === "admin") {
+    return value;
+  }
+
+  return "student";
+}
+
+function createUser(scenario: Exclude<MockAuthScenario, "guest">): SessionUser {
+  if (scenario === "student") {
+    const user: StudentSessionUser = {
+      studentNumber: "123456789",
+      email: "khangthinh111555@gmail.com",
+      role: "student",
+      facultyId: 1,
+      fullName: "Khang Thinh",
+      avatarUrl: null,
+      userId: 1,
+      permissions: [],
+    };
+
+    return user;
+  }
+
+  const user: StaffSessionUser = {
+    userId: scenario === "organizer" ? 2 : 3,
+    email: `${scenario}@hcmus.edu.vn`,
+    fullName: scenario === "organizer" ? "Mock Organizer" : "Mock Admin",
+    role: scenario,
+    permissions: [],
+    studentNumber: null,
+    facultyId: null,
+    avatarUrl: null,
+  };
+
+  return user;
+}
 
 class MockAuthService {
   async login(data: LoginRequest): Promise<AuthResponse> {
-    console.log("MockAuthService.login called with data:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
-    if (data.role == ROLE_CODES[0] && data.email == "khangthinh111555@gmail.com" && data.password == "123456") {
-      const user: StudentSessionUser = {
-        studentNumber: "123456789",
-        email: data.email,
-        role: "student",
-        facultyId: 1,
-        fullName: "Khang Thinh",
-        avatarUrl: null,
-        userId: 1,
-        permissions: [],
-      };
-      return { user };
+    if (
+      data.role === ROLE_CODES[0] &&
+      data.email === "khangthinh111555@gmail.com" &&
+      data.password === "123456"
+    ) {
+      return { user: createUser("student") };
     }
+
     throw new Error("Invalid email or password or role");
   }
 
-
   async logout(): Promise<void> {
-    console.log("MockAuthService.logout called");
     return;
   }
 
   async getMe(): Promise<SessionUser> {
-    console.log("MockAuthService.getMe called");
-    return {
-      userId: 1,
-      email: 'asdasdasdasd@sdasd',
-      fullName: "Test Student",
-      role: "student",
-      permissions: [],
-      studentNumber: "123456789",
-      facultyId: 1,
-      avatarUrl: null,
-    };
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    const scenario = getScenario();
+
+    if (scenario === "guest") {
+      throw new Error("No active mock session");
+    }
+
+    return createUser(scenario);
   }
 }
 

@@ -3,7 +3,7 @@ import { ServiceResponse } from "../types/ServiceResponse.ts";
 import AuthService from "../services/AuthService.ts";
 import type { UserRegistrationData } from "../types/UserRegistrationData.ts";
 import { generate400Response } from "../helper/generate400Response.ts";
-import { InMemoryAuthRepository } from '../repositories/AuthRepository.ts';
+import InMemoryAuthRepository from '../repositories/AuthRepository.ts';
 import { generate409Response } from "../helper/generate409Response.ts";
 
 // implement a function to check if a user with given email exists
@@ -15,7 +15,7 @@ class AuthController {
 		const email: string = req.body.email;
 		const phone: string = req.body.phone;
 		const password: string = req.body.password;
-		const enrollmentYear: string = req.body.enrollmentYear;
+		const enrollmentYear: number = req.body.enrollmentYear;
 		const majorID: number = req.body.majorID;
 		const facultyID: number = req.body.facultyID;
 
@@ -39,13 +39,13 @@ class AuthController {
 			return void res.status(response.statusCode).json(response.get());
 		}
 
-		const userEmailExists = InMemoryAuthRepository.checkUserExistsFromEmail(email);
+		const userEmailExists = await InMemoryAuthRepository.checkUserExistsWithEmail(email);
 		if (userEmailExists) {
 			const response: ServiceResponse = generate409Response('A user registered with that email already exists');
 			return void res.status(response.statusCode).json(response.get());
 		}
 
-		const userPhoneExists = InMemoryAuthRepository.checkUserExistsFromPhone(phone);
+		const userPhoneExists = await InMemoryAuthRepository.checkUserExistsWithPhoneNumber(phone);
 		if (userPhoneExists) {
 			const response: ServiceResponse = generate409Response('A user registered with that phone number already exists');
 			return void res.status(response.statusCode).json(response.get());
@@ -58,7 +58,8 @@ class AuthController {
 			passwordPlainText: password,
 			enrollmentYear,
 			majorID,
-			facultyID
+			facultyID,
+			createdAt: new Date()
 		};
 		const response: ServiceResponse = await AuthService.register(userRegistrationData);
 		return void res.status(response.statusCode)

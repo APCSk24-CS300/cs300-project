@@ -1,7 +1,7 @@
 import { generate201Response } from "../helper/generate201Response.ts";
 import { generate500Response } from "../helper/generate500Response.ts";
 import { ServiceResponse } from "../types/ServiceResponse.ts";
-import { InMemoryAuthRepository } from "../repositories/AuthRepository.ts";
+import InMemoryAuthRepository from "../repositories/AuthRepository.ts";
 import type { UserRegistrationData } from "../types/UserRegistrationData.ts";
 import bcrypt from 'bcrypt';
 
@@ -31,11 +31,11 @@ class AuthService {
 				userID: userID,
 				data: data,
 				passwordHash: passwordHash,
-				userStatus: InMemoryAuthRepository.getActiveUserID(),
-				userRole: InMemoryAuthRepository.getStudentUserID()
+				userStatus: await InMemoryAuthRepository.getActiveUserID(),
+				userRole: await InMemoryAuthRepository.getStudentUserID()
 			};
 
-			InMemoryUserRepository.insertUser(user)
+			InMemoryAuthRepository.insertUser(user)
 
 			const responseData = {
 				userID: userID

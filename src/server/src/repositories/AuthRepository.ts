@@ -1,6 +1,6 @@
 import type { User } from "../types/UserRegistrationData.ts";
 
-export interface AuthRepository {
+interface AuthRepository {
     getActiveUserID(): Promise<number>;
 
     getStudentUserID() : Promise<number>;
@@ -25,7 +25,7 @@ export interface AuthRepository {
 
 }
 
-export class InMemoryAuthRepository implements AuthRepository {
+class InMemoryAuthRepository implements AuthRepository {
     private readonly db: User[] = [
         {
             userID: "123",
@@ -90,3 +90,5 @@ export class InMemoryAuthRepository implements AuthRepository {
     }
 }
 
+const inMemoryAuthRepository = new InMemoryAuthRepository();
+export default inMemoryAuthRepository;

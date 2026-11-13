@@ -7,28 +7,20 @@ import bcrypt from 'bcrypt';
 
 const SALT_ROUNDS: number = 10;
 
-// implement a function constructUserID() to construct the user id from faculty and majors
-
-// repository functions:
-// implement a function to get the active user ID
-// implement a function to get student user ID
-// implement a function to get activity manager user ID
-// implement a function to get admin user ID
-// implement a function to insert user
-// implement a function to check if a user exists given their user ID
-// implement a function to get their password hash
-// implement a function to get a list of refresh token hashes given user ID
-// implement a function to insert a refresh token hash - user ID pair
+function constructUserID(createdAt: Date, majorFacultyID: number, discriminator: number) {
+	const year = createdAt.getFullYear() % 100;
+	return year * 1000000 + majorFacultyID * 1000 + discriminator;
+}
 
 class AuthService {
 	public async register(data: UserRegistrationData): Promise<ServiceResponse> {
-		// uncomment when constructUserID() is implemented
-		const userID: string = await constructUserID();
+		const discriminator: number = InMemoryAuthRepository.getStudentDiscriminator(data.createdAt.getFullYear(), data.majorFacultyID);
+		const userID: number = constructUserID(data.createdAt, data.majorFacultyID, discriminator);
 		const passwordHash: string = await bcrypt.hash(data.passwordPlainText, SALT_ROUNDS);
 
 		try {
 			const user: User = {
-				userID: userID,
+				userID: userID.toString(),
 				data: data,
 				passwordHash: passwordHash,
 				userStatus: await InMemoryAuthRepository.getActiveUserID(),

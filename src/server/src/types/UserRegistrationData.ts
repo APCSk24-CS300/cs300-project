@@ -5,8 +5,7 @@ export interface UserRegistrationData {
     phone: string,
     passwordPlainText: string,
     enrollmentYear: number,
-    majorID: number,
-    facultyID: number,
+    majorFacultyID: number,
     createdAt: Date,
 }
 

@@ -146,7 +146,7 @@ flowchart TD
     AC --> N
 
 ```
-flowchart TD
+
     
 **Workflow 2: Activity Recognition and Score Appeal**
 

@@ -104,18 +104,19 @@ The following workflows illustrate two important processes supported by myHCMUS:
 
 ```mermaid
 
-flowchart TD
-    A[Student browses activities] --> B1{Search or filter?}
-    B1 -->|Yes| C[Search or filter activities]
-    B1 -->|No| B2[Select an activity]
-    C --> B2
-    B2 --> E1[View activity details]
-    E1 --> D{Student action?}
 
-    D -- Follow --> E[Follow activity]
+flowchart TD
+    A[Student browses activities] --> B{Search or filter?}
+    B -- Yes --> C[Search or filter activities]
+    B -- No --> D[Select an activity]
+    C --> D
+    D --> V[View activity details]
+    V --> SA{Student action?}
+
+    SA -- Follow --> E[Follow activity]
     E --> F[Receive activity updates]
 
-    D -- Register --> G{Registration conditions satisfied?}
+    SA -- Register --> G{Registration conditions satisfied?}
     G -- No --> H[Registration unavailable]
     G -- Yes --> I{Capacity available?}
 
@@ -123,7 +124,9 @@ flowchart TD
     J --> K{Schedule conflict?}
     K -- Yes --> L[Display conflict warning]
     K -- No --> M[Submit registration]
-    L --> M
+    L --> L1{Continue registration?}
+    L1 -- Yes --> M
+    L1 -- No --> L2[Cancel registration attempt]
 
     M --> N{Approval required?}
     N -- Yes --> O[Manager reviews registration]
@@ -135,15 +138,16 @@ flowchart TD
 
     I -- No --> T{Join waiting list?}
     T -- No --> U[Registration unavailable]
-    T -- Yes --> V[Add student to FIFO waiting list]
-    V --> W[Waiting for an available slot]
+    T -- Yes --> WL[Add student to FIFO waiting list]
+    WL --> W[Waiting for an available slot]
 
     X[Registered student cancels registration] --> Y[Release available slot]
     Y --> Z{Waiting list empty?}
     Z -- Yes --> AA[Slot becomes available]
-    Z -- No --> AB[Select first student in FIFO order]
-    AB --> AC[Automatically promote student]
+    Z -- No --> AB[Select first eligible student in FIFO order]
+    AB --> AC[Promote student from waiting list]
     AC --> N
+
 
 ```
 

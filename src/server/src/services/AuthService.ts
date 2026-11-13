@@ -2,7 +2,7 @@ import { generate201Response } from "../helper/generate201Response.ts";
 import { generate500Response } from "../helper/generate500Response.ts";
 import { ServiceResponse } from "../types/ServiceResponse.ts";
 import InMemoryAuthRepository from "../repositories/AuthRepository.ts";
-import type { UserRegistrationData } from "../types/UserRegistrationData.ts";
+import type { UserRegistrationData, User } from "../types/UserRegistrationData.ts";
 import bcrypt from 'bcrypt';
 
 const SALT_ROUNDS: number = 10;

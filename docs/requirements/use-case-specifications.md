@@ -1,4 +1,4 @@
-# myHCMUS - Use-Case Specifications (Updated)
+# myHCMUS - Use-Case Specifications
  
 
 ## 1. Purpose and modeling conventions

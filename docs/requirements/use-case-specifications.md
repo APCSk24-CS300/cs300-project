@@ -121,16 +121,15 @@ This document specifies **all 31 use cases** in the use case model document, ord
 -->
 
 #### UC-04 - Discover activities
-
 | **Use case: Discover activities** |
 | :--- |
 | **Use-case name and ID:**<br>Discover activities - UC-04 |
-| **Actor(s):**<br>Student |
+| **Actor(s):**<br>Student, Activity Manager |
 | **Description:**<br>Browse, search, filter, and inspect extracurricular activities and their eligibility, schedule, and registration information. |
-| **Preconditions:**<br>Student is authenticated; visible activity data exists or the catalog can report an empty state. |
-| **Basic flow (main success scenario):**<br>1. Student opens the **Activities** section.<br>2. System shows currently visible activities with key details such as capacity, deadline, and score value.<br>3. Student searches or filters by faculty, date, location, training-score criteria, or registration status.<br>4. System updates the matching list and displays active filters.<br>5. Student selects an activity.<br>6. System displays its description, schedule, eligibility, capacity, registration deadline, and current status. |
-| **Alternative flows:**<br>A1 - Step 2: No visible activities exist; show an empty-state message.<br>A2 - Step 3: Student clears all filters; return to the unfiltered list.<br>A3 - Step 3: Invalid date/filter values; show validation feedback without losing valid filters.<br>A4 - Step 4: No results match; show a no-results state and reset option.<br>A5 - Step 4: Search ignores missing Vietnamese diacritics as required by NFR-LOC-03.<br>A6 - Step 6: Activity was cancelled, hidden, or removed; show an unavailable/not-found state rather than permitting registration.<br>A7 - Steps 2/4/6: Retrieval fails; show a retry option without changing records. |
-| **Postconditions:**<br>Student can inspect matching activity details; no registration or activity record is changed. |
+| **Preconditions:**<br>User is authenticated; visible activity data exists or the catalog can report an empty state. |
+| **Basic flow (main success scenario):**<br>1. User opens the **Activities** section.<br>2. System shows currently visible activities with key details such as capacity, deadline, and score value.<br>3. User searches or filters by faculty, date, location, training-score criteria, or registration status.<br>4. System updates the matching list and displays active filters.<br>5. User selects an activity.<br>6. System displays its description, schedule, eligibility, capacity, registration deadline, and current status. |
+| **Alternative flows:**<br>A1 - Step 2: No visible activities exist; show an empty-state message.<br>A2 - Step 3: User clears all filters; return to the unfiltered list.<br>A3 - Step 3: Invalid date/filter values; show validation feedback without losing valid filters.<br>A4 - Step 4: No results match; show a no-results state and reset option.<br>A5 - Step 4: Search ignores missing Vietnamese diacritics as required by NFR-LOC-03.<br>A6 - Step 6: Activity was cancelled, hidden, or removed; show an unavailable/not-found state rather than permitting registration.<br>A7 - Steps 2/4/6: Retrieval fails; show a retry option without changing records. |
+| **Postconditions:**<br>User can inspect matching activity details; no registration or activity record is changed. |
 | **Special requirements:**<br>NFR-LOC-03, USA-01, USA-06, PER-02, SEC-03. |
 | **Prototype screen checklist:**<br>S01 - Activity catalog and filters<br>S02 - No-results/empty/error state<br>S03 - Activity details with requirements |
 | **Prototype screenshots:**<br>**Pending - no prototypes or screenshots generated.** Save screenshots under `prototypes/screenshots/UC-04/`. See capture inventory for the exact filenames and states. |

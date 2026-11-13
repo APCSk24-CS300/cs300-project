@@ -60,7 +60,9 @@ The schema uses one **User** account entity for every student or staff member, w
 | **RolePermission** | `role_id` (FK), `permission_id` (FK) | Composite PK (`role_id`, `permission_id`); defines which actions each role grants. Seeded and maintained by administrators. |
 | **Faculty** | `faculty_id` (PK), `code` (UQ), `name` | Academic unit for staff who belongs to any faculty. |
 | **Derpartment** | `department_id` (PK), `code` (UQ), `name` | Non-academic unit for staff who does not belong to any faculty. |
+| **Club** | `club_id` (PK), `code` (UQ), `name` | Non-academic unit for clubs. |
 | **ActivityCategory** | `category_id` (PK), `name` (UQ), `description` | Activity classification and student interest matching. |
+| **AppealStatus** | `appeal_status_id (PK), `code` (UQ), `name` | Include Pending Assignment, Pending Review, Additional Information Required, and Withdrawn. |
 | **Semester** | `semester_id` (PK), `academic_year`, `term`, `starts_at`, `ends_at` | UQ (`academic_year`, `term`); score reporting period. `starts_at` must precede `ends_at`. |
 | **ScoreCriterion** | `criterion_id` (PK), `code` (UQ), `name`, `description`, `max_points`, `is_active` | Administrator-controlled training-score criterion. `max_points` is nonnegative. Once referenced by a score, its meaning and maximum are fixed; deactivation preserves historical links. |
 
@@ -68,7 +70,7 @@ The schema uses one **User** account entity for every student or staff member, w
 
 | Entity | Main attributes | Purpose and constraints |
 | --- | --- | --- |
-| **User** | `user_id` (PK), `role_id` (FK), `status_id` (FK), `email` (UQ), `password_hash`, `full_name`, `avatar_url` (nullable), `created_at` | Shared account, identity, and contact fields. `role_id` is required. Verified academic identity remains available to staff who are also students; nonstudents may leave it null. Store only password hashes. UQ (`user_id`, `role_id`) supports subtype consistency FKs; a constraint can be added later to chek for mismatch between base and derived objects. |
+| **User** | `user_id` (PK), `role_id` (FK), `status_id` (FK), `email` (UQ), `phone_number`, `password_hash`, `full_name`, `avatar_url` (nullable), `created_at` | Shared account, identity, and contact fields. `role_id` is required. Verified academic identity remains available to staff who are also students; nonstudents may leave it null. Store only password hashes. UQ (`user_id`, `role_id`) supports subtype consistency FKs; a constraint can be added later to chek for mismatch between base and derived objects. |
 | **Student** | `user_id` (PK, FK), `role_id` (FK), `major_id` (FK), `faculty_id` (FK), `enrollment_year`| Role-specific student profile. `role_id` is fixed to the `student` Role row. |
 | **Manager** | `user_id` (PK, FK), `role_id` (FK), `faculty_id` (FK) (nullable), `department_id` (FK) (nullable),`position_title` (nullable) | Role-specific activity-manager profile. `role_id` is fixed to the `manager` Role row. |
 | **Administrator** | `user_id` (PK, FK), `role_id` (FK), `office_name` (nullable), `position_title` (nullable) | Role-specific system-administrator profile. `role_id` is fixed to the `administrator` Role row. |
@@ -82,7 +84,7 @@ The initial permission mapping is cumulative, as in each higher role automatical
 
 | Entity | Main attributes | Purpose and constraints |
 | --- | --- | --- |
-| **Activity** | `activity_id` (PK), `title`, `description`, `eligibility_notes` (nullable), `category_id` (FK), `semester_id` (FK), `capacity`, `registration_opens_at`, `registration_closes_at`, `status`, `created_by_user_id` (FK), `created_at` | An activity belongs to one category and semester. `eligibility_notes` describes any requirements beyond faculty membership. Status covers draft, published, cancelled, and completed. |
+| **Activity** | `activity_id` (PK), `title`, `description`, `eligibility_notes` (nullable), `category_id` (FK), `semester_id` (FK), `capacity`, `registration_opens_at`, `registration_closes_at`, `status`, `created_by_user_id` (FK), `created_at` | An activity belongs to one category and semester. `eligibility_notes` describes any requirements beyond faculty membership. Status covers draft, published, ongoing, cancelled, and completed. |
 | **ActivityManage** | `activity_id` (FK), `user_id` (FK) | Composite PK (`activity_id`, `user_id`) for event managers. An assigned user needs `activity.manage` permission. An activity may have several managers. |
 | **ActivitySchedule** | `schedule_id` (PK), `activity_id` (FK), `starts_at`, `ends_at`, `location` | One activity may have several sessions. Start precedes end; these intervals support calendar and conflict checks. |
 | **ActivityEligibility** | `activity_id` (FK), `faculty_id` (FK) | Composite PK (`activity_id`, `faculty_id`). If an activity has no rows here, it is open to all faculties; otherwise, only listed faculties are eligible. |
@@ -97,7 +99,7 @@ The initial permission mapping is cumulative, as in each higher role automatical
 
 | Entity | Main attributes | Purpose and constraints |
 | --- | --- | --- |
-| **Appeal** | `appeal_id` (PK), `submitted_by_user_id` (FK), `activity_id` (nullable FK), `registration_id` (nullable FK), `score_id` (nullable FK), `type`, `description`, `status`, `reviewed_by_user_id` (nullable FK), `response` (nullable), `submitted_at`, `reviewed_at` (nullable) | Covers recognition, participation correction, or score correction. An earlier-semester recognition may link an existing activity; outside-activity recognition may have no activity FK. The submitter needs a verified student number, and the manager needs appeal-review permission. |
+| **Appeal** | `appeal_id` (PK), `submitted_by_user_id` (FK), `activity_id` (nullable FK), `registration_id` (nullable FK), `score_id` (nullable FK), `type`, `description`, `status`, `reviewed_by_user_id` (nullable FK), `response` (nullable), `submitted_at`, `reviewed_at` (nullable) | Covers recognition, participation correction, or score correction. An earlier-semester recognition may link an existing activity; outside-activity recognition may have no activity FK. The submitter needs a verified student number, and the manager needs appeal-review permission.  |
 | **AppealEvidence** | `evidence_id` (PK), `appeal_id` (FK), `file_url`, `description`, `uploaded_at` | Supporting files or links for an appeal. An appeal can have multiple evidence items. |
 | **Recognition** | `recognition_id` (PK), `appeal_id` (FK, UQ), `student_user_id` (FK), `title`, `occurred_at`, `semester_id` (FK), `criterion_id` (FK), `verified_by_user_id` (FK), `verified_at` | An approved appeal creates one verified record for an external activity or a prior activity credited in a later semester. `semester_id` is the target scoring semester; the student matches the appeal submitter. |
 | **ActivityAnnouncement** | `announcement_id` (PK), `activity_id` (FK), `author_user_id` (FK), `title`, `body`, `published_at` | manager updates tied to an activity. |

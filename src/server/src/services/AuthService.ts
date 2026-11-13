@@ -1,7 +1,7 @@
 import { generate201Response } from "../helper/generate201Response.ts";
 import { generate500Response } from "../helper/generate500Response.ts";
 import { ServiceResponse } from "../types/ServiceResponse.ts";
-import { InMemoryUserRepository } from "../repositories/AuthRepository.ts";
+import { InMemoryAuthRepository } from "../repositories/AuthRepository.ts";
 import type { UserRegistrationData } from "../types/UserRegistrationData.ts";
 import bcrypt from 'bcrypt';
 
@@ -20,7 +20,7 @@ const SALT_ROUNDS: number = 10;
 // implement a function to get a list of refresh token hashes given user ID
 // implement a function to insert a refresh token hash - user ID pair
 
-export class AuthService {
+class AuthService {
 	public async register(data: UserRegistrationData): Promise<ServiceResponse> {
 		// uncomment when constructUserID() is implemented
 		const userID: string = await constructUserID();
@@ -31,8 +31,8 @@ export class AuthService {
 				userID: userID,
 				data: data,
 				passwordHash: passwordHash,
-				userStatus: InMemoryUserRepository.getActiveUserID(),
-				userRole: InMemoryUserRepository.getStudentUserID()
+				userStatus: InMemoryAuthRepository.getActiveUserID(),
+				userRole: InMemoryAuthRepository.getStudentUserID()
 			};
 
 			InMemoryUserRepository.insertUser(user)
@@ -48,3 +48,6 @@ export class AuthService {
 		}
 	}
 }
+
+const authService = new AuthService();
+export default authService

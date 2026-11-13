@@ -103,19 +103,20 @@ The following workflows illustrate two important processes supported by myHCMUS:
 **Workflow 1: Activity Discovery and Registration**
 
 ```mermaid
+flowchart TD
 
 flowchart TD
-    A[Student browses activities] --> B{Search or filter?}
-    B -->|Yes| C[Search or filter activities]
-    B -->|No| D[Select an activity]
-    C --> D
-    D --> V[View activity details]
-    V --> SA{Student action?}
+    A[Student browses activities] --> B1{Search or filter?}
+    B1 -->|Yes| C[Search or filter activities]
+    B1 -->|No| B2[Select an activity]
+    C --> B2
+    B2 --> E1[View activity details]
+    E1 --> D{Student action?}
 
-    SA -- Follow --> E[Follow activity]
+    D -- Follow --> E[Follow activity]
     E --> F[Receive activity updates]
 
-    SA -- Register --> G{Registration conditions satisfied?}
+    D -- Register --> G{Registration conditions satisfied?}
     G -- No --> H[Registration unavailable]
     G -- Yes --> I{Capacity available?}
 

@@ -294,3 +294,9 @@ CREATE TABLE "AuditLog" (
     after_value JSONB,
     occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE "RefreshToken" (
+    user_id TEXT NOT NULL REFERENCES "User"(user_id),
+    refresh_token_id CHAR(64) NOT NULL CHECK (btrim(refresh_token_id) <> '')
+    PRIMARY KEY (user_id, refresh_token_id)
+)

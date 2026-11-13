@@ -507,3 +507,8 @@ This document specifies **all 31 use cases** in the use case model document, ord
 | Activity / scores and reports | UC-18–UC-24 | Features 5–6 |
 | Recognition, appeals and administration | UC-27–UC-31 | Features 9–10; Workflow 2 |
 
+## 5. Interactive Prototype
+
+An interactive prototype of the myHCMUS system was developed using Figma Make to visualize the user interfaces and demonstrate the main workflows described in this document. The prototype includes role-based interfaces for Students, Activity Managers, and University Administrators, supporting the demonstration of basic and alternative use-case flows.
+
+**Figma Prototype:** [View myHCMUS Interactive Prototype](https://flick-curry-05211016.figma.site)

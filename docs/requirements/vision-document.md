@@ -117,7 +117,6 @@ flowchart TD
     E --> F{Student action?}
 
     F -->|Follow| G[Follow activity]
-    G --> H[Receive activity updates]
 
     F -->|Register| I([Continue to Workflow 1.2])
     F -->|Continue browsing| A
@@ -132,18 +131,18 @@ flowchart TD
     A[Student selects Register] --> B{Registration conditions satisfied?}
 
     B -->|No| C[Registration unavailable]
-    B -->|Yes| D{Capacity available?}
-
-    D -->|No| WL([Continue to Workflow 1.3])
-    D -->|Yes| E[Check schedule conflicts]
+    B -->|Yes| E[Check schedule conflicts]
 
     E --> F{Schedule conflict?}
     F -->|Yes| G[Display conflict warning]
-    F -->|No| J[Submit registration]
+    F -->|No| D{Capacity available?}
 
     G --> H{Continue registration?}
     H -->|No| I[Cancel registration attempt]
-    H -->|Yes| J
+    H -->|Yes| D
+
+    D -->|No| WL([Continue to Workflow 1.3])
+    D -->|Yes| J[Submit registration]
 
     J --> K{Approval required?}
 
@@ -172,16 +171,7 @@ flowchart TD
     A --> B{Join waiting list?}
 
     B -->|No| C[Registration unavailable]
-    B -->|Yes| D[Check schedule conflicts]
-
-    D --> E{Schedule conflict?}
-
-    E -->|Yes| F[Display conflict warning]
-    E -->|No| I[Add student to FIFO waiting list]
-
-    F --> G{Continue joining waiting list?}
-    G -->|No| H[Do not join waiting list]
-    G -->|Yes| I
+    B -->|Yes| I[Add student to FIFO waiting list]
 
     I --> J[Set status to Waiting List]
     J --> K[Notify student of waiting-list status]
@@ -354,7 +344,7 @@ flowchart TD
 | NFR-COM-03 | Registered activities shall be exportable in the iCalendar (.ics) format, so students can import them into Google Calendar or other calendar-management platforms |
 | NFR-COM-04 | The system shall be able to import student and activity lists from CSV or XLSX files, and shall report which rows were rejected and why |
 | NFR-COM-05 | The system shall send notifications by email in addition to in-app notifications, using standard email protocols |
-
+| NFR-COM-06 | The system shall support image uploads in JPG and PNG formats, with a maximum file size of 5 MB per image unless a stricter feature-specific limit applies. Unsupported formats and oversized files shall be rejected with an appropriate error message. |
 
 ## V. Reliability
 

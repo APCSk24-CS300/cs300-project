@@ -1,6 +1,6 @@
 # Vision Document
 **Workers:** Quách Thiên Lạc, Phạm Vân Trang, Nguyễn Khang Thịnh  
-**Reviewers:** Nguyễn Văn Tĩnh, Quách Thiên Lạc, Nguyễn Khang Thịnh  
+**Reviewers:** Nguyễn Văn Tĩnh, Quách Thiên Lạc, Nguyễn Khang Thịnh, Phan Minh Khôi  
 **Editors:** Quách Thiên Lạc, Phạm Vân Trang, Nguyễn Khang Thịnh  
 **Version:** 1.0.0  
 **Amendment:** 2026/11/11
@@ -36,7 +36,7 @@ This introduction provides an overview of the Vision document, including its pur
 
 ## 3.2 Users
 - **Students:** Search and filter available activities, register for activities, view registration and participation status, and monitor accumulated training scores.
-- **Activity managers:** Create and manage activities, communicate activity information, review registrations, record attendance, submit participation results, and handle students' requests.
+- **Activity managers:** Create and manage activities, communicate activity information, review registrations, record attendance, submit participation results, and handle students' recognition requests and appeals.
 - **University administrators:** Manage user roles and access permissions, configure system-wide settings such as training-score criteria, monitor reports and statistics on training activity, and oversee the management process.
 
 

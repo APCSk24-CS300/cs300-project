@@ -1,6 +1,6 @@
 import type { User } from "../types/UserRegistrationData.ts";
 
-export interface UserRepository {
+export interface AuthRepository {
     getActiveUserID(): Promise<number>;
 
     getStudentUserID() : Promise<number>;
@@ -13,6 +13,10 @@ export interface UserRepository {
 
     checkUserExists(id: string): Promise<boolean>;
 
+    checkUserExistsWithEmail(email: string): Promise<boolean>;
+
+    checkUserExistsWithPhoneNumber(phone: string): Promise<boolean>;
+
     getUserPasswordHash(id: string): Promise<string>;
 
     getUserRefreshTokenHash(id: string): Promise<string>;
@@ -21,7 +25,7 @@ export interface UserRepository {
 
 }
 
-export class InMemoryUserRepository implements UserRepository {
+export class InMemoryAuthRepository implements AuthRepository {
     private readonly db: User[] = [
         {
             userID: "123",
@@ -65,6 +69,14 @@ export class InMemoryUserRepository implements UserRepository {
         return true;
     }
 
+    public async checkUserExistsWithEmail(email: string): Promise<boolean> {
+        return true;
+    }
+
+    public async checkUserExistsWithPhoneNumber(phone: string): Promise<boolean> {
+        return true;
+    }
+    
     public async getUserRefreshTokenHash(id: string): Promise<string> {
         return '#FF6920';
     }

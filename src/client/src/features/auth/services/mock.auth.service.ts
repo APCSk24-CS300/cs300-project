@@ -1,3 +1,4 @@
+
 import type {
   AuthResponse,
   LoginRequest,
@@ -11,74 +12,138 @@ import { ROLE_CODES } from "@/libs/roles";
 
 type MockAuthScenario = "guest" | "student" | "manager" | "admin";
 
-function getScenario(): MockAuthScenario {
-  const value = process.env.NEXT_PUBLIC_MOCK_AUTH_STATE;
-
-  if (value === "guest" || value === "manager" || value === "admin") {
-    return value;
-  }
-
-  return "student";
+interface MockAccount {
+  email: string;
+  password: string;
+  role: LoginRequest["role"];
+  scenario: Exclude<MockAuthScenario, "guest">;
 }
 
-function createUser(scenario: Exclude<MockAuthScenario, "guest">): SessionUser {
-  if (scenario === "student") {
-    const user: StudentSessionUser = {
+class MockAuthService {
+  private readonly loginDelay = 300;
+  private readonly sessionDelay = 150;
+
+  private readonly accounts: MockAccount[] = [
+    {
+      email: "nguyenvana@gmail.com",
+      password: "123456",
+      role: ROLE_CODES[0],
+      scenario: "student",
+    },
+    {
+      email: "manager@hcmus.edu.vn",
+      password: "123456",
+      role: ROLE_CODES[1],
+      scenario: "manager",
+    },
+    {
+      email: "admin.work@gmail.com",
+      password: "123456",
+      role: ROLE_CODES[1],
+      scenario: "admin",
+    },
+  ];
+
+  private readonly scenarios = new Set<MockAuthScenario>([
+    "guest",
+    "student",
+    "manager",
+    "admin",
+  ]);
+
+  private async delay(ms: number): Promise<void> {
+    await new Promise<void>((resolve) => setTimeout(resolve, ms));
+  }
+
+  private getScenario(): MockAuthScenario {
+    const value = process.env.NEXT_PUBLIC_MOCK_AUTH_STATE;
+
+    if (value && this.scenarios.has(value as MockAuthScenario)) {
+      return value as MockAuthScenario;
+    }
+
+    return "student";
+  }
+
+  private createStudent(): StudentSessionUser {
+    return {
       studentNumber: "123456789",
-      email: "khangthinh111555@gmail.com",
+      email: "nguyenvana@gmail.com",
       role: "student",
       facultyId: 1,
-      fullName: "Khang Thinh",
+      fullName: "Nguyen Van A",
       avatarUrl: null,
       userId: 1,
       permissions: [],
     };
-
-    return user;
   }
 
-  const user: StaffSessionUser = {
-    userId: scenario === "manager" ? 2 : 3,
-    email: `${scenario}@hcmus.edu.vn`,
-    fullName: scenario === "manager" ? "Mock Manager" : "Mock Admin",
-    role: scenario,
-    permissions: [],
-    studentNumber: null,
-    facultyId: null,
-    avatarUrl: null,
-  };
+  private createStaff(
+    scenario: "manager" | "admin",
+  ): StaffSessionUser {
+    const isManager = scenario === "manager";
 
-  return user;
-}
+    return {
+      userId: isManager ? 2 : 3,
+      email: isManager
+        ? "manager@hcmus.edu.vn"
+        : "admin.work@gmail.com",
+      fullName: isManager ? "Mock Manager" : "Mock Admin",
+      role: scenario,
+      permissions: [],
+      studentNumber: null,
+      facultyId: null,
+      avatarUrl: null,
+    };
+  }
 
-class MockAuthService {
-  async login(data: LoginRequest): Promise<AuthResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    if (
-      data.role === ROLE_CODES[0] &&
-      data.email === "khangthinh111555@gmail.com" &&
-      data.password === "123456"
-    ) {
-      return { user: createUser("student") };
+  private createUser(
+    scenario: Exclude<MockAuthScenario, "guest">,
+  ): SessionUser {
+    if (scenario === "student") {
+      return this.createStudent();
     }
 
-    throw new Error("Invalid email or password or role");
+    return this.createStaff(scenario);
+  }
+
+  private authenticate(data: LoginRequest): SessionUser {
+    const account = this.accounts.find(
+      (account) =>
+        account.email === data.email &&
+        account.password === data.password &&
+        account.role === data.role,
+    );
+
+    if (!account) {
+      throw new Error("Invalid email or password");
+    }
+
+    return this.createUser(account.scenario);
+  }
+
+  async login(data: LoginRequest): Promise<AuthResponse> {
+    await this.delay(this.loginDelay);
+
+    return {
+      user: this.authenticate(data),
+    };
   }
 
   async logout(): Promise<void> {
-    return;
+    await this.delay(100);
   }
 
   async getMe(): Promise<SessionUser> {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    const scenario = getScenario();
+    await this.delay(this.sessionDelay);
+
+    const scenario = this.getScenario();
 
     if (scenario === "guest") {
       throw new Error("No active mock session");
     }
 
-    return createUser(scenario);
+    return this.createUser(scenario);
   }
 }
 

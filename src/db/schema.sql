@@ -113,7 +113,7 @@ CREATE TABLE "ScoringPolicyVersion" (
 
 CREATE TABLE "User" (
     user_id TEXT PRIMARY KEY CHECK (btrim(user_id) <> ''),
-    status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+    is_active BOOLEAN,
     email TEXT NOT NULL UNIQUE CHECK (btrim(email) <> ''),
     phone_number TEXT,
     password_hash TEXT NOT NULL CHECK (btrim(password_hash) <> ''),

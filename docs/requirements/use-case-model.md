@@ -64,7 +64,7 @@ Manager --|> User
 Admin --|> User
 ```
 
-The general actor **User** captures shared capabilities. Student, Activity Manager, and University Administrator specialize it. The student ID and faculty in Manage Own Profile are read-only, as specified in the Vision Document.
+The general actor **User** captures shared capabilities. Student, Activity Manager, and University Administrator specialize it.
 
 ### 3.2. Activity Registration, Calendar, and Notifications
 

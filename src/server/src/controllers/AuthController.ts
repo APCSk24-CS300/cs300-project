@@ -51,13 +51,18 @@ class AuthController {
 		}
 
 		const userRegistrationData: UserRegistrationData = {
-			name,
+			full_name: name,
 			email,
-			phone,
-			passwordPlainText: password,
-			enrollmentYear,
-			majorFacultyID,
-			createdAt: new Date()
+			phone_number: phone,
+			role_id: 1,
+			role_data: {
+				major_id: '1',
+				faculty_id: '11',
+				enrollment_year: 2026,
+			},
+			password_plain_text: password,
+			granted_by_user_id: '00000000',
+			granted_at: new Date()
 		};
 		const response: ServiceResponse = await AuthService.register(userRegistrationData);
 		return void res.status(response.statusCode)

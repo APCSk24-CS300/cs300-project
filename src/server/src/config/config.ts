@@ -6,13 +6,13 @@ const config: any = {
 		port: process.env.BACKEND_PORT
 	},
 	thirdparty: {},
-	// db: {
-	// 	dbHost: process.env.LOCAL_DB_HOST,
-	// 	dbUser: process.env.LOCAL_DB_USER,
-	// 	dbPassword: process.env.LOCAL_DB_PASSWORD,
-	// 	dbName: process.env.LOCAL_DB_NAME,
-	// 	dbPort: process.env.LOCAL_DB_PORT
-	// },
+	db: {
+		dbHost: 'db',
+		dbUser: process.env.POSTGRES_USER,
+		dbPassword: process.env.POSTGRES_PASSWORD,
+		dbName: process.env.POSTGRES_DB,
+		dbPort: 5432
+	},
 	jwt: {
 		secret: process.env.JWT_SECRET
 	}

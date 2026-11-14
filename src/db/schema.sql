@@ -113,16 +113,13 @@ CREATE TABLE "ScoringPolicyVersion" (
 
 CREATE TABLE "User" (
     user_id TEXT PRIMARY KEY CHECK (btrim(user_id) <> ''),
-    status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+    is_active BOOLEAN,
     email TEXT NOT NULL UNIQUE CHECK (btrim(email) <> ''),
     phone_number TEXT,
     password_hash TEXT NOT NULL CHECK (btrim(password_hash) <> ''),
     full_name TEXT NOT NULL CHECK (btrim(full_name) <> ''),
-    student_number TEXT UNIQUE CHECK (student_number IS NULL OR btrim(student_number) <> ''),
-    faculty_id TEXT REFERENCES "Faculty"(faculty_id),
     avatar_url TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (user_id, faculty_id)
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "UserRole" (
@@ -134,12 +131,10 @@ CREATE TABLE "UserRole" (
 );
 
 CREATE TABLE "Student" (
-    user_id TEXT PRIMARY KEY,
+    user_id TEXT PRIMARY KEY REFERENCES "User"(user_id),
     major_id TEXT REFERENCES "Major"(major_id),
     faculty_id TEXT NOT NULL REFERENCES "Faculty"(faculty_id),
-    enrollment_year INT NOT NULL CHECK (enrollment_year > 0),
-    FOREIGN KEY (user_id, faculty_id) REFERENCES "User"(user_id, faculty_id),
-    FOREIGN KEY (major_id, faculty_id) REFERENCES "Major"(major_id, faculty_id)
+    enrollment_year INT NOT NULL CHECK (enrollment_year > 0)
 );
 
 CREATE TABLE "Manager" (

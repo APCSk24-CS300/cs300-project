@@ -32,7 +32,7 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 - Implemented `getDashboardPath`, `getLoginHref`, and `isSafeRedirectPath`.
 - Added `service-mode.ts`.
 - Fixed stale `AuthProvider` memoization and removed unused imports.
-- Added mock auth QA scenarios: `guest | student | organizer | admin`, defaulting to `student`.
+- Added mock auth QA scenarios: `guest | student | manager | admin`, defaulting to `student`.
 - Added local landing images and four local service icons.
 
 ### Shared UI and Chrome
@@ -83,7 +83,7 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 - Verified reduced motion in Chrome: `scroll-behavior` becomes `auto`, transitions collapse to `1e-05s`, and translation is `none`; added a global reduced-motion `translate: none !important` override because Tailwind hover lifts use the `translate` property.
 - Compared the rendered page with `docs/ui/landing-page-ui.png` and corrected the hero headline width, Help decoration overlap, guide-card fade, and contrast tokens.
 - Verified the guest build: header Log In resolves to `/login` so successful sign-in continues to the role dashboard; hero Get Started resolves to `/login`; five main content sections plus footer render; activity grouping is 2 featured + 3 compact.
-- Verified signed-in builds: student, organizer, and admin all keep the header `Log In` action; hero `Get Started` still points at the correct role dashboard.
+- Verified signed-in builds: student, manager, and admin all keep the header `Log In` action; hero `Get Started` still points at the correct role dashboard.
 - Reworked HCMUS Services to six display-only cards (adding placeholder `HCMUS Library` and `IT Support`), all inert with no hrefs, behind a translucent gradient/blur overlay with a `Log in for more` CTA. Chrome checks at 1440 and 375 show 3x2 and 1x6 layouts, six inert cards, zero card links, full overlay coverage, and no horizontal overflow.
 - Verified all eight activity scenarios in Chrome: `success` (2+3), `partial` (1+3), `empty`, `error`, `delay` (skeleton then success), `single-list` (5 featured-only), `all-invalid` (error, no broken cards), and `long-content` (2+3, clamp, multi-day dates, image fallback). No scenario produced horizontal overflow; repeated `Try again` kept a single error node and moved focus to the section heading.
 - Verified navigation and drawer behavior: direct `/#services` scroll restores with the header offset and active nav; activities → help → Back → Forward restores hashes; brand returns to `#home`; selecting a drawer link closes the dialog, scrolls to the section, and focuses it.
@@ -228,7 +228,7 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 - Desktop tab order and mobile-drawer focus containment/restoration are verified in Chrome.
 - Reduced motion is verified in Chrome for scroll behavior, transitions, and hover translation.
 - The rendered page has been reviewed against `docs/ui/landing-page-ui.png`; visual mismatches were fixed.
-- Guest, student, organizer, and admin role journeys are verified in Chrome.
+- Guest, student, manager, and admin role journeys are verified in Chrome.
 - All eight activity scenarios, repeated retry, single-list reflow, image failure, and throttled loading are verified in Chrome.
 - Direct hashes, Back/Forward, brand-to-top, drawer section selection, focus restoration, and backdrop/Escape closure are verified in Chrome.
 - `tasks.md` has 112 of 112 tasks checked.
@@ -247,7 +247,7 @@ All implementation and verification tasks in `tasks.md` are complete (`112/112`)
 - T069–T075: services/role tests and implementation.
 - T076: all six service cards are display-only and inert behind the login overlay; no service destination is keyboard/pointer/AT reachable.
 - T077–T082: signed-in role tests and implementation.
-- T083: student/organizer/admin role flows verified against role builds; header remains login-only and hero Get Started uses the role dashboard.
+- T083: student/manager/admin role flows verified against role builds; header remains login-only and hero Get Started uses the role dashboard.
 - T084–T093: scroll, mobile drawer, redirect, and integration tests/implementation.
 - T094: direct hashes, Back/Forward, brand-to-top, drawer selection, Escape/backdrop, and focus restoration.
 - T095–T105: boundary, metadata, copy, asset, login return-flow, composition, scope, lint, build, and test gates.
@@ -306,4 +306,4 @@ NEXT_PUBLIC_MOCK_ACTIVITY_SCENARIO=success
 NEXT_PUBLIC_MOCK_AUTH_STATE=student
 ```
 
-Use `guest` for guest-state QA and `organizer`/`admin` for role continuity.
+Use `guest` for guest-state QA and `manager`/`admin` for role continuity.

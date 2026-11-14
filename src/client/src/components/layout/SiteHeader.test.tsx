@@ -112,7 +112,7 @@ describe("SiteHeader", () => {
 
   it.each([
     "student",
-    "organizer",
+    "manager",
     "admin",
   ] satisfies RoleCode[])(
     "still shows the Log In link for an authenticated %s",

@@ -18,7 +18,7 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-async function submitLogin(role: "Student" | "Organizer" = "Student") {
+async function submitLogin(role: "Student" | "Manager" = "Student") {
   const user = userEvent.setup();
 
   await user.click(screen.getByRole("button", { name: role }));
@@ -75,18 +75,18 @@ describe("LoginForm redirect handling", () => {
   });
 
   it("resolves the dashboard for the authenticated role", async () => {
-    const login = vi.fn(async () => createSessionUser("organizer"));
+    const login = vi.fn(async () => createSessionUser("manager"));
 
     renderWithAuth(
       <LoginForm />,
       createAuthContextValue({ login }),
     );
 
-    await submitLogin("Organizer");
+    await submitLogin("Manager");
 
     await waitFor(() =>
       expect(routerMocks.replace).toHaveBeenCalledWith(
-        "/organizer/dashboard",
+        "/manager/dashboard",
       ),
     );
   });

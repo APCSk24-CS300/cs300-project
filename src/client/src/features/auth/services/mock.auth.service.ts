@@ -9,12 +9,12 @@ import type {
 } from "@/features/auth/types";
 import { ROLE_CODES } from "@/libs/roles";
 
-type MockAuthScenario = "guest" | "student" | "organizer" | "admin";
+type MockAuthScenario = "guest" | "student" | "manager" | "admin";
 
 function getScenario(): MockAuthScenario {
   const value = process.env.NEXT_PUBLIC_MOCK_AUTH_STATE;
 
-  if (value === "guest" || value === "organizer" || value === "admin") {
+  if (value === "guest" || value === "manager" || value === "admin") {
     return value;
   }
 
@@ -38,9 +38,9 @@ function createUser(scenario: Exclude<MockAuthScenario, "guest">): SessionUser {
   }
 
   const user: StaffSessionUser = {
-    userId: scenario === "organizer" ? 2 : 3,
+    userId: scenario === "manager" ? 2 : 3,
     email: `${scenario}@hcmus.edu.vn`,
-    fullName: scenario === "organizer" ? "Mock Organizer" : "Mock Admin",
+    fullName: scenario === "manager" ? "Mock Manager" : "Mock Admin",
     role: scenario,
     permissions: [],
     studentNumber: null,

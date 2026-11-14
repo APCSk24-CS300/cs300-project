@@ -3,7 +3,7 @@
 **Reviewers**: Quách Thiên Lạc, Phạm Vân Trang, Phan Minh Khôi, Nguyễn Khang Thịnh, Nguyễn Văn Tĩnh  
 **Editors**: Trần Tôn Minh Kỳ
 
-## ======== Sprint 2 &mdash; 14/11 Review meeting ========
+## ======== Sprint 3 &mdash; 14/11 Review meeting ========
 ![review-tasks](../../../assets/PA3-review-meeting-tasks.png)
 
 ### Presence

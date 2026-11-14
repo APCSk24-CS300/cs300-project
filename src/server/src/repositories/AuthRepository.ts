@@ -60,19 +60,37 @@ class InMemoryAuthRepository implements AuthRepository {
     }
 
     public async insertUser(user: User): Promise<void> {
-        // insert user to db
+        
     }
 
     public async checkUserExists(id: string): Promise<boolean> {
-        return true;
+        const query = ` 
+            SELECT *
+            FROM "User"
+            WHERE user_id = ${id}
+        `;
+        const result = await DbConnection.pool.query<User>(query, [id]);
+        return result != null;
     }
 
     public async checkUserExistsWithEmail(email: string): Promise<boolean> {
-        return true;
+        const query = ` 
+            SELECT *
+            FROM "User"
+            WHERE email = ${email}
+        `;
+        const result = await DbConnection.pool.query<User>(query, [id]);
+        return result != null;
     }
 
     public async checkUserExistsWithPhoneNumber(phone: string): Promise<boolean> {
-        return true;
+        const query = ` 
+            SELECT *
+            FROM "User"
+            WHERE phone_number = ${phone}
+        `;
+        const result = await DbConnection.pool.query<User>(query, [id]);
+        return result != null;
     }
 
     public async getUserEmail(id: string): Promise<String> {

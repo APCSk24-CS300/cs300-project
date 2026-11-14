@@ -131,12 +131,10 @@ CREATE TABLE "UserRole" (
 );
 
 CREATE TABLE "Student" (
-    user_id TEXT PRIMARY KEY,
+    user_id TEXT PRIMARY KEY REFERENCES "User"(user_id),
     major_id TEXT REFERENCES "Major"(major_id),
     faculty_id TEXT NOT NULL REFERENCES "Faculty"(faculty_id),
-    enrollment_year INT NOT NULL CHECK (enrollment_year > 0),
-    FOREIGN KEY (user_id, faculty_id) REFERENCES "User"(user_id, faculty_id),
-    FOREIGN KEY (major_id, faculty_id) REFERENCES "Major"(major_id, faculty_id)
+    enrollment_year INT NOT NULL CHECK (enrollment_year > 0)
 );
 
 CREATE TABLE "Manager" (

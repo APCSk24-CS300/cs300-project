@@ -17,6 +17,7 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
+    "typedoc": "^0.28.20",
     "typescript": "^6.0.3"
   },
   "dependencies": {

@@ -16,8 +16,7 @@ class AuthController {
 		const phone: string = req.body.phone;
 		const password: string = req.body.password;
 		const enrollmentYear: number = req.body.enrollmentYear;
-		const majorID: number = req.body.majorID;
-		const facultyID: number = req.body.facultyID;
+		const majorFacultyID: number = req.body.majorFacultyID;
 
 		if (!name) {
 			const response: ServiceResponse = generate400Response(`Missing name parameter`);
@@ -57,14 +56,31 @@ class AuthController {
 			phone,
 			passwordPlainText: password,
 			enrollmentYear,
-			majorID,
-			facultyID,
+			majorFacultyID,
 			createdAt: new Date()
 		};
 		const response: ServiceResponse = await AuthService.register(userRegistrationData);
 		return void res.status(response.statusCode)
 		.location('/api/users/' + response.payload.data.userID)
 		.json(response.get());
+	}
+
+	async login(req: Request, res: Response, next: NextFunction): Promise<void> {
+		const email: string = req.body.email;
+		const password: string = req.body.password;
+
+		if (!email) {
+			const response = generate400Response('Missing email parameter');
+			return void res.status(response.statusCode).json(response.get());
+		}
+
+		if (!password) {
+			const response = generate400Response('Missing password parameter');
+			return void res.status(response.statusCode).json(response.get());
+		}
+
+		const response = await AuthService.login(email, password);
+		return void res.status(response.statusCode).json(response.get());
 	}
 }
 

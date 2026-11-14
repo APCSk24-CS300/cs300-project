@@ -2,7 +2,6 @@
 // provide a context for authentication state and methods
 
 
-import { RoleCode } from '@/libs/roles';
 import { SessionUser } from '@/features/auth/types/auth';
 import { LoginRequest } from '@/features/auth/types/auth.dto';
 import { createContext } from 'react';

@@ -1,8 +1,32 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #111827;
+}
+
+@theme {
+  --color-primary: #1f4fa3;
+  --color-primary-dark: #17409a;
+  --color-accent-gold: #f2b31b;
+  --color-accent-gold-strong: #a16207;
+  --color-text: #111827;
+  --color-text-muted: #5b6472;
+  --color-surface: #ffffff;
+  --color-success: #15803d;
+  --color-warning: #b45309;
+  --color-neutral-status: #5b6472;
+  --color-guide-gradient-from: #ffffff;
+  --color-guide-gradient-to: #e3eefb;
+  --color-focus-ring: #f2b31b;
+  --radius-card: 24px;
+  --radius-pill: 9999px;
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --container-landing: 1200px;
+  --header-height: 56px;
+  --page-gutter: 24px;
+  --focus-ring-width: 3px;
 }
 
 @theme inline {
@@ -12,15 +36,33 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    translate: none !important;
+  }
 }

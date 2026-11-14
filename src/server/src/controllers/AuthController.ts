@@ -16,8 +16,7 @@ class AuthController {
 		const phone: string = req.body.phone;
 		const password: string = req.body.password;
 		const enrollmentYear: number = req.body.enrollmentYear;
-		const majorID: number = req.body.majorID;
-		const facultyID: number = req.body.facultyID;
+		const majorFacultyID: number = req.body.majorFacultyID;
 
 		if (!name) {
 			const response: ServiceResponse = generate400Response(`Missing name parameter`);
@@ -57,8 +56,7 @@ class AuthController {
 			phone,
 			passwordPlainText: password,
 			enrollmentYear,
-			majorID,
-			facultyID,
+			majorFacultyID,
 			createdAt: new Date()
 		};
 		const response: ServiceResponse = await AuthService.register(userRegistrationData);

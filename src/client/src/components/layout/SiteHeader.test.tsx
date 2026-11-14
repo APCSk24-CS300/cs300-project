@@ -105,7 +105,7 @@ describe("SiteHeader", () => {
     );
     expect(screen.getByRole("link", { name: "Log In" })).toHaveAttribute(
       "href",
-      "/login?redirectTo=%2F",
+      "/login",
     );
     expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
   });
@@ -127,7 +127,7 @@ describe("SiteHeader", () => {
 
       expect(screen.getByRole("link", { name: "Log In" })).toHaveAttribute(
         "href",
-        "/login?redirectTo=%2F",
+        "/login",
       );
       expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
     },
@@ -162,14 +162,14 @@ describe("SiteHeader", () => {
     expect(activeLink).toHaveClass("border-primary", "font-semibold");
   });
 
-  it("preserves the active section in the login return path", () => {
-    scrollMocks.useScrollSpy.mockReturnValue("services");
+  it("does not carry the active section into the login return path", () => {
+    scrollMocks.useScrollSpy.mockReturnValue("activities");
 
     renderHeader();
 
     expect(screen.getByRole("link", { name: "Log In" })).toHaveAttribute(
       "href",
-      "/login?redirectTo=%2F%23services",
+      "/login",
     );
   });
 

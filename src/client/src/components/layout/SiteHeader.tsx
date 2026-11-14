@@ -14,7 +14,6 @@ import { Logo } from "@/components/layout/Logo";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { useAuth } from "@/hooks/useAuth";
-import { getLoginHref } from "@/libs/navigation";
 import { scrollToSection, useHashScroll, useScrollSpy } from "@/libs/scroll";
 import { cn } from "@/libs/cn";
 import type { NavigationLink } from "@/types/navigation";
@@ -36,9 +35,7 @@ export function SiteHeader({ links }: SiteHeaderProps) {
 
   useHashScroll();
 
-  const returnTo =
-    activeSection && activeSection !== "home" ? `/#${activeSection}` : "/";
-  const loginHref = getLoginHref(returnTo);
+  const loginHref = "/login";
 
   useEffect(() => {
     const dialog = dialogRef.current;

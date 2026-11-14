@@ -26,6 +26,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const response = await authServiceInstance.login(data);
         if (response.user != null) {
           setUser(response.user);
+          console.log(response.user);
           return response.user;
         }
         throw new Error("Login failed: user is null");

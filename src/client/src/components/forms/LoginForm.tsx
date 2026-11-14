@@ -70,13 +70,18 @@ function LoginForm({ redirectTo }: LoginFormProps) {
         setLoginError(null);
 
         try {
+            console.log('Form trying to log in');
+            
+
             const user = await authContext.login(data);
 
+            console.log('User (LogIn Form): ',user)
             if (user) {
                 const destination =
                     redirectTo && isSafeRedirectPath(redirectTo)
                         ? redirectTo
                         : getDashboardPath(user.role);
+                console.log(destination);
                 router.replace(destination);
             }
             else {

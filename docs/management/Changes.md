@@ -1,8 +1,9 @@
-# Changes
-
-## B. Detailed Vision Document – 2nd Submission
+# Changes document
 **Worker:** Phạm Vân Trang 
 **Reviewer:** Trần Tôn Minh Kỳ
+## A. Detailed Project Plan Changes – 2nd Submission
+Nothing changed.
+## B. Detailed Vision Document Changes – 2nd Submission
 ### Changes Made
 
 #### 1. Role and terminology alignment (Section 3 and throughout the document)

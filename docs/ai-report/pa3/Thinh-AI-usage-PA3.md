@@ -14,7 +14,7 @@
 | Model / version | `deepseek-v4.1-flash-free` |
 | Platform / provider | OpenCode 1.19.5 (CLI/terminal), model served through the OpenCode provider. Project: myHCMUS frontend, `src/client` |
 | Sessions | 1. “myHCMUS frontend engineering principles constitution”, November 13, 2026, 00:13–02:46. 2. “Landing page spec consistency analysis”, November 13, 2026, 09:55–21:02 |
-| Chat history | Detailed log: [Thinh-AI-log-PA3.md](Thinh-AI-log-PA3.md). Full OpenCode session exports: session 1 [Thinh-AI-log-PA3-speckit-setup.json](Thinh-AI-log-PA3-speckit-setup.json) (`ses_e2f4050d0ffeY0nbSoZSsk89ZC`), session 2 [Thinh-AI-log-PA3-landingpage-implementation.json](Thinh-AI-log-PA3-landingpage-implementation.json) (`ses_e2d2b6933ffepqFUkILG2rpuJD`). The detailed log calls them `ai-session-speckit-setup(1).json` and `ai-session-landingpage-implementation(1).json`. |
+| Chat history | Detailed log: [Thinh-AI-log-PA3.md](Thinh-AI-log-PA3.md). Full OpenCode session exports: session 1 [Thinh-AI-log-PA3-speckit-setup.json](Thinh-AI-log-PA3-speckit-setup.json) (`ses_e2f4050d0ffeY0nbSoZSsk89ZC`), session 2 [Thinh-AI-log-PA3-landingpage-implementation.json](Thinh-AI-log-PA3-landingpage-implementation.json) (`ses_e2d2b6933ffepqFUkILG2rpuJD`). |
 
 All times are Vietnam time (UTC+7), from the timestamps in the OpenCode session exports.
 

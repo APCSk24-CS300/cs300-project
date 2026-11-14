@@ -66,6 +66,24 @@ class AuthController {
 		.location('/api/users/' + response.payload.data.userID)
 		.json(response.get());
 	}
+
+	async login(req: Request, res: Response, next: NextFunction): Promise<void> {
+		const email: string = req.body.email;
+		const password: string = req.body.password;
+
+		if (!email) {
+			const response = generate400Response('Missing email parameter');
+			return void res.status(response.statusCode).json(response.get());
+		}
+
+		if (!password) {
+			const response = generate400Response('Missing password parameter');
+			return void res.status(response.statusCode).json(response.get());
+		}
+
+		const response = await AuthService.login(email, password);
+		return void res.status(response.statusCode).json(response.get());
+	}
 }
 
 export default new AuthController();

@@ -17,6 +17,8 @@ interface AuthRepository {
 
     checkUserExistsWithPhoneNumber(phone: string): Promise<boolean>;
 
+    getUserEmail(id: string): Promise<String>;
+
     getUserPasswordHash(id: string): Promise<string>;
 
     getUserRefreshTokenHash(id: string): Promise<string>;
@@ -35,8 +37,7 @@ class InMemoryAuthRepository implements AuthRepository {
                 email: "example@mail.com",
                 passwordPlainText: "thisispw",
                 enrollmentYear: 2024,
-                majorID: 67,
-                facultyID: 69,
+                majorFacultyID: 6767,
                 createdAt: new Date('2024-09-16T14:30:00.000Z')
             },
             passwordHash: "676767",
@@ -75,6 +76,10 @@ class InMemoryAuthRepository implements AuthRepository {
 
     public async checkUserExistsWithPhoneNumber(phone: string): Promise<boolean> {
         return true;
+    }
+
+    public async getUserEmail(id: string): Promise<String> {
+        return (this.db[0].userID == id) ? this.db[0].data.email : "No matching email.";
     }
     
     public async getUserRefreshTokenHash(id: string): Promise<string> {

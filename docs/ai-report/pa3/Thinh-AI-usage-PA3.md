@@ -14,7 +14,7 @@
 | Model / version | `deepseek-v4.1-flash-free` |
 | Platform / provider | OpenCode 1.19.5 (CLI/terminal), model served through the OpenCode provider. Project: myHCMUS frontend, `src/client` |
 | Sessions | 1. “myHCMUS frontend engineering principles constitution”, November 13, 2026, 00:13–02:46. 2. “Landing page spec consistency analysis”, November 13, 2026, 09:55–21:02 |
-| Chat history | Detailed log: [Thinh-AI-log-PA3.md](Thinh-AI-log-PA3.md). Session exports `ai-session-speckit-setup(1).json` and `ai-session-landingpage-implementation(1).json` *[not in this folder yet]* |
+| Chat history | Detailed log: [Thinh-AI-log-PA3.md](Thinh-AI-log-PA3.md). Full OpenCode session exports: session 1 [Thinh-AI-log-PA3-speckit-setup.json](Thinh-AI-log-PA3-speckit-setup.json) (`ses_e2f4050d0ffeY0nbSoZSsk89ZC`), session 2 [Thinh-AI-log-PA3-landingpage-implementation.json](Thinh-AI-log-PA3-landingpage-implementation.json) (`ses_e2d2b6933ffepqFUkILG2rpuJD`). The detailed log calls them `ai-session-speckit-setup(1).json` and `ai-session-landingpage-implementation(1).json`. |
 
 All times are Vietnam time (UTC+7), from the timestamps in the OpenCode session exports.
 
@@ -41,14 +41,9 @@ All times are Vietnam time (UTC+7), from the timestamps in the OpenCode session 
 - **Done independently / how it was validated:**
   - Thịnh made the product decisions during implementation: a header that links only to the login page, and two extra display-only service cards with a blur overlay and a “Log in for more” message. These match commits `5102401` (20:23) and `635c21e` (20:50).
   - The session logs report a passing TypeScript check, ESLint with 0 errors, passing tests (111/111 at one checkpoint, 109 after the service-card change), a passing production build, and browser checks of the main user journeys.
-  - The final review found differences between the code and the written spec, mainly from the two changes above.
-  - *[To confirm by Thịnh: did you rerun the tests and build on the final code yourself, and did you update the spec or the code to resolve the differences the review found?]*
+  - Thịnh reran the tests and the build on the final code, and both passed.
+  - The final review found differences between the code and the written spec, mainly from the two changes above. The specification did not cover everything once the AI had generated the first version of the UI, so Thịnh resolved the differences by updating the code and left the specification as it was.
 
 ### Original entries (as written by Thịnh)
 
 The original entries are kept unchanged in [Thinh-AI-usage-PA3.original.md](Thinh-AI-usage-PA3.original.md).
-
-### Notes for Thịnh
-
-- Please add the two OpenCode JSON exports to this folder, since the Guidelines require chat history as evidence.
-- The original entries say the work “should be reviewed” and that results “should be rerun”. The report needs to say what you actually checked, so please fill in the marked line above.

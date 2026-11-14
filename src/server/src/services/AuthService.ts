@@ -19,17 +19,17 @@ function constructUserID(createdAt: Date, majorFacultyID: number, discriminator:
 
 class AuthService {
 	public async register(data: UserRegistrationData): Promise<ServiceResponse> {
-		const discriminator: number = await InMemoryAuthRepository.getStudentDiscriminator(data.createdAt.getFullYear(), data.majorFacultyID);
-		const userID: number = constructUserID(data.createdAt, data.majorFacultyID, discriminator);
-		const passwordHash: string = await bcrypt.hash(data.passwordPlainText, SALT_ROUNDS);
+		const discriminator: number = 1;
+		const userID: number = constructUserID(data.granted_at, Number(`${data.role_data.faculty_id}${data.role_data.major_id}`), discriminator);
+		const passwordHash: string = await bcrypt.hash(data.password_plain_text, SALT_ROUNDS);
 
 		try {
 			const user: User = {
-				userID: userID.toString(),
+				user_id: userID.toString(),
+				is_active: true,
 				data: data,
-				passwordHash: passwordHash,
-				userStatus: await InMemoryAuthRepository.getActiveUserID(),
-				userRole: await InMemoryAuthRepository.getStudentUserID()
+				password_hash: passwordHash,
+				created_at: data.granted_at
 			};
 
 			await InMemoryAuthRepository.insertUser(user);
@@ -53,7 +53,7 @@ class AuthService {
 			return response;
 		}
 
-		const userID = InMemoryAuthRepository.getUserFromEmail(email);
+		const userID = await InMemoryAuthRepository.getUserFromEmail(email);
 		const passwordHash = await InMemoryAuthRepository.getUserPasswordHash(userID);
 		const passwordMatch = await bcrypt.compare(password, passwordHash);
 		if (!passwordMatch) {

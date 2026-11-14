@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 
 const USERS = {
   'student@test.com':   { userId: 1, role: 'student',   fullName: 'Test Student' },
-  'organizer@test.com': { userId: 2, role: 'organizer', fullName: 'Test Organizer' },
+  'manager@test.com':   { userId: 2, role: 'manager',   fullName: 'Test Manager' },
   'admin@test.com':     { userId: 3, role: 'admin',     fullName: 'Test Admin' },
 } as const;
 

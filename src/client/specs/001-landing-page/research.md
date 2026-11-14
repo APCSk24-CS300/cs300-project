@@ -162,7 +162,7 @@ The DTO uses snake_case wire fields and ISO date strings. The mapper accepts the
 
 ## Decision 10: Guest/auth-state QA for the existing mock auth
 
-**Decision**: Keep the landing feature's auth dependency to `useAuth()`. Add the minimal `AuthProvider` fix that includes `isLoading` and `refreshUser` in the context `useMemo` dependencies so auth-loading changes reach consumers. Add an optional mock-only scenario to `mock.auth.service.ts` controlled by `NEXT_PUBLIC_MOCK_AUTH_STATE=guest|student|organizer|admin` (default `student` to preserve current behavior). In `guest`, `getMe()` rejects with a normalized unauthenticated error; `AuthProvider` already clears the user on rejection.
+**Decision**: Keep the landing feature's auth dependency to `useAuth()`. Add the minimal `AuthProvider` fix that includes `isLoading` and `refreshUser` in the context `useMemo` dependencies so auth-loading changes reach consumers. Add an optional mock-only scenario to `mock.auth.service.ts` controlled by `NEXT_PUBLIC_MOCK_AUTH_STATE=guest|student|manager|admin` (default `student` to preserve current behavior). In `guest`, `getMe()` rejects with a normalized unauthenticated error; `AuthProvider` already clears the user on rejection.
 
 **Rationale**:
 - The current mock auth always authenticates a test student, so guest-only presentation cannot be manually verified in the running app.

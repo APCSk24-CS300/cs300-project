@@ -8,7 +8,7 @@ import {
 describe("navigation helpers", () => {
   it("resolves a dashboard path for every role", () => {
     expect(getDashboardPath("student")).toBe("/student/dashboard");
-    expect(getDashboardPath("organizer")).toBe("/organizer/dashboard");
+    expect(getDashboardPath("manager")).toBe("/manager/dashboard");
     expect(getDashboardPath("admin")).toBe("/admin/dashboard");
     expect(getDashboardPath(null)).toBe("/login");
   });

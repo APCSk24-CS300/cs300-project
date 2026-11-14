@@ -40,7 +40,7 @@ Header nav items map to anchors: Home → `#home`, About Us → `#about`, Activi
 
 ## 3. Fit with the Existing Frontend
 
-Existing structure (Next.js App Router): `app/(public)`, `app/(protected)/{admin,organizer,student}`, `features/auth/*` (context, provider, schema, services + mock service, types, DTO), `hooks/useAuth.ts`, `libs/{api-client,navigation,roles,session}.ts`, `components/{forms,icons}`, `types/{api,entities}.ts`.
+Existing structure (Next.js App Router): `app/(public)`, `app/(protected)/{admin,manager,student}`, `features/auth/*` (context, provider, schema, services + mock service, types, DTO), `hooks/useAuth.ts`, `libs/{api-client,navigation,roles,session}.ts`, `components/{forms,icons}`, `types/{api,entities}.ts`.
 
 Follow the same conventions already used by `features/auth`:
 - Feature-first folders under `features/<name>/`.
@@ -432,10 +432,10 @@ type ServiceItem = {
 5. Clicks an activity card → `/activities/{id}` [ASSUMPTION: detail page is publicly viewable; registering requires login].
 6. Clicks a guide card → `/help#…`.
 
-### 8.2 Authenticated user (student / organizer / admin)
+### 8.2 Authenticated user (student / manager / admin)
 1. Lands on `/` (no forced redirect). Header shows **Dashboard** (+ user menu).
 2. Services section is fully unlocked (blur removed).
-3. **Get Started** and **Dashboard** → `getDashboardPath(role)` (`/student/dashboard`, `/organizer/dashboard`, `/admin/dashboard`).
+3. **Get Started** and **Dashboard** → `getDashboardPath(role)` (`/student/dashboard`, `/manager/dashboard`, `/admin/dashboard`).
 4. Activities behave the same as for guests.
 
 ### 8.3 Activities API outcomes

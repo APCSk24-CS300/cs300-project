@@ -46,7 +46,7 @@ NEXT_PUBLIC_MOCK_AUTH_STATE=student
 |----------|--------|---------|
 | `NEXT_PUBLIC_DATA_SOURCE` | `mock` (default), `api` | Selects the activity service implementation |
 | `NEXT_PUBLIC_MOCK_ACTIVITY_SCENARIO` | `success`, `partial`, `empty`, `error`, `delay`, `single-list`, `all-invalid`, `long-content` | Selects deterministic activity fixtures |
-| `NEXT_PUBLIC_MOCK_AUTH_STATE` | `guest`, `student`, `organizer`, `admin` | Optional mock-auth QA scenario; default preserves the existing signed-in mock behavior |
+| `NEXT_PUBLIC_MOCK_AUTH_STATE` | `guest`, `student`, `manager`, `admin` | Optional mock-auth QA scenario; default preserves the existing signed-in mock behavior |
 
 `NEXT_PUBLIC_*` values are embedded at build time. Restart the dev server after changing them.
 
@@ -83,7 +83,7 @@ Do not enable this until the endpoint, response envelope, field names, and image
 
 ### 3. Signed-in behavior
 
-1. Set the mock auth state to `student`, then repeat for `organizer` and `admin`.
+1. Set the mock auth state to `student`, then repeat for `manager` and `admin`.
 2. Confirm `/` does not redirect away.
 3. Confirm the header shows Dashboard and links to the correct role dashboard.
 4. Confirm all services are visible and usable.

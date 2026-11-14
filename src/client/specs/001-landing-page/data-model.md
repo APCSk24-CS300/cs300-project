@@ -12,7 +12,7 @@ Represents the person viewing the landing page. The landing page does not own au
 
 ```ts
 type SessionUserView = {
-  role: "student" | "organizer" | "admin";
+  role: "student" | "manager" | "admin";
   fullName: string;
   avatarUrl: string | null;
 };
@@ -26,7 +26,7 @@ type AuthViewState =
 | Field | Type | Required | Notes |
 |-------|------|----------|-------|
 | `status` | `loading \| guest \| authenticated` | Yes | Derived from `isLoading`, `isAuthenticated`, and `user` |
-| `user.role` | `student \| organizer \| admin` | Authenticated only | Determines dashboard path |
+| `user.role` | `student \| manager \| admin` | Authenticated only | Determines dashboard path |
 | `user.fullName` | `string` | Authenticated only | Available for future header user menu; not required by this feature |
 | `user.avatarUrl` | `string \| null` | No | Not required for the landing page |
 

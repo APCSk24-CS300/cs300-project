@@ -48,7 +48,7 @@ export function createLandingActivities(
 
 export function createSessionUser(role: RoleCode): SessionUser {
   const base = {
-    userId: role === "student" ? 1 : role === "organizer" ? 2 : 3,
+    userId: role === "student" ? 1 : role === "manager" ? 2 : 3,
     email: `${role}@hcmus.edu.vn`,
     fullName: `Test ${role}`,
     avatarUrl: null,

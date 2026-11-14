@@ -76,7 +76,7 @@ A signed-out visitor can use the publicly available university services and clea
 
 ### User Story 4 - Signed-in visitor keeps using the landing page (Priority: P4)
 
-A signed-in student, organizer, or administrator can still visit the public landing page, sees a direct path to their dashboard, and finds every service unlocked.
+A signed-in student, manager, or administrator can still visit the public landing page, sees a direct path to their dashboard, and finds every service unlocked.
 
 **Why this priority**: Signed-in visitors must not be redirected away or lose access to public content, and they must be able to return to their work quickly.
 
@@ -244,7 +244,7 @@ A visitor uses the header to move between sections, always knows which section i
 
 ### Key Entities
 
-- **Visitor**: A person viewing the landing page, either signed out or signed in. Signed-in visitors have a role (student, organizer, or administrator) that determines their dashboard destination.
+- **Visitor**: A person viewing the landing page, either signed out or signed in. Signed-in visitors have a role (student, manager, or administrator) that determines their dashboard destination.
 - **Activity**: A discoverable extracurricular opportunity with an identifier, title, cover image, categories, start and end time, location, registration status, and detail destination. An activity is usable only when it has an identifier (from which its detail destination is formed), title, start time, end time, and registration status; cover image, categories, and location are optional and may be absent.
 - **Activity Collection**: The featured and upcoming activities supplied for the landing page. The collection may provide explicit featured and upcoming groups or a single ordered list. The landing page displays at most two featured and three upcoming items when groups are explicit, or up to five items in the featured-card style when only a single list is supplied.
 - **Navigation Link**: A labeled section destination shown in the header and footer, with an active state based on the section in view.

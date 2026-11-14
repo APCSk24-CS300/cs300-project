@@ -42,8 +42,8 @@
 #### Student Interface
 - [ ] Design Student Dashboard.
 
-#### Organizer Interface
-- [ ] Design Organizer Dashboard.
+#### Manager Interface
+- [ ] Design Manager Dashboard.
 
 #### Administrator Interface
 - [ ] Design Admin Dashboard.

@@ -24,8 +24,8 @@ const ROLE_OPTIONS = [
         icon: "user",
     },
     {
-        value: "organizer",
-        label: "Organizer",
+        value: "manager",
+        label: "Manager",
         icon: "users",
     },
 ] as const;

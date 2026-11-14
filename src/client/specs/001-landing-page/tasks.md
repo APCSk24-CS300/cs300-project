@@ -38,11 +38,11 @@
 - [x] T008 [P] Wire the existing Geist import in `src/app/layout.tsx` with `Geist({ variable: "--font-geist-sans", subsets: ["latin"] })`, apply its variable class, set the body font from the token layer in `src/app/globals.css`, and remove or neutralize the `prefers-color-scheme: dark` override. Verify the landing renders with Geist and remains light under dark-mode preference. Covers FR-066 and plan Typography.
 - [x] T009 [P] Add `src/libs/format.test.ts` covering same-day `dd/MM/yyyy, H:mm - H:mm`, multi-day `dd/MM/yyyy H:mm - dd/MM/yyyy H:mm`, midnight, leading-zero minutes, Asia/Ho_Chi_Minh boundary, and invalid dates. Verify the tests fail before T010. Covers FR-034.
 - [x] T010 [P] Implement `src/libs/format.ts` with `formatActivityTime(start: Date, end: Date): string` using `Intl.DateTimeFormat` and `formatToParts` in `Asia/Ho_Chi_Minh`, 24-hour, non-padded hour, and two-digit minutes. Verify T009 passes. Covers FR-034.
-- [x] T011 [P] Add `src/libs/navigation.test.ts` covering `getDashboardPath` for student/organizer/admin, `getLoginHref` encoding, valid landing return paths, and rejection of absolute URLs, protocol-relative URLs, backslashes, control characters, and `/login`. Verify the tests fail before T012. Covers FR-007, FR-008, and FR-015.
+- [x] T011 [P] Add `src/libs/navigation.test.ts` covering `getDashboardPath` for student/manager/admin, `getLoginHref` encoding, valid landing return paths, and rejection of absolute URLs, protocol-relative URLs, backslashes, control characters, and `/login`. Verify the tests fail before T012. Covers FR-007, FR-008, and FR-015.
 - [x] T012 [P] Add `getDashboardPath(role)`, `getLoginHref(returnTo?)`, and `isSafeRedirectPath(value)` to `src/libs/navigation.ts`, resolving dashboard paths from `NAVIGATION_ITEMS` and returning a role dashboard fallback for invalid values. Verify T011 passes. Covers FR-007, FR-008, and FR-015.
 - [x] T013 [P] Create `src/libs/service-mode.ts` exposing a single mock/API selection helper based on `NEXT_PUBLIC_DATA_SOURCE`, defaulting to `mock`. Verify no component or hook reads the environment variable directly. Covers plan Selection and Mock Strategy.
 - [x] T014 [P] Fix the stale `useMemo` dependencies in `src/features/auth/provider/AuthProvider.tsx` so `isLoading` and `refreshUser` are included. Verify a consumer observes loading-to-guest/authenticated changes without remounting. Covers FR-009 and FR-047.
-- [x] T015 [P] Add the optional `NEXT_PUBLIC_MOCK_AUTH_STATE=guest|student|organizer|admin` scenario to `src/features/auth/services/mock.auth.service.ts`, defaulting to `student` to preserve current behavior; guest must reject `getMe()` so `AuthProvider` clears the user. Verify the existing scratch `src/app/test/page.tsx` still renders `LoginForm` without a redirect prop. Covers FR-009, FR-047, and quickstart guest QA.
+- [x] T015 [P] Add the optional `NEXT_PUBLIC_MOCK_AUTH_STATE=guest|student|manager|admin` scenario to `src/features/auth/services/mock.auth.service.ts`, defaulting to `student` to preserve current behavior; guest must reject `getMe()` so `AuthProvider` clears the user. Verify the existing scratch `src/app/test/page.tsx` still renders `LoginForm` without a redirect prop. Covers FR-009, FR-047, and quickstart guest QA.
 - [x] T016 [P] Add local landing assets under `public/images/landing/`: `hero.*`, `highlight-activities.*`, `highlight-journey.*`, `highlight-campus.*`, and `activity-placeholder.*`; reuse `public/images/hcmus-campus.png` or approved source assets, do not use remote Unsplash URLs, and reserve image dimensions. Verify the files exist and are referenced only through config. Covers FR-017, FR-035, FR-074, and FR-075.
 
 **Checkpoint**: Foundation ready. Test harness, shared types, API options, tokens, formatter, navigation helpers, service mode, auth-loading fix, and local assets exist.
@@ -168,21 +168,21 @@
 
 ## Phase 6: User Story 4 - Signed-In Continuity (Priority: P4)
 
-**Goal**: Signed-in students, organizers, and administrators can still use `/`, see a role-correct Dashboard action, and access every service without a forced redirect.
+**Goal**: Signed-in students, managers, and administrators can still use `/`, see a role-correct Dashboard action, and access every service without a forced redirect.
 
 **Independent Test**: Load `/` as each signed-in role; verify no redirect, header Dashboard goes to the correct role dashboard, Get Started goes to the role dashboard, and all services are unlocked.
 
 ### Tests for User Story 4
 
-- [x] T077 [P] [US4] Extend `src/features/landing/components/HeroActions.test.tsx` for authenticated student/organizer/admin and auth-loading guest-safe behavior. Verify each role resolves the correct dashboard path. Covers FR-015 and SC-007.
-- [x] T078 [P] [US4] Extend `src/components/layout/SiteHeader.test.tsx` for authenticated student/organizer/admin Dashboard paths, loading skeleton, and no signed-in-only action flash. Verify the header never shows Dashboard during loading. Covers FR-008, FR-009, and SC-007.
+- [x] T077 [P] [US4] Extend `src/features/landing/components/HeroActions.test.tsx` for authenticated student/manager/admin and auth-loading guest-safe behavior. Verify each role resolves the correct dashboard path. Covers FR-015 and SC-007.
+- [x] T078 [P] [US4] Extend `src/components/layout/SiteHeader.test.tsx` for authenticated student/manager/admin Dashboard paths, loading skeleton, and no signed-in-only action flash. Verify the header never shows Dashboard during loading. Covers FR-008, FR-009, and SC-007.
 
 ### Implementation for User Story 4
 
 - [x] T079 [US4] Update `src/components/layout/SiteHeader.tsx` so the auth action renders Log In for guests, a reserved skeleton for loading, and Dashboard for authenticated users via `getDashboardPath(user.role)`; preserve the existing guest return path. Verify T078 passes. Covers FR-008 and FR-009.
 - [x] T080 [P] [US4] Update `src/features/landing/components/HeroActions.tsx` so authenticated Get Started goes directly to `getDashboardPath(user.role)` while guest/loading still uses the guest-safe login path. Verify T077 passes. Covers FR-015.
 - [x] T081 [P] [US4] Update `src/features/landing/components/ServicesSection.tsx` so authenticated users see every available service unlocked and no auth-loading locked state persists after resolution. Verify no layout shift occurs on unlock. Covers FR-047 and FR-048.
-- [x] T082 [US4] Verify `src/app/(public)/page.tsx` has no forced redirect for authenticated users and that student/organizer/admin Dashboard links from `src/components/layout/SiteHeader.tsx` resolve to `/student/dashboard`, `/organizer/dashboard`, and `/admin/dashboard`. Verify the existing proxy is not modified for this feature. Covers FR-001, FR-008, and SC-007.
+- [x] T082 [US4] Verify `src/app/(public)/page.tsx` has no forced redirect for authenticated users and that student/manager/admin Dashboard links from `src/components/layout/SiteHeader.tsx` resolve to `/student/dashboard`, `/manager/dashboard`, and `/admin/dashboard`. Verify the existing proxy is not modified for this feature. Covers FR-001, FR-008, and SC-007.
 - [x] T083 [US4] Run the US4 tests in `src/features/landing/components/HeroActions.test.tsx` and `src/components/layout/SiteHeader.test.tsx`, plus `specs/001-landing-page/quickstart.md` signed-in checks for all three roles. Verify no backend or auth-service refactor is included. Covers US4 and SC-007.
 
 **Checkpoint**: US4 is independently testable for every role.

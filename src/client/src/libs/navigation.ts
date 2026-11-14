@@ -9,7 +9,7 @@ export const NAVIGATION_ITEMS: Record<
     { label: "Dashboard", href: "/student/dashboard" },
     { label: "Activities", href: "/student/activities" },
   ],
-  organizer: [{ label: "Dashboard", href: "/organizer/dashboard" }],
+  manager: [{ label: "Dashboard", href: "/manager/dashboard" }],
   admin: [{ label: "Dashboard", href: "/admin/dashboard" }],
 };
 

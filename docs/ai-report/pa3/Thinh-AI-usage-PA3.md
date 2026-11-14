@@ -44,6 +44,3 @@ All times are Vietnam time (UTC+7), from the timestamps in the OpenCode session 
   - Thịnh reran the tests and the build on the final code, and both passed.
   - The final review found differences between the code and the written spec, mainly from the two changes above. The specification did not cover everything once the AI had generated the first version of the UI, so Thịnh resolved the differences by updating the code and left the specification as it was.
 
-### Original entries (as written by Thịnh)
-
-The original entries are kept unchanged in [Thinh-AI-usage-PA3.original.md](Thinh-AI-usage-PA3.original.md).

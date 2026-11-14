@@ -244,7 +244,7 @@ This document specifies **all 31 use cases** in the use case model document, ord
 | **Actor(s):**<br>Activity Manager |
 | **Description:**<br>Inspect activity participants and waiting lists, and review registration requests for activities under the Manager’s responsibility. |
 | **Preconditions:**<br>Manager is authenticated and assigned permission for the selected activity. |
-| **Basic flow (main success scenario):**<br>1. Manager opens **Managed Activities** and selects an activity.<br>2. System displays its registration list, participant status, capacity and pending approvals.<br>3. Manager opens a pending registration.<br>4. System presents the applicant details relevant to eligibility and the current status.<br>5. Manager approves the registration when approval is required.<br>6. System validates authority and capacity and records **Confirmed** status.<br>7. System updates the participant list and triggers relevant student status notifications. |
+| **Basic flow (main success scenario):**<br>1. Manager opens **Registrations** and selects an activity.<br>2. System displays its registration list, participant status, capacity and pending approvals.<br>3. Manager opens a pending registration.<br>4. System presents the applicant details relevant to eligibility and the current status.<br>5. Manager approves the registration when approval is required.<br>6. System validates authority and capacity and records **Confirmed** status.<br>7. System updates the participant list and triggers relevant student status notifications. |
 | **Alternative flows:**<br>A1 - Step 2: No registrations or pending approvals; show empty sections without an error.<br>A2 - Step 5: Manager rejects a request; record **Rejected** status and the reason if required, notify student.<br>A3 - Step 5: Manager chooses not to decide yet; leave the request pending.<br>A4 - Step 4: Registration was already processed or withdrawn; refresh and prevent a second decision.<br>A5 - Step 6: Activity was cancelled or capacity is no longer available; block confirmation and explain.<br>A6 - Step 6: Manager is not assigned to the activity; deny read/update access.<br>A7 - Step 6: Concurrent approval or database failure; preserve consistent participant totals and display retry/error.<br>A8 - Step 7: Notification fails; approval result is retained and notification failure handled separately.<br>A9 - Step 2: Waiting-list records are present; Manager may view them but cannot manually bypass FIFO without an explicitly agreed policy.<br>A10 - Step 2: Manager selects an existing registration and chooses **Cancel Registration**. System displays a confirmation dialog and requires a cancellation reason. Upon confirmation, system validates the Manager's authority and current registration status, changes the registration to **Cancelled**, releases the reserved seat, promotes the next eligible student from the waiting list according to FIFO rules, and notifies the affected student.|
 | **Postconditions:**<br>An authorized decision is committed and list/status updated, or pending state remains without an inconsistent seat allocation. |
 | **Special requirements:**<br>Vision 5.4/Workflow 1; NFR-SEC-03, SCA-PHY-03, REL-01, REL-02, USA-10. |
@@ -512,3 +512,21 @@ This document specifies **all 31 use cases** in the use case model document, ord
 An interactive prototype of the myHCMUS system was developed using Figma Make to visualize the user interfaces and demonstrate the main workflows described in this document. The prototype includes role-based interfaces for Students, Activity Managers, and University Administrators, supporting the demonstration of basic and alternative use-case flows.
 
 **Figma Prototype:** [View myHCMUS Interactive Prototype](https://flick-curry-05211016.figma.site)
+
+**Demo Scenario Navigator:** [View Use-Case Demonstrations](https://flick-curry-05211016.figma.site/demo/uc-01)
+
+### 5.1. Demo Accounts
+
+The following accounts can be used to explore the prototype with different user roles.
+
+| Role | Email | Password |
+|---|---|---|
+| Student | student1@example.invalid | demo2026 |
+| Activity Manager | manager1@example.invalid | demo2026 |
+| University Administrator | admin@example.invalid | demo2026 |
+
+**Note:** The prototype uses simulated authentication and demo data. No real authentication or user sessions are implemented.
+
+### 5.2. Use-Case Demonstrations
+
+The Demo Scenario Navigator provides access to use-case demonstrations, including basic and alternative flows. It allows reviewers to navigate directly to relevant prototype screens and examine the corresponding system behavior.

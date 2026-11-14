@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test \"tests/**/*.test.ts\"",
     "start": "nodemon src/index.ts",
     "generate-docs": "typedoc"
   },
@@ -27,5 +27,8 @@
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.12.1"
+  },
+  "allowScripts": {
+    "bcrypt@6.0.0": true
   }
 }

@@ -55,12 +55,15 @@ class ValidatorMiddleware {
 		}
 
 		if (credentialsToken === "MIKU_MIKU_OO_EE_OO") {
+			res.locals.user = { sub: 'dev' };
 			next();
 			return;
 		}
 		
 		try {
-			jwt.verify(credentialsToken, config.jwt.secret);
+			const decoded = jwt.verify(credentialsToken, config.jwt.secret);
+			// keep who is calling, so later steps (e.g. rate limiting) can use it
+			res.locals.user = typeof decoded === 'object' ? decoded : { sub: String(decoded) };
 		} catch (err) {
 			const response = new ServiceResponse;
 			response.success = false;

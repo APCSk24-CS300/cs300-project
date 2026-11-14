@@ -1,38 +1,11 @@
 // libs
-import express from 'express';
-import bodyParser from 'body-parser';
-import morgan from 'morgan';
-
-// modules
+import { createApp } from './app.ts';
 import config from './config/config.ts';
 
 // this will be added when i make the database
 // import DbConnection from './connections/DbConnection.ts';
 
-// routes
-import AuthRoute from './routes/AuthRoute.ts';
-
-
-// callbacks
-import errorHandler from './middleware/errorHandler.ts';
-import { rootCallback } from './middleware/rootCallback.ts';
-import { healthCallback } from './middleware/healthCallback.ts';
-import { nonexistentRouteCallback } from './middleware/nonexistentRouteCallback.ts';
-
-
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-const app = express();
-app.use(bodyParser.json());
-app.use(morgan('dev'));
-
-
-app.use('/api/auth', AuthRoute);
-app.get('/', rootCallback);
-app.get('/health', healthCallback);
-app.use(nonexistentRouteCallback);
-app.use(errorHandler);
+const app = createApp();
 
 
 // port magic

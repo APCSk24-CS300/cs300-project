@@ -8,3 +8,4 @@ src/.agents
 src/.agents/*
 src/.specify/*
 !src/.specify/memory/constitution.md
+docs/pa

@@ -1,7 +1,7 @@
 # Software Architecture: Tech Stack
-**Workers:** Phan Minh Khôi  
-**Reviewers:**  
-**Editors:**
+**Workers:** Phan Minh Khoi
+**Reviewers:**  Tran Ton Minh Ky
+**Editors:** Phan Minh Khoi
 
 **Version:** 0.1.0 (draft)  
 **Amendment:** 2026/11/17
@@ -118,7 +118,7 @@ The items below are part of the product vision but are not in the `dev` branch a
 | Hosting platform | Makes the system reachable outside a developer machine. | Not chosen. See the deployment diagram. |
 | Docker image for the frontend | Lets the frontend start together with the backend and the database. | The frontend is not in `docker-compose.yml` yet. |
 
-## 8. Notes for the team
+## 8. Notes my teammates
 
 These are differences between the code and what a reader might expect. They do not change the tech stack, but the architecture documents must stay consistent with the code, so each one should be either fixed in code or kept in mind when the diagrams are updated.
 

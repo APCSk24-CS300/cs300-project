@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
 
   db:
-    image: postgres:18
+    image: pgvector/pgvector:pg18   # PostgreSQL 18 + pgvector (specs/003 R2)
     container_name: myHCMUS-db
     restart: always
     env_file:

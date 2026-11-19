@@ -11,4 +11,10 @@ router.all('/register',
 	AuthController.register
 );
 
+router.all('/login',
+	ValidatorMiddleware.validateMethod([HTTPMethod.POST]),
+	ValidatorMiddleware.validateContentType,
+	AuthController.login
+);
+
 export default router;

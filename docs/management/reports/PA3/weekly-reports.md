@@ -94,3 +94,92 @@ Issues/Obstacles:
 ### Summary
 - Every member reports their work over the week.
 - The server and client setup is completed, enabling the implementation of endpoints and screens.
+- 
+## ======== Sprint 3 &mdash; 13/11 Weekly meeting 1 ========
+![weekly-1-tasks](../../../assets/PA3-weekly-meeting-2-tasks.png)
+
+### Presence
+Team members present:
+- Kỳ
+- Lạc
+- Thịnh
+- Trang
+- Khôi
+- Tĩnh
+
+Team members absent:
+- None
+
+### Status report - Kỳ
+Completed tasks:
+- Complete the weekly meeting 1 report
+- Implement `api/auth/register` endpoint
+- Implement `api/auth/login` endpoint
+
+To-do tasks:
+- Complete the weekly meeting 2 report
+- Implement `api/auth/refresh` endpoint
+- Compose documentation on how to build the application with Docker
+
+Issues/Obstacles:
+- Procrastination
+
+### Status reports - Lạc
+Completed tasks:
+- Finish mock auth repository with added function
+- Refining the business requirement and the database schema
+
+To-do tasks:
+- None
+
+Issues/Obstacles:
+- Deadline deadlock (have to resolve different conflicting deadlines); schema design task passed the deadline while issue for business requirements has just been opened
+
+### Status reports - Thịnh
+Completed tasks:
+- Refined the login page and homepage
+
+To-do tasks:
+- None
+
+Issues/Obstacles:
+- None
+
+### Status reports - Trang
+Completed tasks:
+- Model the use-case of the software system
+- Review planning report
+  
+To-do tasks:
+- Record a video demonstration of the authentication functional group
+- Create test cases for authentication functional group
+- Build the software prototype
+- Revise the vision document and project proposal
+- Write the use-case specification for every use case
+
+Issues/Obstacles:
+- None
+
+### Status reports - Khôi
+Completed tasks:
+- Implemented endpoint `api/ai/prompt`
+
+To-do tasks:
+- None
+
+Issues/Obstacles:
+- None
+
+### Status reports - Tĩnh
+Completed tasks:
+- Implemented homepage
+- Reviewed teammate works
+
+To-do tasks:
+
+Issues/Obstacles:
+- None
+
+### Summary
+- Every member reports their work over the week.
+- The functional group for authentication is almost completed.

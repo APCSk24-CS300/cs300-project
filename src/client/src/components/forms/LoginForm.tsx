@@ -1,7 +1,7 @@
 
 "use client";
 
-import { SubmitEvent, useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import type { LoginSchemaType } from "@/features/auth/schema/login.schema";
@@ -11,8 +11,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UserIcon } from "../icons/UserIcon";
 import { UsersIcon } from "../icons/UsersIcon";
 import { LoginRequest } from "@/features/auth/types/auth.dto";
+import { getDashboardPath, isSafeRedirectPath } from "@/libs/navigation";
 
-
+type LoginFormProps = {
+    redirectTo?: string;
+};
 
 const ROLE_OPTIONS = [
     {
@@ -21,8 +24,8 @@ const ROLE_OPTIONS = [
         icon: "user",
     },
     {
-        value: "organizer",
-        label: "Organizer",
+        value: "manager",
+        label: "Manager",
         icon: "users",
     },
 ] as const;
@@ -30,7 +33,7 @@ const ROLE_OPTIONS = [
 
 
 
-function LoginForm() {
+function LoginForm({ redirectTo }: LoginFormProps) {
     const router = useRouter();
     const authContext = useAuth();
     const [loginError, setLoginError] = useState<string | null>(null);
@@ -63,25 +66,23 @@ function LoginForm() {
     });
     const isDisabled = !email || !password || form.formState.isSubmitting;
 
-    // useEffect(() => {
-    //     if (authContext.isAuthenticated && authContext.user?.role) {
-    //         router.replace(`/${authContext.user.role}/dashboard`);
-    //     }
-    // }, [
-    //     authContext.isAuthenticated,
-    //     authContext.user?.role,
-    //     router,
-    // ]);
-
     const onSubmit: SubmitHandler<LoginSchemaType> = async (data: LoginRequest) => {
         setLoginError(null);
 
         try {
+            console.log('Form trying to log in');
+            
+
             const user = await authContext.login(data);
 
+            console.log('User (LogIn Form): ',user)
             if (user) {
-                const user_role = user.role;
-                router.push(`/${user_role}/dashboard`);
+                const destination =
+                    redirectTo && isSafeRedirectPath(redirectTo)
+                        ? redirectTo
+                        : getDashboardPath(user.role);
+                console.log(destination);
+                router.replace(destination);
             }
             else {
                 setLoginError("Login failed. Please check your credentials.");

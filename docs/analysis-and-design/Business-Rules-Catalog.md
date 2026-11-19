@@ -24,7 +24,7 @@
 | BR-ACT-03 | An activity's schedule must contain valid time intervals, with each session's start time preceding its end time. | E | BR Explicit constraints; UC-18 |
 | BR-ACT-04 | An activity's registration opening time must precede its closing time. | E | BR Explicit constraints; UC-10/18 |
 | BR-ACT-05 | An activity must have positive capacity. | E | BR Explicit constraints; UC-10/18 |
-| BR-ACT-06 | Activity lifecycle states must distinguish **Draft**, **Published**, **Ongoing**, **Completed**, and **Cancelled**. Invalid transitions must not be accepted. | R | BR `Activity.status`; V NFR-USA-12; UC-18 A7 |
+| BR-ACT-06 | Activities must follow these valid status transitions: Draft → Published → Ongoing → Completed, with cancellation allowed from Draft, Published, or Ongoing. Completed and Cancelled are terminal states. All other transitions, such as Draft → Ongoing, Published → Completed, or Ongoing → Published, are prohibited.| R | BR `Activity.status`; V NFR-USA-12; UC-18 A7 |
 | BR-ACT-07 | Only activities currently visible to the student may appear as available discovery results; hidden, cancelled, or unavailable activities must not be presented as registrable. | N | UC-04 A6; UC-10 A2 |
 | BR-ACT-08 | Discovery must support filtering by faculty, date, location (campus), specialized topic (A, B), training-score criteria, and registration status, with current activity details shown to the student. | N | V Feature 3; UC-04 |
 | BR-ACT-09 | A student may follow an accessible activity without registering for it; following an activity must not reserve capacity or create a registration. | N | V Feature 3/Workflow 1; UC-05 A6 |

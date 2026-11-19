@@ -7,7 +7,7 @@ import { BLOCKED_REPLY } from '../../src/services/aiSystemPrompt.ts';
 import { AIGateway } from '../../src/ai/AIGateway.ts';
 import { AISettings } from '../../src/ai/settings/AISettings.ts';
 import { UsageLogger } from '../../src/ai/logging/UsageLogger.ts';
-import type { AIIdentity } from '../../src/ai/types.ts';
+import type { AIIdentity } from '../../src/types/AIIdentity.ts';
 import { FakeSettingsSource, FakeRequestLogStore } from '../helpers/fakes.ts';
 
 function service(llm: LLMClient): AIService {

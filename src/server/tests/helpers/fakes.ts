@@ -1,9 +1,9 @@
 // In-memory stand-ins for the database-backed parts of the AI module, so unit and
 // integration tests run without PostgreSQL.
-import type { IdentityStore } from '../../src/ai/identity/IdentityStore.ts';
-import type { AIRole } from '../../src/ai/types.ts';
-import type { SettingsSource } from '../../src/ai/settings/AISettings.ts';
-import type { RequestLogRow, RequestLogStore } from '../../src/repositories/ai/AiRequestLogRepository.ts';
+import type { IdentityStore } from '../../src/repositories/IdentityRepository.ts';
+import type { AIRole } from '../../src/types/AIIdentity.ts';
+import type { SettingsSource } from '../../src/repositories/AiSettingsRepository.ts';
+import type { RequestLogRow, RequestLogStore } from '../../src/repositories/AiRequestLogRepository.ts';
 
 export interface FakeUser { roles: AIRole[], facultyId?: string | null, permissions?: string[] }
 

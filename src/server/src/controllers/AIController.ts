@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { AIService } from '../services/AIService.ts';
 import { validatePromptRequest } from '../helper/validatePromptRequest.ts';
 import { generate400Response } from '../helper/generate400Response.ts';
-import type { AIIdentity } from '../ai/types.ts';
+import type { AIIdentity } from '../types/AIIdentity.ts';
 
 /** HTTP handling for the AI endpoint: validate the body, call AIService, send the response. */
 export class AIController {

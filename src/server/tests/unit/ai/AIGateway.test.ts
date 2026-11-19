@@ -6,7 +6,7 @@ import { UsageLogger } from '../../../src/ai/logging/UsageLogger.ts';
 import { LLMError } from '../../../src/clients/LLMClient.ts';
 import type { LLMClient } from '../../../src/clients/LLMClient.ts';
 import { DISABLED_REPLY, BLOCKED_REPLY, PROMPT_VERSION } from '../../../src/ai/prompt/systemPrompt.ts';
-import type { AIIdentity } from '../../../src/ai/types.ts';
+import type { AIIdentity } from '../../../src/types/AIIdentity.ts';
 import { FakeSettingsSource, FakeRequestLogStore, captureErrors } from '../../helpers/fakes.ts';
 
 const student: AIIdentity = { userId: 'u1', roles: ['student'], facultyId: 'F1' };

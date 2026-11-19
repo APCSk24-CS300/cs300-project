@@ -100,6 +100,8 @@ src/server/
 │   ├── clients/LLMClient.ts              # CHANGED: tool calls, token counts, classify(), embed()
 │   ├── clients/GeminiClient.ts           # CHANGED: function calling, JSON output, embeddings, usageMetadata
 │   ├── connections/aiDb.ts               # NEW: pg Pool with the ai_gateway role
+│   ├── types/AIIdentity.ts, ChatResult.ts # NEW: shared AI types, one concept per file like PromptRequest.ts
+│   ├── helper/primaryRole.ts             # NEW
 │   ├── ai/                               # NEW: the AI Gateway module (only AIGateway.ts is imported from outside)
 │   │   ├── AIGateway.ts                  #   the pipeline (design 3.2)
 │   │   ├── prompt/systemPrompt.ts        #   moved from services/aiSystemPrompt.ts; versioned; canary
@@ -125,7 +127,7 @@ src/server/
 │   │   │                                 #   suggest_score_criterion, get_my_managed_activities
 │   │   ├── logging/UsageLogger.ts
 │   │   └── flags/FlagService.ts
-│   ├── repositories/ai/                  # NEW: AiRequestLogRepository, AiUsageWindowRepository, AiFlagRepository,
+│   ├── repositories/                     # NEW, flat like AuthRepository.ts (interface + class per file): AiRequestLogRepository, AiUsageWindowRepository, AiFlagRepository,
 │   │                                     #   AiKnowledgeRepository, AiToolViewsRepository, AiSettingsRepository,
 │   │                                     #   AiConsentRepository, AiUserQuotaRepository
 │   ├── services/AdminAIService.ts        # NEW: dashboard queries, settings changes + AuditLog

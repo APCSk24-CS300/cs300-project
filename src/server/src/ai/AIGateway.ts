@@ -6,8 +6,9 @@ import type { AISettingsSnapshot } from './settings/AISettings.ts';
 import { UsageLogger } from './logging/UsageLogger.ts';
 import type { UsageEntry } from './logging/UsageLogger.ts';
 import { AI_SYSTEM_PROMPT, BLOCKED_REPLY, DISABLED_REPLY, PROMPT_VERSION } from './prompt/systemPrompt.ts';
-import { primaryRole } from './types.ts';
-import type { AIIdentity, AIOutcome, ChatRequest, ChatResult } from './types.ts';
+import { primaryRole } from '../helper/primaryRole.ts';
+import type { AIIdentity } from '../types/AIIdentity.ts';
+import type { AIOutcome, ChatRequest, ChatResult } from '../types/ChatResult.ts';
 
 export const UNAVAILABLE_MESSAGE = 'AI assistant is temporarily unavailable, please try again later';
 const QUOTA_RETRY_AFTER_SECONDS = 30;
@@ -32,6 +33,26 @@ export interface AIGatewayDeps {
 export class AIGateway {
 	private readonly deps: Required<AIGatewayDeps>;
 
+	/**
+	 * Creates the AI module's pipeline. Supports dependency injection so tests can pass a fake model, in-memory settings and an in-memory log.
+	 * @param {AIGatewayDeps} deps - The model client, the settings cache, the usage logger, and optionally a clock (<code>now</code>) and a request ID generator (<code>newRequestId</code>).
+	 * @returns {AIGateway}
+	 *
+	 * @example <caption>Production (see app.ts)</caption>
+	 * const gateway = new AIGateway({
+	 *   llm: new GeminiClient(config.gemini),
+	 *   settings: new AISettings(new AiSettingsRepository(getAiPool())),
+	 *   logger: new UsageLogger(new AiRequestLogRepository(getAiPool()))
+	 * });
+	 *
+	 * @example <caption>Test</caption>
+	 * const gateway = new AIGateway({
+	 *   llm: { async generate() { return { text: 'Hi', blocked: false }; } },
+	 *   settings: new AISettings(new FakeSettingsSource()),
+	 *   logger: new UsageLogger(new FakeRequestLogStore()),
+	 *   newRequestId: () => 'req-1'
+	 * });
+	 */
 	constructor(deps: AIGatewayDeps) {
 		this.deps = {
 			now: Date.now,
@@ -41,11 +62,49 @@ export class AIGateway {
 	}
 
 	/**
-	 * Answers one question for a verified user. Never throws: every failure becomes a
-	 * ChatResult with a status code, and every call writes exactly one AiRequestLog row.
+	 * Entry point of the AI module for <code>/api/ai/chat</code> and <code>/api/ai/prompt</code>. Answers one question for a verified user: checks the kill switch (<code>ai.enabled</code> in <code>SystemSetting</code>), calls the model, and writes exactly one <code>AiRequestLog</code> row with tokens, estimated cost and latency, never the message text. Never throws: every failure becomes a <code>ChatResult</code> with a status code. Code outside <code>src/ai/</code> must call only this method (specs/003 plan, "Structure Decision").
+	 * @param {AIIdentity} identity - The verified caller, built by the <code>LoadIdentity</code> middleware. The only source of identity; nothing in the message or history can change it.
+	 * @param {ChatRequest} request - Validated request body: <code>message</code> is 1-2000 characters; <code>history</code> has at most 20 turns, oldest first.
+	 * @returns {Promise<ChatResult>}
 	 *
-	 * @param identity - The verified caller (from LoadIdentity). The only source of identity.
-	 * @param request - A validated body: message 1-2000 characters, history of at most 20 turns.
+	 * @example <caption>Usage</caption>
+	 * const gateway = new AIGateway({ llm: new GeminiClient(config.gemini), settings, logger });
+	 * const result = await gateway.chat(
+	 *   { userId: '23127001', roles: ['student'], facultyId: 'IT' },
+	 *   { message: 'How do I earn training points?', history: [] }
+	 * );
+	 *
+	 * @example <caption>Result (answered)</caption>
+	 * {
+	 *   "statusCode": 200,
+	 *   "requestId": "6f1c2a9e-0b7d-4a51-9c43-2f8e1d5a7b10",
+	 *   "outcome": "answered",
+	 *   "blocked": false,
+	 *   "reply": "You earn training points by joining verified activities..."
+	 * }
+	 *
+	 * @example <caption>Result (assistant switched off by an administrator)</caption>
+	 * {
+	 *   "statusCode": 200,
+	 *   "requestId": "0d4e8b2c-5f61-4c7a-8e93-1a2b3c4d5e6f",
+	 *   "outcome": "disabled",
+	 *   "blocked": true,
+	 *   "reply": "The assistant is temporarily unavailable. Please try again later."
+	 * }
+	 *
+	 * @example <caption>Result (AI service out of free quota)</caption>
+	 * {
+	 *   "statusCode": 503,
+	 *   "requestId": "9a8b7c6d-1e2f-4a3b-8c4d-5e6f7a8b9c0d",
+	 *   "outcome": "error",
+	 *   "blocked": false,
+	 *   "message": "AI assistant is temporarily unavailable, please try again later",
+	 *   "retryAfterSeconds": 30
+	 * }
+	 *
+	 * @response
+	 * - `200 OK` - Answered (`outcome: "answered"`); refused by the provider's safety filter (`outcome: "blocked_output"`, fixed refusal); or switched off (`outcome: "disabled"`, fixed unavailable text)
+	 * - `503 SERVICE_UNAVAILABLE` - AI settings could not be read, or the AI service failed, timed out or ran out of quota (`retryAfterSeconds: 30` for quota)
 	 */
 	async chat(identity: AIIdentity, request: ChatRequest): Promise<ChatResult> {
 		const { llm, settings, logger, now, newRequestId } = this.deps;

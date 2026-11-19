@@ -1,5 +1,5 @@
 import type { AIGateway } from '../ai/AIGateway.ts';
-import type { AIIdentity } from '../ai/types.ts';
+import type { AIIdentity } from '../types/AIIdentity.ts';
 import { generate503Response } from '../helper/generate503Response.ts';
 import { ServiceResponse } from '../types/ServiceResponse.ts';
 import type { PromptRequest } from '../types/PromptRequest.ts';
@@ -119,6 +119,7 @@ export class AIService {
 	 * - `200 OK` - Successful request. If the AI refuses for safety reasons, `blocked` is `true` and `reply` is a fixed polite refusal
 	 * - `400 BAD_REQUEST` - Invalid body; `payload.data.details` lists every problem (missing/blank/too long message, bad history)
 	 * - `401 UNAUTHORIZED` - Missing, malformed or invalid Bearer token
+	 * - `403 FORBIDDEN` - The caller's roles do not include the `ai.chat` permission
 	 * - `405 METHOD_NOT_ALLOWED` - The endpoint does not support the HTTP method specified
 	 * - `415 UNSUPPORTED_MEDIA_TYPE` - Content-Type is not exactly `application/json`
 	 * - `429 TOO_MANY_REQUESTS` - More than 10 requests in a minute; see the `Retry-After` header

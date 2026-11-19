@@ -46,10 +46,10 @@ description: "Task list for AI Assistant Safety, Usage Limits and Admin Monitori
 - [x] T010 [P] Unit test for identity loading in `server/tests/unit/ai/identity.test.ts` (roles and faculty from the token, otherwise from `UserRole` and `Student`)
 - [x] T011 Extend `validateAccessToken` in `server/src/middleware/ValidatorMiddleware.ts` to put `roles` and `faculty_id` on `res.locals.user` (done as a separate `middleware/LoadIdentity.ts` on AI routes instead of changing the shared token check)
 - [x] T012 [P] Create `server/src/middleware/RequirePermission.ts` with a unit test in `server/tests/unit/RequirePermission.test.ts`
-- [x] T013 [P] Create `server/src/repositories/ai/AiSettingsRepository.ts` and `server/src/ai/settings/AISettings.ts` (typed `ai.*` values, 10 s cache) with `server/tests/unit/ai/AISettings.test.ts`
+- [x] T013 [P] Create `server/src/repositories/AiSettingsRepository.ts` and `server/src/ai/settings/AISettings.ts` (typed `ai.*` values, 10 s cache) with `server/tests/unit/ai/AISettings.test.ts`
 - [x] T014 Extend `server/src/clients/LLMClient.ts` with token counts in results, `classify(prompt, schema)` and `embed(texts, taskType)`; update the fake client in `server/tests/helpers/fakeLLMClient.ts` (token counts done; `classify` and `embed` moved to T026 and T066, where they are first used)
 - [x] T015 Implement the new `LLMClient` methods and `usageMetadata` parsing in `server/src/clients/GeminiClient.ts`; extend `server/tests/unit/GeminiClient.test.ts` with stubbed `fetch`
-- [x] T016 [P] Create `server/src/repositories/ai/AiRequestLogRepository.ts` and `server/src/ai/logging/UsageLogger.ts` (cost from `ai.price.<model>`; a logging failure never changes the reply) with `server/tests/unit/ai/UsageLogger.test.ts`
+- [x] T016 [P] Create `server/src/repositories/AiRequestLogRepository.ts` and `server/src/ai/logging/UsageLogger.ts` (cost from `ai.price.<model>`; a logging failure never changes the reply) with `server/tests/unit/ai/UsageLogger.test.ts`
 - [x] T017 Create `server/src/ai/AIGateway.ts` with `chat(identity, request)` reproducing phase 1 behaviour plus a log row; move `services/aiSystemPrompt.ts` to `server/src/ai/prompt/systemPrompt.ts` with a version constant
 - [x] T018 Make `server/src/services/AIService.ts` delegate to `AIGateway`; add `/chat` and keep `/prompt` as an alias in `server/src/routes/AIRoute.ts`; wire in `server/src/app.ts`
 - [x] T019 Integration test `server/tests/integration/aiChat.test.ts`: `/chat` and `/prompt` answer as in `002`, and each request writes one `AiRequestLog` row
@@ -78,7 +78,7 @@ description: "Task list for AI Assistant Safety, Usage Limits and Admin Monitori
 - [ ] T026 [P] [US1] Create `server/src/ai/guards/TopicClassifier.ts` (flash-lite JSON, 2 s timeout, decision table of design 4.2, `unclassified` on failure)
 - [ ] T027 [P] [US1] Create `server/src/ai/history/HistorySigner.ts` (HMAC-SHA256, base64url, constant-time compare) and add signature validation to `server/src/helper/validatePromptRequest.ts`
 - [ ] T028 [US1] Create `server/src/ai/guards/OutputGuard.ts`: canary and prompt fragments, code, personal data, link allowlist, length (grounding checks come in US5)
-- [ ] T029 [P] [US1] Create `server/src/repositories/ai/AiFlagRepository.ts` and `server/src/ai/flags/FlagService.ts` (category, severity, metadata only until US4 adds content)
+- [ ] T029 [P] [US1] Create `server/src/repositories/AiFlagRepository.ts` and `server/src/ai/flags/FlagService.ts` (category, severity, metadata only until US4 adds content)
 - [ ] T030 [US1] Wire input guard, signer and output guard into `AIGateway.chat`; return `blocked`, `flagged`, `request_id`, `signature`
 - [ ] T031 [US1] Update `docs-api` style doc for `/api/ai/chat` responses (blocked, flagged, signature)
 
@@ -100,9 +100,9 @@ description: "Task list for AI Assistant Safety, Usage Limits and Admin Monitori
 
 ### Implementation for User Story 2
 
-- [ ] T035 [US2] Create `server/src/repositories/ai/AiUsageWindowRepository.ts` (row lock, reset, reserve, settle) and `server/src/ai/limits/UsageBars.ts`
+- [ ] T035 [US2] Create `server/src/repositories/AiUsageWindowRepository.ts` (row lock, reset, reserve, settle) and `server/src/ai/limits/UsageBars.ts`
 - [ ] T036 [P] [US2] Create `server/src/ai/limits/InFlightGuard.ts` and `server/src/ai/limits/RepeatCache.ts`
-- [ ] T037 [P] [US2] Create `server/src/repositories/ai/AiUserQuotaRepository.ts` and `server/src/ai/limits/CooldownPolicy.ts` (3 flags in 1 hour → 24 h)
+- [ ] T037 [P] [US2] Create `server/src/repositories/AiUserQuotaRepository.ts` and `server/src/ai/limits/CooldownPolicy.ts` (3 flags in 1 hour → 24 h)
 - [ ] T038 [P] [US2] Create `server/src/ai/limits/ProjectLimiter.ts` (RPM, RPD re-seeded from today's log, 5 concurrent calls, 5 s wait)
 - [ ] T039 [P] [US2] Create `server/src/middleware/IpRateLimit.ts` and set a 16 KB body limit on AI routes in `server/src/app.ts`
 - [ ] T040 [US2] Wire all limits into `AIGateway.chat` in the order of contracts/ai-chat-api.md; include `usage` in replies
@@ -152,7 +152,7 @@ description: "Task list for AI Assistant Safety, Usage Limits and Admin Monitori
 
 ### Implementation for User Story 4
 
-- [ ] T055 [US4] Write the notice text (design 7.1) in `server/src/ai/prompt/notice.ts`; create `server/src/repositories/ai/AiConsentRepository.ts`; add the notice check to `AIGateway.chat`
+- [ ] T055 [US4] Write the notice text (design 7.1) in `server/src/ai/prompt/notice.ts`; create `server/src/repositories/AiConsentRepository.ts`; add the notice check to `AIGateway.chat`
 - [ ] T056 [US4] Add `GET /api/ai/notice` and `POST /api/ai/notice/accept` to `server/src/routes/AIRoute.ts` and `AIController.ts`
 - [ ] T057 [US4] Create `server/src/ai/guards/Redactor.ts`; make `FlagService` store redacted content with `expires_at`; add "saved for review" to flagged replies
 - [ ] T058 [US4] Add flag endpoints to `AdminAIController` and `AdminAIRoute` with `AuditLog`
@@ -180,9 +180,9 @@ description: "Task list for AI Assistant Safety, Usage Limits and Admin Monitori
 ### Implementation for User Story 5
 
 - [ ] T066 [P] [US5] Create `server/src/ai/retrieval/Chunker.ts` (about 800 tokens, split on headings and paragraphs) and the embedding call with normalisation
-- [ ] T067 [US5] Create `server/src/repositories/ai/AiKnowledgeRepository.ts` and `server/src/ai/retrieval/Indexer.ts` (content hash, rule filter on chunks → `flagged`)
+- [ ] T067 [US5] Create `server/src/repositories/AiKnowledgeRepository.ts` and `server/src/ai/retrieval/Indexer.ts` (content hash, rule filter on chunks → `flagged`)
 - [ ] T068 [US5] Create `server/src/ai/retrieval/Retriever.ts` with the filtered query of design 6.3 and the distance threshold
-- [ ] T069 [US5] Create `server/src/repositories/ai/AiToolViewsRepository.ts` and the five student tools in `server/src/ai/tools/student/`; create `server/src/ai/tools/ToolRegistry.ts`
+- [ ] T069 [US5] Create `server/src/repositories/AiToolViewsRepository.ts` and the five student tools in `server/src/ai/tools/student/`; create `server/src/ai/tools/ToolRegistry.ts`
 - [ ] T070 [US5] Add the function-calling loop (max 3 rounds, `AiToolCall` rows) to `GeminiClient` and `AIGateway`; strip identifying fields from tool results (FR-013)
 - [ ] T071 [US5] Add grounding checks (activities and points must come from sources) to `OutputGuard`; return `sources`
 - [ ] T072 [US5] Add the 5-minute re-index of changed activities to `aiMaintenance` and the `POST /knowledge/reindex` endpoint

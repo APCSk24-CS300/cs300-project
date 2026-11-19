@@ -11,6 +11,13 @@ const config: any = {
 		model: process.env.GEMINI_MODEL || process.env.GEMINI_BACKUP_MODEL,
 		timeoutMs: 20000
 	},
+	// db: {
+	// 	dbHost: process.env.LOCAL_DB_HOST,
+	// 	dbUser: process.env.LOCAL_DB_USER,
+	// 	dbPassword: process.env.LOCAL_DB_PASSWORD,
+	// 	dbName: process.env.LOCAL_DB_NAME,
+	// 	dbPort: process.env.LOCAL_DB_PORT
+	// },
 	db: {
 		dbHost: 'db',
 		dbUser: process.env.POSTGRES_USER,

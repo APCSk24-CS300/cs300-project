@@ -14,9 +14,17 @@ export class LLMError extends Error {
 	}
 }
 
+/** Tokens a call used, as reported by the provider. Output includes any "thinking" tokens. */
+export interface LLMUsage {
+	inputTokens: number,
+	outputTokens: number
+}
+
 export interface LLMResult {
 	text: string,       // the answer ('' when blocked)
-	blocked: boolean    // the AI service refused for safety reasons
+	blocked: boolean,   // the AI service refused for safety reasons
+	usage?: LLMUsage,   // missing when the provider did not report it
+	model?: string      // the model that answered
 }
 
 /**

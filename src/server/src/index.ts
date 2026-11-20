@@ -1,6 +1,7 @@
 // libs
 import { createApp } from './app.ts';
 import config from './config/config.ts';
+import { closeAiPool } from './connections/aiDb.ts';
 
 // this will be added when i make the database
 // import DbConnection from './connections/DbConnection.ts';
@@ -22,6 +23,7 @@ async function shutdown() {
 		}
 
 		// await DbConnection.pool.end();
+		await closeAiPool();
 	});
 }
 

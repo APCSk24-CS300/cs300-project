@@ -1,5 +1,5 @@
 import { LLMError } from './LLMClient.ts';
-import type { LLMClient, LLMResult } from './LLMClient.ts';
+import type { LLMClient, LLMResult, LLMUsage } from './LLMClient.ts';
 import type { ConversationTurn } from '../types/PromptRequest.ts';
 
 export interface GeminiOptions {
@@ -78,8 +78,9 @@ export class GeminiClient implements LLMClient {
 			throw new LLMError('bad_response', 'Gemini returned a body that is not JSON');
 		}
 
+		const usage = readUsage(json?.usageMetadata);
 		if (json?.promptFeedback?.blockReason) {
-			return { text: '', blocked: true };
+			return { text: '', blocked: true, usage, model };
 		}
 		const candidate = json?.candidates?.[0];
 		const parts: unknown = candidate?.content?.parts;
@@ -88,10 +89,21 @@ export class GeminiClient implements LLMClient {
 			: '';
 		if (text.length === 0) {
 			if (candidate?.finishReason === 'SAFETY' || candidate?.finishReason === 'PROHIBITED_CONTENT') {
-				return { text: '', blocked: true };
+				return { text: '', blocked: true, usage, model };
 			}
 			throw new LLMError('bad_response', 'Gemini returned no text');
 		}
-		return { text, blocked: false };
+		return { text, blocked: false, usage, model };
 	}
+}
+
+// Gemini's usageMetadata. 2.5 models report thinking separately (thoughtsTokenCount);
+// it is billed as output, so it counts as output here.
+function readUsage(meta: any): LLMUsage | undefined {
+	if (!meta || typeof meta !== 'object') return undefined;
+	const n = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? Math.round(v) : 0);
+	return {
+		inputTokens: n(meta.promptTokenCount),
+		outputTokens: n(meta.candidatesTokenCount) + n(meta.thoughtsTokenCount)
+	};
 }

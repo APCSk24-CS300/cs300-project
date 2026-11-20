@@ -139,8 +139,8 @@
 | BR-NOT-09 | Activity Managers must receive notifications when recognition requests or appeals are assigned to them. | N | UC-25/26/28 |
 | BR-NOT-10 | Activity Managers must receive notifications when assigned requests are updated, resubmitted, or withdrawn by students. | N | UC-27/28 |
 | BR-NOT-11 | Activity Managers must receive reminders about pending participation verification before the five-day deadline following activity completion. | N | Proposed Participation Record Deadline |
-| BR-NOT-XX | Students must receive notifications when their recognition requests or appeals are submitted, approved, rejected, or require additional information. | N | UC-25/26/27/28 |
-
+| BR-NOT-12 | Students must receive notifications when their recognition requests or appeals are submitted, approved, rejected, or require additional information. | N | UC-25/26/27/28 |
+| BR-NOT-13 | If an Activity Manager fails to complete participation verification within five days after an activity ends, the system must mark the verification as overdue and notify the responsible manager. |  |  |
 ### 2.8 Administration, data exchange, reports, and record integrity
 
 | ID | Business rule | Origin | Source |

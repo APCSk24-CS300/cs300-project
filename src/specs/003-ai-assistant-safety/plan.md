@@ -4,7 +4,7 @@
 
 **Input**: Feature specification from `/specs/003-ai-assistant-safety/spec.md`
 
-**Design reference**: `docs/analysis-and-design/ai-chatbot-design.md` v0.2.0 (approved by the team on 2026-11-18). This plan does not repeat the design; it says what is built, where, and in which order. Section numbers below (for example "design 6.3") point into that document.
+**Design reference**: `docs/analysis-and-design/ai-chatbot/ai-chatbot-design.md` v0.3.0 (approved by the team on 2026-11-18). This plan does not repeat the design; it says what is built, where, and in which order. Section numbers below (for example "design 6.3") point into that document.
 
 ## Summary
 
@@ -41,7 +41,7 @@ Extend the phase 1 assistant (`POST /api/ai/prompt`, `AIService`, `GeminiClient`
 
 | Principle | How this plan complies | Status |
 |---|---|---|
-| I. Architecture aligned with `docs/` | Implements the approved design `docs/analysis-and-design/ai-chatbot-design.md` and UC-06. The design was reviewed with the team before planning, as Principle I requires for a new architecture element (AI Gateway). | Pass |
+| I. Architecture aligned with `docs/` | Implements the approved design `docs/analysis-and-design/ai-chatbot/ai-chatbot-design.md` and UC-06. The design was reviewed with the team before planning, as Principle I requires for a new architecture element (AI Gateway). | Pass |
 | I. Clear interfaces; logic apart from HTTP | `AIGateway.chat(identity, request)` is the only entry point of the module. Controllers only validate and map to HTTP. Guards, limits, retrieval and tools are separate classes behind interfaces. | Pass |
 | I. UI components without business logic | Chat and admin pages call services in `features/ai-assistant/services`; bar maths and notice rules stay on the server. | Pass |
 | II. Clear responsibilities; documented public interfaces | One class per guard, limit, tool. TSDoc on `AIGateway.chat`, each tool (what it may return), `UsageBars` (window rules), `OutputGuard` (what it blocks). The design document covers what comments cannot. | Pass |

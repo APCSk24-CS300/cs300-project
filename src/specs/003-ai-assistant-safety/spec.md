@@ -8,7 +8,7 @@
 
 **Input**: User description: "Act as a senior AI engineer. If you are given a task to build or integrate an AI chatbot to the system, like ours, then what would you do? Like how the admin of the system can view the AI usage or stuffs related to AI, or I don't want the user to do like prompt injection to our system. Like one day the user would ask our learning management system to code a Python file. Like there's nothing related to our LMS. Or a student can query the whole db." Follow-up decisions (2026-11-18): show a disclaimer that chats are not stored except flagged suspicious attempts; start the AI part as a module inside the server; give managers help with hosting rules, allowed venues and matching an event to a training-points section; stay on the free AI tier; prevent spam and DDoS, with two usage bars per user (one resetting every 5 hours, one weekly).
 
-**Related documents**: Design `docs/analysis-and-design/ai-chatbot-design.md` (v0.2.0); phase 1 spec `specs/002-ai-prompt-endpoint/spec.md`; UC-06 "Chat with AI Student Assistant" (`docs/requirements/use-case-specifications.md`); NFR-SEC-03/09/10/11 and NFR-REL-04/05/06 (`docs/requirements/vision-document.md`).
+**Related documents**: Design `docs/analysis-and-design/ai-chatbot/ai-chatbot-design.md` (v0.3.0); phase 1 spec `specs/002-ai-prompt-endpoint/spec.md`; UC-06 "Chat with AI Student Assistant" (`docs/requirements/use-case-specifications.md`); NFR-SEC-03/09/10/11 and NFR-REL-04/05/06 (`docs/requirements/vision-document.md`).
 
 ## Scope
 

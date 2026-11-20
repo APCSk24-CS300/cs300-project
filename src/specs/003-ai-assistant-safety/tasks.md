@@ -217,7 +217,7 @@ description: "Task list for AI Assistant Safety, Usage Limits and Admin Monitori
 ## Phase 9: Polish & Cross-Cutting Concerns
 
 - [ ] T080 [P] TSDoc on `AIGateway.chat`, every tool, `UsageBars`, `OutputGuard`, `HistorySigner`; regenerate TypeDoc
-- [ ] T081 [P] Add `docs/analysis-and-design/ai-chatbot-design.md` changes to the C4 container diagram, tech stack and ERD (design section 10)
+- [ ] T081 [P] Add `docs/analysis-and-design/ai-chatbot/ai-chatbot-design.md` changes to the C4 container diagram, tech stack and ERD (design section 10)
 - [ ] T082 [P] API docs for `/api/ai/*` and `/api/admin/ai/*` in the style of the register endpoint doc
 - [ ] T083 Run `npm run redteam` against Gemini and record the results per category in this feature's folder
 - [ ] T084 Run every check in quickstart.md

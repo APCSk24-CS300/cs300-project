@@ -2,7 +2,7 @@
 
 **Feature**: `003-ai-assistant-safety` | **Date**: 2026-11-18
 
-Each decision lists what was chosen, why, and what else was considered. Background and diagrams are in `docs/analysis-and-design/ai-chatbot-design.md`.
+Each decision lists what was chosen, why, and what else was considered. Background and diagrams are in `docs/analysis-and-design/ai-chatbot/ai-chatbot-design.md`.
 
 ## R1. Where the AI code lives
 

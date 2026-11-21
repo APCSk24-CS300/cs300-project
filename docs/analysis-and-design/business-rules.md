@@ -122,7 +122,7 @@
 | BR-REQ-17 | Finalizing a request and applying all associated participation, recognition, score, and required audit changes must succeed or fail together. A request must never be Approved while its mandatory score/record updates are incomplete. | N | UC-28 A9; V NFR-REL-01/03 |
 | BR-REQ-18 | A potentially duplicate recognition request may be accepted for review, but an identified duplicate must be rejected rather than granting duplicate credit. | N | UC-25 A4; V NFR-REL-03 |
 | BR-REQ-19 | An approved recognition must be credited to the student who submitted the underlying recognition request, not to another student. | E | BR `Recognition` identity constraint; UC-25/28; V NFR-SEC-04 |
-| BR-REQ-19 | An appeal submission must identify the related activity and the disputed participation record or training score (if available), issue's description, and include supporting evidence. |  |  |
+| BR-REQ-20 | An appeal submission must identify the related activity and the disputed participation record or training score (if available), issue's description, and include supporting evidence. |  |  |
 
 ### 2.7 Notifications and external services
 

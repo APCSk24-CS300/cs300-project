@@ -11,19 +11,19 @@
 | BR-ACC-05 | University Administrators may manage user accounts, roles, and permissions; invalid or unauthorized changes must be rejected. | R | BR Semantic constraints; UC-29; V Feature 10 |
 | BR-ACC-06 | A change to a user's permissions must be enforced on subsequent protected requests, including when that user has an existing session. | N | UC-29 A10 |
 | BR-ACC-07 | Users may change their own phone number, password, and avatar within the supported validation rules. | N | UC-03; V Feature 2 |
-| BR-ACC-08 | Full name, student ID, and faculty are read-only in the user's self-service profile; users must not update another person's profile. | N | UC-03 A6 |
+| BR-ACC-08 | Full name, ID, and faculty are read-only in the user's self-service profile; users must not update another person's profile. | N | UC-03 A6 |
 | BR-ACC-09 | Passwords must be stored as salted hashes; password changes require valid current-password verification and a new password of at least six characters. | R | BR `User.password_hash`; V NFR-SEC-02; UC-03 A2/A7 |
-| BR-ACC-10 | Profile avatar uploads must be JPG or PNG images not exceeding 5 MB; invalid uploads must not replace the current avatar. | N | UC-03 A3/A8/A9 |
+| BR-ACC-10 | Profile avatar uploads must be JPG or PNG images not exceeding 10 MB; invalid uploads must not replace the current avatar. | N | UC-03 A3/A8/A9 |
 
 ### 2.2 Activity ownership, management, discovery, and following
 
 | ID | Business rule | Origin | Source |
 | --- | --- | --- | --- |
 | BR-ACT-01 | Activities are managed within an authorized organizational unit; a manager cannot create or modify activities belonging to another unit without authorization. | R | BR `ActivityOrganizer`; UC-18; V NFR-SCA-INT-01 |
-| BR-ACT-02 | Each activity must provide valid description, schedule,  associated semester, location (campus and room), category, capacity, registration period, cancellation deadline, waiting list availability, participation requirements (student's year and faculty), specialized topic (A, B, or Neither), and applicable score criteria before publication. | R | BR `Activity`/publish constraint; UC-18; V Feature 5 |
+| BR-ACT-02 | Each activity must provide valid description, schedule,  associated semester, location (campus and room/online platform), category, capacity, registration period, cancellation deadline, waiting list availability, participation requirements (student's year and faculty), specialized topic (A, B, or Neither), and applicable score criteria before publication. | R | BR `Activity`/publish constraint; UC-18; V Feature 5 |
 | BR-ACT-03 | An activity's schedule must contain valid time intervals, with each session's start time preceding its end time. | E | BR Explicit constraints; UC-18 |
 | BR-ACT-04 | An activity's registration opening time must precede its closing time. | E | BR Explicit constraints; UC-10/18 |
-| BR-ACT-05 | An activity must have positive capacity. | E | BR Explicit constraints; UC-10/18 |
+| BR-ACT-05 | An activity may have either limited or unlimited capacity. If a limit is specified, it must be positive and comply with applicable university policies. | E | BR Explicit constraints; UC-10/18 |
 | BR-ACT-06 | Activities must follow these valid status transitions: Draft → Published → Ongoing → Completed, with cancellation allowed from Draft, Published, or Ongoing. Completed and Cancelled are terminal states. All other transitions, such as Draft → Ongoing, Published → Completed, or Ongoing → Published, are prohibited.| R | BR `Activity.status`; V NFR-USA-12; UC-18 A7 |
 | BR-ACT-07 | Only activities currently visible to the student may appear as available discovery results; hidden, cancelled, or unavailable activities must not be presented as registrable. | N | UC-04 A6; UC-10 A2 |
 | BR-ACT-08 | Discovery must support filtering by faculty, date, location (campus), specialized topic (A, B), training-score criteria, and registration status, with current activity details shown to the student. | N | V Feature 3; UC-04 |
@@ -31,11 +31,14 @@
 | BR-ACT-10 | A student may unfollow a previously followed activity; the system must not create duplicate active follow relationships. | N | UC-05 A1/A2 |
 | BR-ACT-11 | An assigned Activity Manager may publish announcements only for activities within their management scope. | R | BR `ActivityAnnouncement`; UC-19 |
 | BR-ACT-12 | Relevant updates and announcements to published activities must trigger notification handling for affected followers and registrants. | N | UC-18 A9; UC-19; UC-17 |
-| BR-ACT-13 | When an activity's capacity is reduced below its confirmed participant count, the excess most-recently registered confirmed participants must be moved to the front of the waiting list and notified. | N | UC-18 A8 |
-| BR-ACT-14 | Activity Managers must define the schedule of each session and the minimum number of sessions students must attend to qualify for training scores. The total number of sessions is determined by the scheduled sessions, and the minimum required sessions must be between 1 and the total. If the number of sessions changes, the minimum attendance requirement must be revalidated and adjusted if necessary. |  |  |
+| BR-ACT-13 | When an activity's capacity is reduced below its confirmed participant count, the excess most-recently registered confirmed participants must be moved to the front of the waiting list (if enabled) and notified. | N | UC-18 A8 |
+| BR-ACT-14 | For activity with multiple sessions, Activity Managers must define the schedule, capacity, location of each session and the minimum number of sessions students must attend to qualify for training scores. The total number of sessions is determined by the scheduled sessions, and the minimum required sessions must be between 1 and the total. If the number of sessions changes, the minimum attendance requirement must be revalidated and adjusted if necessary. |  |  |
 | BR-ACT-15 | All published activity announcements must be displayed on the corresponding activity's detail page. | N | V Feature 5; UC-19 |
 | BR-ACT-16 | An activity may span a maximum of two consecutive semesters, but its training scores must be awarded in only one designated semester. | N | Proposed |
-
+| BR-ACT-17 | Activities may take place within a single day or span multiple days. |  |  |
+| BR-ACT-18 | Each scheduled session must specify whether it is online, offline, or hybrid. Online sessions must provide an access link, offline sessions must provide a physical location, and hybrid sessions must provide both. |  |  |
+| BR-ACT-19 | A session can only have one location, schedule, capacity. |  |  |
+| BR-ACT-23 | Activities with flexible participation windows must specify their start time, end time, participation requirements, and applicable location or online access information. |  |  |
 ### 2.3 Registration, cancellation, and waiting lists
 
 | ID | Business rule | Origin | Source |
@@ -46,7 +49,7 @@
 | BR-REG-05 | A confirmed registration must not be recorded if doing so would exceed the activity's available capacity, including under concurrent requests. | E | BR capacity/serialization constraints; V NFR-SCA-PHY-03; UC-10 A8 |
 | BR-REG-07 | Waiting-list entries must be unique for each student and activity and processed in strict first-in, first-out (FIFO) order, without skipping or double promotion. | R | BR waiting-list assumption; V NFR-REL-02; UC-13/14 |
 | BR-REG-08 | When a reserved place is released, the system must process applicable waiting-list promotion automatically, revalidating eligibility and preserving strict FIFO among eligible waiting entries. | R | BR serialized promotion; V Workflow 1; UC-11 A7; UC-13 |
-| BR-REG-09 | Students register for an activity as a whole rather than individual sessions.|  |  |
+| BR-REG-09 | Students register for an activity as a whole rather than individual sessions. For activities with selectable sessions, their selected sessions must be associated with the activity registration.|  |  |
 | BR-REG-10 | A manager may inspect waiting-list entries but must not bypass FIFO order unless the team approves an explicit override policy. | N | UC-14 A9; V NFR-REL-02 |
 | BR-REG-11 | Students may cancel a registration only while cancellation is permitted and only for their own registration. | E | BR cancellation constraints; UC-11 |
 | BR-REG-12 | Cancelling a confirmed registration must release its capacity and initiate waiting-list handling without leaving an inconsistent registration or seat count. | R | BR transaction constraints; UC-11; V NFR-REL-01/02 |
@@ -54,10 +57,15 @@
 | BR-REG-14 | Schedule conflicts must produce a warning before registration is finalized; the student may proceed or cancel rather than being automatically rejected. | R | BR schedule-conflict constraint; V Workflow 1; UC-10 A6 |
 | BR-REG-15 | Cancellation, capacity changes, and waiting-list promotion must preserve seat counts and queue consistency under concurrent operations. | R | BR serialized updates; V NFR-REL-01/02; UC-10/11/14/18 |
 | BR-REG-16 | Students must be able to view their current registration state. | N | UC-12 |
-| BR-REG-17 | Confirmed activities appear in the student's personal calendar; waiting-list activities may be shown but must be clearly labelled as unconfirmed. Followed activities may also be displayed. | N | UC-10/15 |
+| BR-REG-17 | Confirmed activities must appear in the student's personal calendar, displaying their selected sessions or flexible participation windows as applicable. Waitlisted and followed activities may also appear but must be clearly distinguished from confirmed activities. | N | UC-10/15 |
 | BR-REG-18 | The waiting list feature is enabled only when the Activity Manager explicitly allows it for an activity. |  |  |
-| BR-REG-19 | The default registration cancellation deadline is 72 hours before the activity starts. Activity Managers may configure this deadline, but it must not be later than the activity's start time. If the activity's start time changes, the cancellation deadline must be recalculated accordingly. |  |  |
+| BR-REG-19 | The default registration cancellation deadline is 72 hours before the activity starts. Activity Managers may configure this deadline, but it must not be later than the activity's end time. If the activity's end time changes, the cancellation deadline must be recalculated accordingly. |  |  |
 | BR-REG-20 | A registration can have three statuses: Confirmed, Waitlisted, or Cancelled. Waitlisted registrations become Confirmed when a spot becomes available, while Confirmed registrations may return to Waitlisted when capacity is reduced or become Cancelled when the student cancels. Leaving the waiting list simply removes the entry without creating a Cancelled status. |  |  |
+| BR-REG-21 | When registering for an activity with multiple selectable sessions, students must select at least one session. The system must warn them if the number of selected sessions is below the minimum required to qualify for training scores. |  |  |
+| BR-REG-22 | Students must register individually for activities involving team participation. Team formation and membership management are handled by Activity Managers outside the system using external tools. |  |  |
+| BR-REG-24 | When a session has a separate capacity limit, the system must prevent confirmed selections from exceeding that limit and inform students of available alternatives. |  |  |
+| BR-REG-25 | Authorized Activity Managers may modify the registration lists of activities within their management scope. All changes must comply with applicable registration, eligibility, capacity, and waiting-list rules, be recorded in an audit history, and trigger notifications to affected students. |  |  |
+| BR-REG-26 | Waiting lists are only available for activities with exactly one scheduled session. Activities with multiple sessions is not eligible for waiting lists. |  |  |
 
 ### 2.4 Attendance and verified participation
 
@@ -141,6 +149,13 @@
 | BR-NOT-11 | Activity Managers must receive reminders about pending participation verification before the five-day deadline following activity completion. | N | Proposed Participation Record Deadline |
 | BR-NOT-12 | Students must receive notifications when their recognition requests or appeals are submitted, approved, rejected, or require additional information. | N | UC-25/26/27/28 |
 | BR-NOT-13 | If an Activity Manager fails to complete participation verification within five days after an activity ends, the system must mark the verification as overdue and notify the responsible manager. |  |  |
+
+### 2.8 Calendar
+| BR-CAL-01 | Each selected session must be displayed according to its actual start and end times, including sessions spanning multiple days. Separate sessions must not be represented as one continuous event. |  |  |
+| BR-CAL-02 | Calendar entries must display the activity title, schedule and applicable physical location or online access information. |  |  |
+| BR-CAL-03 | When a registered session is rescheduled, relocated, or cancelled, the student's in-app calendar must be updated accordingly. |  |  |
+| BR-CAL-04 | Calendar exports must contain the latest eligible session information at the time of export. |  |  |
+
 ### 2.8 Administration, data exchange, reports, and record integrity
 
 | ID | Business rule | Origin | Source |
@@ -156,7 +171,17 @@
 | BR-ADM-09 | Every score adjustment, request decision, and system-setting modification must have an audit record protected from modification by ordinary users. | R | BR `ScoreChange`; V NFR-SEC-06 |
 | BR-ADM-10 | All registration, cancellation, and request-resolution operations must preserve consistency: an operation either commits all required related records or none of them. | R | BR transactional constraints; V NFR-REL-01; UC-11/28 |
 | BR-ADM-11 | Administrators must assign Student Affairs Office Managers to specific faculties. Each Manager may be responsible for one or more faculties. Activity recognition requests must be assigned to an authorized Manager responsible for the submitting student's faculty. If no eligible Manager is available, the request remains Pending Assignment. |  |  |
-| BR-ADM-12 | A user may have multiple roles, including Student, Activity Manager, and University Administrator. Each role must be assigned independently by an authorized Administrator and grant only its associated permissions. |  |  |
+| BR-ADM-12 | A user may have only one role per account. Users who need multiple roles, such as Student, Activity Manager, or University Administrator, must use separate accounts for each role. Each account must be assigned its role by an authorized Administrator and grant only the permissions associated with that role. |  |  |
+
+### 2.9 Dashboard
+| ID | Business Rule | Action |
+|---|---|---|
+| BR-OVR-01 | The dashboard must display information relevant to the user's assigned roles and permissions.|  |  |
+| BR-OVR-02 | Students may view summaries of their upcoming registered activities, registration statuses, training scores, and submitted requests. All displayed information must belong to the authenticated student. |  |  |
+| BR-OVR-03 | Activity Managers may view summaries of activities within their management scope, including registration statistics, upcoming activities, and pending or overdue participation verifications. |  |  |
+| BR-OVR-04 | University Administrators may view system-wide summaries of activities, registrations, participation, and training scores, subject to their assigned permissions. |  |  |
+| BR-OVR-05 | Dashboard statistics must accurately reflect the underlying records and their current statuses. Cancelled registrations must not be counted as confirmed participants, and unverified participation must not contribute to awarded training scores. |  |  |
+| BR-OVR-06 | Dashboard information must reflect the selected semester or reporting period, where applicable. |  |  |
 
 ## Appendix 
 ### System Administration Configuration
@@ -171,3 +196,15 @@
 | **University Service Links** | Manage external links to university services such as Moodle, Student Portal, and the university library. | Vision Feature 11 |
 | **Specialized Topics** | Manage specialized topic classifications, such as Topic A and Topic B. | Proposed |
 | **System-wide Policies** | Configure default policies, such as registration cancellation deadlines, participation verification deadlines, and notification schedules. | Proposed |
+
+### Activity Categories
+| ID | Category | Description | Example Activities |
+|---|---|---|---|
+| CAT-01 | Academic & Research | Activities related to academic learning, research, and knowledge development. | Academic competitions, research seminars, workshops |
+| CAT-02 | Career & Professional Development | Activities that support career exploration and professional preparation. | Career fairs, company visits, internship workshops |
+| CAT-03 | Volunteering & Community Service | Activities that contribute to the community and promote social responsibility. | Charity events, blood donation, environmental campaigns |
+| CAT-04 | Culture & Arts | Activities that promote cultural awareness, creativity, and artistic expression. | Music performances, cultural festivals, art exhibitions |
+| CAT-05 | Sports & Wellness | Activities that encourage physical fitness, health, and well-being. | Sports tournaments, fitness events, wellness workshops |
+| CAT-06 | Leadership & Soft Skills | Activities that develop leadership, communication, teamwork, and interpersonal skills. | Leadership training, public speaking, teamwork workshops |
+| CAT-07 | Clubs & Student Engagement | Activities that promote student participation, networking, and campus engagement. | Club recruitment, student networking events, club gatherings |
+| CAT-08 | Civic & Social Awareness | Activities that raise awareness of civic responsibilities, social issues, and university values. | Legal awareness workshops, civic education events |

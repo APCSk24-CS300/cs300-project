@@ -1,3 +1,14 @@
+# Business requirements analysis
+
+**Worker:** Nguyễn Văn Tĩnh 
+**Reviewer(s):** Nguyễn Khang Thịnh
+**Editor(s):** Nguyễn Văn Tĩnh
+
+**Version:** 1.1 
+**Amendment:** 23/11/2026
+
+---
+
 # Frontend Component Architecture
 
 **Project:** myHCMUS  
@@ -371,107 +382,4 @@ It provides a consistent interface for sending requests, managing headers, seria
 - Provides a shared communication boundary for the Frontend.
 - Prevents individual UI components from implementing their own HTTP communication.
 
-## 4. Main Component Interaction Flow
 
-The following diagram illustrates two important interactions within the current implementation: authentication and activity discovery.
-
-```mermaid
-flowchart TD
-    User((User))
-
-    subgraph Auth["Authentication Flow"]
-        Login["Login Page"]
-        Form["LoginForm"]
-        Provider["AuthProvider"]
-        MockAuth["MockAuthService"]
-        RealAuth["AuthService"]
-        Proxy["Route Authorization Proxy"]
-
-        User --> Login
-        Login --> Form
-        Form --> MockAuth
-        MockAuth --> Provider
-        Provider --> Proxy
-    end
-
-    subgraph Activity["Activity Discovery Flow"]
-        Landing["LandingPage"]
-        Section["ActivitiesSection"]
-        Hook["useLandingActivities"]
-        Factory["Activity Service Factory"]
-        Mock["MockActivityService"]
-        Real["RealActivityService"]
-        Mapper["Activity Mapper"]
-        Client["API Client"]
-
-        Landing --> Section
-        Section --> Hook
-        Hook --> Factory
-        Factory --> Mock
-        Factory --> Real
-        Mock --> Mapper
-        Real --> Mapper
-        Real --> Client
-    end
-
-    Backend["Backend REST API"]
-
-    Client --> Backend
-```
-
-**Interaction summary:**
-
-1. A user accesses the login page and submits credentials through the Login Form.
-2. The Authentication Feature processes the request through the currently configured mock authentication service.
-3. The Auth Provider exposes authentication state to the rest of the application.
-4. Route Authorization validates session information and role-based access for protected routes.
-5. The Landing Page renders the Activity Discovery section.
-6. The activity hook requests data through the Activity Service Factory.
-7. The factory selects the mock or real service implementation.
-8. The real service communicates with the Backend through the API Client.
-9. Activity data is mapped into domain models before being presented by the UI.
-
-## 5. Architectural Boundaries and Exclusions
-
-The following elements are intentionally excluded from this Level 3 diagram.
-
-| Element | Reason for exclusion |
-|---|---|
-| Individual buttons and input fields | Low-level UI elements rather than architectural components |
-| React state variables | Internal implementation details |
-| Individual CSS files | Styling implementation, not architectural components |
-| Database tables | Belong to the Backend container |
-| Backend controllers and services | Outside the scope of the Frontend container |
-| Profile Management internal components | Must be documented after their implementation is confirmed |
-| University Services Hub internal components | Must be documented after their implementation is confirmed |
-| System Administration internal components | Must be documented after their implementation is confirmed |
-
-The Backend REST API is represented only as an external dependency of the Frontend.
-
-Profile Management, University Services Hub, and System Administration are part of the wider project scope, but their presence in API specifications alone does not establish their internal Frontend architecture.
-
-## 6. Architecture Maintenance
-
-This document must evolve together with the implementation.
-
-Whenever a feature is added, removed, or significantly refactored, the corresponding component diagram and descriptions must be updated.
-
-The following changes should trigger an architecture review:
-
-- Adding or removing a major feature module.
-- Introducing a new shared service or infrastructure component.
-- Changing authentication or route authorization mechanisms.
-- Changing the API communication architecture.
-- Introducing new dependencies between feature modules.
-- Replacing mock services with real Backend implementations.
-
-The documented architecture must always reflect the actual source code at the time of submission.
-
----
-
-## 7. References
-
-1. Rafael Câmara, [C4 Model - The Basics](https://dev.to/rafaeljcamara/c4-model-the-basics-5bk5).
-2. [C4 Model Official Documentation](https://c4model.com/).
-3. myHCMUS Frontend Constitution, repository documentation.
-4. myHCMUS Frontend implementation specifications and source structure.

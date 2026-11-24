@@ -5,7 +5,7 @@ Reviewers: Nguyễn Khang Thịnh
 
 ## 1. Modeling Principles
 
-This model captures **externally observable goals** of the actors rather than individual interface commands, processing steps, or the chronological workflow of the application. The system boundary contains only myHCMUS use cases; all human and external-service actors are outside it. The revised diagrams preserve all 12 feature groups in the Vision Document, with several behavior-oriented details grouped into higher-level use cases.
+This model captures **externally observable goals** of the actors rather than individual interface commands, processing steps, or the chronological workflow of the application. The system boundary contains only myHCMUS use cases; all human and external-service actors are outside it. The diagrams preserve all 13 feature groups in the Vision Document, with several behavior-oriented details grouped into higher-level use cases.
 
 - **Association:** A solid line means that an external actor participates in a use case.
 - **Actor generalization:** A specialized actor inherits the shared interactions of the general User actor.
@@ -16,9 +16,9 @@ This model captures **externally observable goals** of the actors rather than in
 
 | Actor | Role and scope |
 |---|---|
-| **User** (abstract/general) | Common account, help, language, and services-hub interactions; specialized by the three account roles below. |
+| **User** (abstract/general) | Common account, dashboard, help, language, and services-hub interactions. Each account is assigned exactly one specialized role. |
 | **Student** | Discovers/registers for activities, manages calendar and notifications, monitors scores, and submits requests. |
-| **Activity Manager** | Manages activities, registration lists, attendance, participation results, student recognition and appeal requests, and related reports. |
+| **Activity Manager** | Manages scoped activities and sessions, registration lists, session attendance, participation verification and score results; assigned Student Affairs Office Managers may additionally perform authorized faculty-scoped recognition and scoring tasks. |
 | **University Administrator** | Manages permissions, configuration, and system reports. |
 | **External Email Service** | Secondary, non-human actor participating in the email-delivery channel; email is required in NFR-COM-05. |
 
@@ -48,6 +48,7 @@ systemBoundary "myHCMUS — Account, Activity Discovery, and Student Services"
   UC07("UC-07: Access university services")
   UC08("UC-08: Change interface language")
   UC09("UC-09: View help and FAQ")
+  UC32("UC-32: View personalized homepage")
 end
 User -- UC01
 User -- UC02
@@ -55,6 +56,7 @@ User -- UC03
 User -- UC07
 User -- UC08
 User -- UC09
+User -- UC32
 Manager -- UC04
 Student -- UC04
 Student -- UC05
@@ -68,7 +70,7 @@ The general actor **User** captures shared capabilities. Student, Activity Manag
 
 ### 3.2. Activity Registration, Calendar, and Notifications
 
-Student registration and scheduling goals, organizer management of registration requests, and the notification service. Validation, duplicate/capacity checks, conflict warnings, and waiting-list promotion are behavior within the corresponding use cases rather than independent goals.
+Student registration and scheduling goals, Manager oversight of activity-level registration lists, and the notification service. Registration confirmation is automatic when conditions and capacities are satisfied; waiting-list enrollment is optional and limited to eligible single-session activities.
 
 ```mermaid
 usecase-beta
@@ -99,12 +101,12 @@ UC13 ..> : extend UC10
 UC16 ..> : extend UC15
 ```
 
-**UC-13** extends registration only when an eligible student faces a full activity and the team supports waiting lists. **UC-16** extends viewing the calendar when a student chooses to export it. 
+**UC-13** extends registration only when an eligible student faces a full activity and the the activity has exactly one session and its Manager has enabled the waiting list. **UC-16** extends viewing the calendar when a student chooses to export it. 
 Email Service is a *secondary, external actor* providing an email delivery channel for UC-17, not a component inside myHCMUS.
 
 ### 3.3. Activity, Attendance, and Training-Score Management
 
-Activity Manager and Student goals relating to extracurricular activities, participation verification, and training-score records. Create/edit/publish/change status are combined under Manage Activities; verify, submit, update, and import/export participation results fall under Manage Participation Records.
+Activity and session management, per-session attendance recording, Manager verification of eligible participation after completion, and training-score management. Participation verification is required before Participation records and related activity scores are awarded.
 
 ```mermaid
 usecase-beta
@@ -119,6 +121,7 @@ systemBoundary "myHCMUS — Activity, Attendance, and Training-Score Management"
   UC22("UC-22: Manage training-score results")
   UC23("UC-23: View participation history")
   UC24("UC-24: View training scores")
+  UC33("UC-33: Manage non-activity training scores")
 end
 Student -- UC23
 Student -- UC24
@@ -127,6 +130,7 @@ Manager -- UC19
 Manager -- UC20
 Manager -- UC21
 Manager -- UC22
+Manager -- UC33
 ```
 
 Managing training scores must honor the authorization and verification rules described in the Vision Document.
@@ -160,7 +164,7 @@ Admin -- UC31
 ```
 
 
-## 4. Revised Use-Case Catalog and Traceability
+## 4. Use-Case Catalog and Traceability
 
 | New ID | Use case | Vision coverage | Primary actor / note |
 |---|---|---|---|
@@ -195,8 +199,10 @@ Admin -- UC31
 | UC-29 | Manage users and permissions | System Administration / NFR-COM-04 | University Administrator |
 | UC-30 | Configure criteria and categories | System Administration / NFR-SCA-INT-04 | University Administrator |
 | UC-31 | View system reports | System Administration | University Administrator |
+| UC-32 | View personalized homepage | Homepage and Overview | All users (one assigned role per account) |
+| UC-33 | Manage non-activity training scores | Participation and Training-Score Management | Authorized Student Affairs Office Manager |
 
-### Coverage of the 12 feature groups
+### Coverage of the 13 feature groups
 
 | Vision feature | Use cases |
 |---|---|
@@ -205,19 +211,20 @@ Admin -- UC31
 | 3. Activity Discovery | UC-04, UC-05 |
 | 4. Activity Registration Management | UC-10–UC-14 |
 | 5. Activity Management | UC-18–UC-20 |
-| 6. Participation and Training-Score Management | UC-21–UC-24 |
+| 6. Participation and Training-Score Management | UC-21–UC-24, UC-33 |
 | 7. Calendar Management | UC-15, UC-16 |
 | 8. Notification Management | UC-17 |
 | 9. Requests System | UC-25–UC-28 |
 | 10. System Administration | UC-29–UC-31 |
 | 11. University Services Hub | UC-07 |
 | 12. AI Student Assistant | UC-06 |
+| 13. Homepage and Overview | UC-32 |
 
 ## 5. Extension Points and Relation Rationale
 
 | Relation | Extension point / condition | Reason |
 |---|---|---|
-| UC-13 `extend` UC-10 | During registration, when the selected activity has no remaining capacity and a waiting list is enabled. | Joining a waiting list is optional, not a mandatory step of every registration. |
+| UC-13 `extend` UC-10 | During registration, the activity has exactly one scheduled session, is full, and its waiting list is enabled. | Joining the waiting list is conditional and optional; activities with multiple sessions do not offer waiting lists. |
 | UC-16 `extend` UC-15 | While viewing the calendar, when the student requests an `.ics` export. | Export is an optional student goal available in the calendar context. |
 | Student, Activity Manager, University Administrator `generalize` User | Shared account functionality. | The three roles can access common functions without repeating every association. |
 

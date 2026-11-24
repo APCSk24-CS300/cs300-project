@@ -3,7 +3,7 @@
 **Reviewers:** Nguyễn Văn Tĩnh, Quách Thiên Lạc, Nguyễn Khang Thịnh, Phan Minh Khôi  
 **Editors:** Quách Thiên Lạc, Phạm Vân Trang, Nguyễn Khang Thịnh  
 **Version:** 1.1.0  
-**Amendment:** 2026/24/11
+**Amendment:** 2026/11/24
 
 # 1. Introduction
 The purpose of this document is to collect, analyze, and define high-level needs and features of the app myHCMUS. It focuses on the capabilities needed by the stakeholders and the target users, and why these needs exist. The details of how myHCMUS fulfills these needs are detailed in the use-case and supplementary specifications.  

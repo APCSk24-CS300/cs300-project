@@ -1,10 +1,12 @@
-%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Arial, sans-serif", "background": "#ffffff"}, "c4": {"diagramMarginX": 30, "diagramMarginY": 30, "c4ShapeMargin": 45, "c4ShapePadding": 20}}}%%
+%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Arial, sans-serif", "background": "#ffffff"}, "c4": {"diagramMarginX": 90, "diagramMarginY": 20, "c4ShapeMargin": 50, "c4ShapePadding": 16, "messageFontSize": 14, "messageFontFamily": "Arial, sans-serif"}, "themeCSS": "text[dominant-baseline=\"middle\"] { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }"}}%%
+%% Export SVG/PNG with node render-diagram.cjs (requires mmdc on PATH).
+%% The renderer centers the title/Next.js card and routes API links in separate labeled lanes.
 C4Deployment
     title Deployment Diagram for myHCMUS
 
-    %% Deployment assumption: Vercel hosts the Next.js frontend.
-    %% The Express API and PostgreSQL run on a separate Docker-capable host.
-    %% Docker services, ports and storage follow src/docker-compose.yml.
+    %% Target deployment: Next.js and a Docker/OCI-packaged API run on Vercel.
+    %% PostgreSQL is provisioned through a Vercel Marketplace integration.
+    %% Docker Compose remains the local development environment.
 
     Deployment_Node(device, "User device", "Desktop or mobile") {
         Deployment_Node(browser, "Web browser", "Chrome / Firefox / Safari / Edge") {
@@ -12,38 +14,42 @@ C4Deployment
         }
     }
 
-    Deployment_Node(frontendHost, "Frontend hosting", "Vercel", "Cloud hosting platform") {
-        Container(web, "Next.js web application", "Next.js 16 / React 19 / TypeScript", "Serves pages and static assets;<br/>runs server-side code and mock login route")
-    }
-
-    Deployment_Node(host, "Backend and database host", "Separate Docker-capable server / VM") {
-        Deployment_Node(compose, "Docker Compose", "Project: myHCMUS", "Default shared network; services: server and db") {
-            Deployment_Node(serverContainer, "myHCMUS-server", "Docker container / node:22") {
-                Container(api, "Backend API", "Node.js 22 / Express 5 / TypeScript", "HTTP port 8080; /api/auth and /health<br/>Current startup: npm start / nodemon")
-            }
-            Deployment_Node(dbContainer, "myHCMUS-db", "Docker container / postgres:18") {
-                ContainerDb(db, "Application database", "PostgreSQL 18", "Service address: db:5432<br/>Host port published: 5432")
-            }
-            Container(storage, "Persistent database storage", "Docker named volume: myHCMUS-db", "Mounted at /var/lib/postgresql")
+    Deployment_Node(vercel, "Application hosting", "Vercel") {
+        Container(web, "Next.js web application", "Next.js 16 / React 19 / TypeScript", "Serves pages and static assets;<br/>runs server-side code")
+        Deployment_Node(serverContainer, "myHCMUS-server", "Vercel Functions / OCI container") {
+            Container(api, "Backend API", "Node.js 22 / Express 5 / TypeScript", "Containerized HTTP service;<br/>public HTTPS endpoint routed to `PORT=8080`")
         }
     }
 
-    Rel(client, web, "Loads pages and assets", "HTTPS")
-    Rel(client, api, "Planned API integration", "REST / JSON over HTTP :8080")
-    Rel(api, db, "Reads and writes data", "pg / TCP :5432")
-    Rel(db, storage, "Persists database files", "Volume mount")
+    Deployment_Node(databaseHost, "Managed database", "Supabase / Vercel Marketplace") {
+        ContainerDb(db, "Application database", "Managed PostgreSQL", "Pooled connection endpoint;<br/>provider-managed persistent storage")
+    }
 
-    %% Blue: browser UI; amber: Vercel frontend; teal: implemented API;
-    %% violet: database and persistence. Relationship labels carry status too.
+    Deployment_Node(externalServices, "External services", "Third-party providers") {
+        Container(emailService, "Email Service", "Email provider API (Gmail/Outlook)", "Sends notifications")
+        Container(aiService, "AI Service", "AI model provider API (Gemini/GPT)", "Sends user queries")
+    }
+
+    Rel(client, web, "Loads pages and assets", "HTTPS")
+    Rel(client, api, "Calls API endpoint", "REST / JSON over HTTPS :443")
+    Rel(api, db, "Reads and writes data", "PostgreSQL / TLS (pooled)")
+    Rel(api, emailService, "Sends notifications", "HTTPS / JSON")
+    Rel(api, aiService, "Sends user questions", "MCP")
+
+    %% Blue: browser UI; amber: Vercel frontend; teal: containerized API;
+    %% violet: managed database.
     UpdateElementStyle(client, $bgColor="#DBEAFE", $fontColor="#172554", $borderColor="#2563EB")
     UpdateElementStyle(web, $bgColor="#FEF3C7", $fontColor="#78350F", $borderColor="#D97706")
     UpdateElementStyle(api, $bgColor="#CCFBF1", $fontColor="#134E4A", $borderColor="#0D9488")
     UpdateElementStyle(db, $bgColor="#EDE9FE", $fontColor="#4C1D95", $borderColor="#7C3AED")
-    UpdateElementStyle(storage, $bgColor="#F5F3FF", $fontColor="#4C1D95", $borderColor="#8B5CF6")
 
-    UpdateRelStyle(client, web, $textColor="#92400E", $lineColor="#D97706", $offsetX="-10", $offsetY="140")
-    UpdateRelStyle(client, api, $textColor="#475569", $lineColor="#64748B", $offsetY="45")
-    UpdateRelStyle(api, db, $textColor="#115E59", $lineColor="#0D9488", $offsetX="-15", $offsetY="100")
-    UpdateRelStyle(db, storage, $textColor="#5B21B6", $lineColor="#7C3AED", $offsetY="-20")
+    UpdateRelStyle(client, web, $textColor="#92400E", $lineColor="#D97706", $offsetX="-45", $offsetY="-45")
+    UpdateRelStyle(client, api, $textColor="#475569", $lineColor="#64748B", $offsetX="-190", $offsetY="60")
+    UpdateRelStyle(api, db, $textColor="#115E59", $lineColor="#0D9488", $offsetX="110", $offsetY="30")
 
-    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="3")
+    UpdateElementStyle(emailService, $bgColor="#F1F5F9", $fontColor="#1E293B", $borderColor="#64748B")
+    UpdateElementStyle(aiService, $bgColor="#F1F5F9", $fontColor="#1E293B", $borderColor="#64748B")
+    UpdateRelStyle(api, emailService, $textColor="#475569", $lineColor="#64748B", $offsetX="280", $offsetY="-60")
+    UpdateRelStyle(api, aiService, $textColor="#475569", $lineColor="#64748B", $offsetX="40", $offsetY="15")
+
+    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="4")

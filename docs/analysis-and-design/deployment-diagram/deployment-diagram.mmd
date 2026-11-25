@@ -1,6 +1,6 @@
 %%{init: {"theme": "base", "themeVariables": {"fontFamily": "Arial, sans-serif", "background": "#ffffff"}, "c4": {"diagramMarginX": 90, "diagramMarginY": 20, "c4ShapeMargin": 50, "c4ShapePadding": 16, "messageFontSize": 14, "messageFontFamily": "Arial, sans-serif"}, "themeCSS": "text[dominant-baseline=\"middle\"] { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }"}}%%
-%% Export SVG/PNG with node render-diagram.cjs (requires mmdc on PATH).
-%% The renderer centers the title/Next.js card and routes API links in separate labeled lanes.
+%% Mermaid source for the accompanying SVG and PNG exports.
+%% SVG export uses centered cards and separate labeled lanes for API links.
 C4Deployment
     title Deployment Diagram for myHCMUS
 
@@ -30,8 +30,8 @@ C4Deployment
         Container(aiService, "AI Service", "AI model provider API (Gemini/GPT)", "Sends user queries")
     }
 
-    Rel(client, web, "Loads pages and assets", "HTTPS")
-    Rel(client, api, "Calls API endpoint", "REST / JSON over HTTPS :443")
+    Rel(client, web, "Loads pages and sends API requests", "HTTPS")
+    Rel(web, api, "Forwards API requests", "REST / JSON over HTTPS :443")
     Rel(api, db, "Reads and writes data", "PostgreSQL / TLS (pooled)")
     Rel(api, emailService, "Sends notifications", "HTTPS / JSON")
     Rel(api, aiService, "Sends user questions", "MCP")
@@ -44,7 +44,7 @@ C4Deployment
     UpdateElementStyle(db, $bgColor="#EDE9FE", $fontColor="#4C1D95", $borderColor="#7C3AED")
 
     UpdateRelStyle(client, web, $textColor="#92400E", $lineColor="#D97706", $offsetX="-45", $offsetY="-45")
-    UpdateRelStyle(client, api, $textColor="#475569", $lineColor="#64748B", $offsetX="-190", $offsetY="60")
+    UpdateRelStyle(web, api, $textColor="#475569", $lineColor="#64748B", $offsetX="0", $offsetY="0")
     UpdateRelStyle(api, db, $textColor="#115E59", $lineColor="#0D9488", $offsetX="110", $offsetY="30")
 
     UpdateElementStyle(emailService, $bgColor="#F1F5F9", $fontColor="#1E293B", $borderColor="#64748B")

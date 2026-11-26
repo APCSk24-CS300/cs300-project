@@ -15,28 +15,30 @@
 
 ## Key Features
 
-1. **Authentication:** Users can log in and log out of the system using their accounts. The system identifies their roles to provide access to the appropriate features and information.
+1. **Authentication:** Users can log in and log out using their accounts. Each account has one assigned role, which determines access to the appropriate features and information.
 
 2. **Profile Management:** Users can edit their personal information, change passwords, update avatars, and manage basic academic information.
 
-3. **Activity Discovery:** Students can browse available activities and search or filter them by category, faculty, date, location, training-score criteria, and registration status. Each activity includes detailed information such as its description, schedule, capacity, eligibility requirements, and registration deadline.
+3. **Activity Discovery:** Students can discover activities through search and filters, including faculty, date, campus, specialized topic, training-score criteria, and registration status. Each activity provides its schedule, session details, capacity, eligibility, and registration information.
 
-4. **Activity Registration Management:** Students can register for suitable activities, cancel registrations within the permitted period, and track their registration status. Activity managers can review participant lists, approve or reject applications when necessary.
+4. **Activity Registration Management:** Students can register for suitable activities,select applicable sessions, track or cancel registrations, and join waiting lists for eligible activities. Activity managers can monitor and manage registration lists.
    
-5. **Activity Management:** Activity managers can create and manage activities, including schedules, locations, participation requirements, capacity, and training-score criteria. They can also publish announcements, track activity statistics, and export reports.
+5. **Activity Management:** Managers can create and manage activities, sessions, locations, eligibility requirements, registration and cancellation deadlines, capacity, and training-score criteria. They can publish announcements, monitor participation, and export reports.
    
-6. **Training Score Management:** Students can view their accumulated training scores and participation history, organized by semester and evaluation criteria. Activity managers can submit verified participation results, and adjust score where appropriate.
+6. **Participation and Training-Score Management:** Activity managers can submit verified attendance and participation results and adjust activity-related scores, while authorized Student Affairs Office Managers can award or deduct training-score points independently of activity participation. Students can view their accumulated training scores and participation history, organized by semester and evaluation criteria.
    
-7. **Calendar Management:** Students can view registered activities in a personal calendar and detect scheduling conflicts to avoid overlapping activities.
+7. **Calendar Management:** Students can view their registered activities and selected sessions in a personal calendar, with schedule updates and conflict warnings.
 
-8. **Notification Management:** Students receive notifications and reminders about upcoming activities, registration deadlines, schedule changes, and registration updates.
+8. **Notification Management:** Students and authorized managers receive relevant notifications about activities, registrations, requests, and participation verification deadlines.
     
-9.  **Appeal Management:** Students can submit requests for recognition of activities inside or outside the university or appeal incorrect participation records and training scores. Activity manager can review requests, verify evidence, provide responses, and update request statuses.
+9.  **Appeal Management:** Students can request recognition of internal or external activities and appeal missing or incorrect participation or scores with supporting evidence. Authorized managers review and resolve assigned requests.
     
-10. **System Administration:**Administrators can assign user roles and manage access permissions, configure system-wide settings, such as training-score criteria and activity categories, and access reports and statistics on activity organization, registration trends, and training-score distribution.
+10. **System Administration:** Administrators manage accounts and their assigned roles, faculty assignments, scoring criteria, academic information, organizations, specialized topics, policies, and system reports.
     
 11. **University Services Hub:** Students can quickly access university platforms such as Moodle, Student Portal, tuition payment systems through a centralized dashboard.
 
+12. **Homepage and Overview:** The system provides role-based dashboards with key summaries, pending tasks, and quick links to relevant functions for students, activity managers, and administrators.
+    
 ## AI Feature
 
 **AI Student Assistant:** An AI-powered assistant recommends extracurricular activities based on students' interests, schedules, participation history, and training-score needs, helping them discover relevant opportunities, save time, and make informed decisions.

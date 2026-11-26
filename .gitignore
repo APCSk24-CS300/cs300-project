@@ -1,10 +1,13 @@
 build
 src/.agents
-.vscode
+src/.claude
+.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 src/.agents/*
+src/.claude/*
 src/.specify/*
 !src/.specify/memory/constitution.md
+docs/pa

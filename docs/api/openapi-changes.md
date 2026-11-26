@@ -60,18 +60,18 @@ Proposed YAML shape:
 | Use case | Sign in, sign out and restore the current session |
 | Current contract | Only `GET /auth/me` exists. The frontend currently posts to the local mock route `/api/auth/login` |
 | Proposed operations | `POST /auth/login`, `POST /auth/logout`, `GET /auth/me` (already present) |
-| Proposed login request | `{ email: string, password: string }` — no role selector; roles come from the account |
+| Proposed login request | `{ email: string, password: string }` — no role selector; the role comes from the account |
 | Proposed login response | `{ success: boolean, data: { user: Profile, permissions: string[], activeOrganizationMemberships: OrganizationMembership[], activeActivityAssignments: string[] } }` or the same envelope as `/auth/me` |
 | Proposed logout response | `{ success: boolean, message: string }` |
 | Reason | The OpenAPI contract does not define login or logout; `getCurrentUserContext` is the only auth operation. The FE cannot claim a real login integration without this |
 | Priority | High (blocks WP-1 real-auth integration) |
-| Frontend impact | `authService` and `AuthProvider` must adapt to the contract envelope and multi-role `Profile`. The local `/api/auth/*` route remains a development mock only |
+| Frontend impact | `authService` and `AuthProvider` must adapt to the contract envelope and the `Profile.role` field. The local `/api/auth/*` route remains a development mock only |
 | Status | `PROPOSED / awaiting backend agreement` — UC-01/UC-02 are outside the three groups covered by this contract |
 
 Notes:
 
-- The current `/auth/me` response is `CurrentUserContextResponse`: `data.user` is a `Profile` with `roles[]`, and `data.permissions` is a `string[]`. The FE `getMe()` currently expects a bare `SessionUser`.
-- Do not keep the mock login request's `role` field in the production contract; a user may hold multiple roles.
+- The current `/auth/me` response is `CurrentUserContextResponse`: `data.user` is a `Profile` with a single `role`, and `data.permissions` is a `string[]`. The FE `getMe()` currently expects a bare `SessionUser`.
+- Do not keep the mock login request's `role` field in the production contract; the server reads the role from the account.
 
 ## API-GAP-003 — Administrative audit log read operation
 
@@ -175,7 +175,7 @@ Notes:
 | Item | Decision | Contract change |
 |---|---|---|
 | Versioned base path | accepted | `servers[0].url` is `/api/v1` |
-| `/users/{id}/role` takes a list | accepted | renamed to `PUT /admin/users/{userId}/roles` |
+| `/users/{id}/role` takes a list | rejected (reviewer read outdated docs) | each user has one role: `PUT /admin/users/{userId}/role` with `{ role, reason }`; `Profile`, `AdminUser` and `CreateUserRequest` use a single `role` |
 | `organization_id` snake_case | accepted, field removed | BR `ServiceLink` has no organization; field dropped from service schemas |
 | Pagination consistency | accepted for unbounded lists | users, organizations, memberships, audit logs paginated; small reference lists stay whole |
 | ETag / If-Match | accepted (UC-29 A8, UC-30 A9) | `ETag` header + `version` field; optional `If-Match`; `412 PreconditionFailed` |
@@ -193,3 +193,4 @@ Other fixes: removed invalid `paths.admin: null`; declared all tags; `Permission
 |---|---|
 | 2026-11-20 | Initial gap register created during WP-0 repository/API audit. No OpenAPI YAML edit was made. |
 | 2026-11-25 | Contract 1.2.0: applied API-GAP-001, 003-009 and accepted review items; API-GAP-002 remains proposed. |
+| 2026-11-26 | Single-role model: reverted `/roles` to `/role` with `{ role, reason }`; `roles[]` -> `role`; removed multi-duty wording and BR v1.2.0 references; import resource `user-roles` -> `user-role`. |

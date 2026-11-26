@@ -6,8 +6,7 @@ info:
     Hub (UC-07) and System Administration (UC-29, UC-30, UC-31).
 
 
-    Aligned with Business Requirements Analysis v1.2.0. A User may hold multiple independently assigned duties (student,
-    manager, administrator). Permissions do not inherit automatically; manager actions also require the relevant
+    Each user has exactly one role: student, manager, or administrator. Manager actions also require the relevant
     organization, activity, or request assignment.
 
 
@@ -68,8 +67,8 @@ paths:
       tags:
       - Authentication & Session
       summary: Get current user context
-      description: Call after login and on page refresh to initialize role-aware navigation. Includes all assigned
-        roles, effective permission codes, and active operational assignments.
+      description: Call after login and on page refresh to initialize role-aware navigation. Includes the user's
+        role, effective permission codes, and active operational assignments.
       operationId: getCurrentUserContext
       responses:
         '200':
@@ -514,8 +513,8 @@ paths:
       tags:
       - Admin - Users
       summary: Create a user account
-      description: Provision one identity with one or more independent duties. Student number and faculty are staff-controlled
-        and must be validated before eligibility-dependent actions.
+      description: Provision one user account with one role. Student number and faculty are staff-controlled and
+        must be validated before eligibility-dependent actions.
       operationId: createUser
       requestBody:
         required: true
@@ -595,8 +594,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-      description: Search by full name, email, or student number. A user may have multiple roles; the role filter
-        matches users holding the selected role.
+      description: Search by full name, email, or student number, and filter by role or status.
   /admin/users/{userId}:
     get:
       tags:
@@ -712,15 +710,15 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '412':
           $ref: '#/components/responses/PreconditionFailed'
-  /admin/users/{userId}/roles:
+  /admin/users/{userId}/role:
     put:
       tags:
       - Admin - Users
-      summary: Replace a user's assigned roles
-      description: Replace the complete set of independently assigned roles. Permissions are not inherited automatically.
-        Records an audit reason. Assignments that violate permission policy return 400 `ROLE_POLICY_VIOLATION` (UC-29
-        A6). Updated permissions apply from the user's next request (UC-29 A10).
-      operationId: replaceUserRoles
+      summary: Change a user's role
+      description: Set the user's single role and record an audit reason. A role change that violates permission
+        policy returns 400 `ROLE_POLICY_VIOLATION` (UC-29 A6). Updated permissions apply from the user's next request
+        (UC-29 A10).
+      operationId: updateUserRole
       parameters:
       - $ref: '#/components/parameters/UserId'
       - $ref: '#/components/parameters/IfMatch'
@@ -731,21 +729,17 @@ paths:
             schema:
               type: object
               required:
-              - roles
+              - role
               - reason
               properties:
-                roles:
-                  type: array
-                  minItems: 1
-                  uniqueItems: true
-                  items:
-                    $ref: '#/components/schemas/UserRole'
+                role:
+                  $ref: '#/components/schemas/UserRole'
                 reason:
                   type: string
                   minLength: 1
       responses:
         '200':
-          description: Roles updated.
+          description: Role updated.
           content:
             application/json:
               schema:
@@ -910,8 +904,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '412':
           $ref: '#/components/responses/PreconditionFailed'
-      description: Replace the complete permission set for a role. Changes are audited. Multiple roles do not imply
-        hierarchy or automatic permission inheritance.
+      description: Replace the complete permission set for a role. Changes are audited.
   /admin/permissions:
     get:
       tags:
@@ -1070,7 +1063,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      description: The user must hold the manager duty; otherwise 400 `ROLE_POLICY_VIOLATION`. Audited.
+      description: The user must have the manager role; otherwise 400 `ROLE_POLICY_VIOLATION`. Audited.
   /admin/organizations/{organizationId}/members/{membershipId}:
     patch:
       tags:
@@ -2071,10 +2064,8 @@ components:
           - $ref: '#/components/schemas/AcademicInfo'
           nullable: true
           type: object
-        roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserRole'
+        role:
+          $ref: '#/components/schemas/UserRole'
         interests:
           type: array
           items:
@@ -2167,32 +2158,27 @@ components:
       required:
       - email
       - fullName
-      - roles
+      - role
       properties:
         email:
           type: string
           format: email
         fullName:
           type: string
-        roles:
-          type: array
-          minItems: 1
-          uniqueItems: true
-          items:
-            $ref: '#/components/schemas/UserRole'
+        role:
+          $ref: '#/components/schemas/UserRole'
         studentNumber:
           type: string
           nullable: true
-          description: Required for student duty; staff-provisioned and unique.
+          description: Required when role is student; staff-provisioned and unique.
         facultyId:
           type: string
           nullable: true
-          description: Required for student duty; staff-provisioned and validated.
+          description: Required when role is student; staff-provisioned and validated.
         phoneNumber:
           type: string
           nullable: true
-      description: Create one user identity with one or more independently assigned duties. Password activation/invitation
-        is a separate flow.
+      description: Create one user account with one role. Password activation/invitation is a separate flow.
     AdminUpdateUserRequest:
       type: object
       required:
@@ -2235,17 +2221,15 @@ components:
           allOf:
           - $ref: '#/components/schemas/FacultySummary'
           nullable: true
-        roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserRole'
+        role:
+          $ref: '#/components/schemas/UserRole'
         permissions:
           type: array
           items:
             type: string
           readOnly: true
-          description: Effective permission codes, shown before an administrator edits roles (NFR-USA-13). Included
-            in single-user responses; may be omitted in list items.
+          description: Effective permission codes, shown before an administrator changes the role (NFR-USA-13).
+            Included in single-user responses; may be omitted in list items.
         createdAt:
           type: string
           format: date-time
@@ -2485,7 +2469,7 @@ components:
             totalManagers:
               type: integer
               example: 280
-              description: Users holding the manager duty. Replaces totalOrganizers (API-GAP-008).
+              description: Users with the manager role. Replaces totalOrganizers (API-GAP-008).
             totalActivities:
               type: integer
               example: 250
@@ -2795,8 +2779,7 @@ components:
           type: string
         quarterAcademicYear:
           type: string
-          description: Follows BR v1.2.0 `quarter_academic_year`. The two BR files disagree (academic_year + term);
-            confirm.
+          description: Follows BR `quarter_academic_year`. The two BR files disagree (academic_year + term); confirm.
         startsAt:
           type: string
           format: date-time
@@ -2853,7 +2836,7 @@ components:
               type: string
         action:
           type: string
-          example: user.roles.replace
+          example: user.role.update
         entityType:
           type: string
           example: User
@@ -2874,10 +2857,10 @@ components:
       type: string
       enum:
       - users
-      - user-roles
+      - user-role
       - score-criteria
       - activity-categories
-      description: users and user-roles serve UC-29; score-criteria and activity-categories serve UC-30. Activity
+      description: users and user-role serve UC-29; score-criteria and activity-categories serve UC-30. Activity
         and attendance imports belong to the manager contracts.
     ImportRowResult:
       type: object

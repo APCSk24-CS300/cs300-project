@@ -1,30 +1,30 @@
-import { LLMError } from '../clients/LLMClient.ts';
-import type { LLMClient } from '../clients/LLMClient.ts';
+import type { AIGateway } from '../ai/AIGateway.ts';
+import type { AIIdentity } from '../types/AIIdentity.ts';
 import { generate503Response } from '../helper/generate503Response.ts';
 import { ServiceResponse } from '../types/ServiceResponse.ts';
-import type { PromptRequest, PromptResult } from '../types/PromptRequest.ts';
-import { AI_SYSTEM_PROMPT, BLOCKED_REPLY } from './aiSystemPrompt.ts';
-
-const UNAVAILABLE_MESSAGE = 'AI assistant is temporarily unavailable, please try again later';
-const QUOTA_RETRY_AFTER_SECONDS = 30;
+import type { PromptRequest } from '../types/PromptRequest.ts';
 
 export interface AIServiceResult {
 	response: ServiceResponse,
 	retryAfterSeconds?: number   // the controller sends this as the Retry-After header
 }
 
-/** Business logic of the AI assistant. Knows nothing about Express or about Gemini. */
+/**
+ * Business logic of the AI endpoints, kept thin: it hands the question to the AI module
+ * (`AIGateway`, specs/003) and turns the result into the shared ServiceResponse format.
+ * Knows nothing about Express or Gemini.
+ */
 export class AIService {
-	private readonly llm: LLMClient;
+	private readonly gateway: AIGateway;
 
-	constructor(llm: LLMClient) {
-		this.llm = llm;
+	constructor(gateway: AIGateway) {
+		this.gateway = gateway;
 	}
 
 	/**
-	 * Service function for <code>/api/ai/prompt</code>. Sends the student's message (and, optionally, the earlier turns of the conversation) to the AI Student Assistant and returns its answer. The server does not store conversations, so the client must send the earlier turns with every request. Requires a Bearer access token. Each user may send at most 10 requests per minute. Supports <code>POST</code> requests. Never throws: an AI failure becomes a <code>503</code> with a generic message, logged with time, user and error kind only (never the message or the API key).
+	 * Service function for <code>/api/ai/chat</code> (and its alias <code>/api/ai/prompt</code>). Sends the student's message (and, optionally, the earlier turns of the conversation) to the AI Student Assistant and returns its answer. The server does not store conversations, so the client must send the earlier turns with every request. Requires a Bearer access token. Each user may send at most 10 requests per minute. Supports <code>POST</code> requests. Never throws: an AI failure becomes a <code>503</code> with a generic message, logged with time, user and error kind only (never the message or the API key).
 	 * @param {PromptRequest} request - Validated request body: <code>{ "message": string, "history"?: { "role": "user" | "assistant", "text": string }[] }</code>. <code>message</code> is 1-2000 characters; <code>history</code> has at most 20 turns of 1-2000 characters each, oldest first.
-	 * @param {string} userId - ID of the caller, used only for logging.
+	 * @param {AIIdentity} identity - The verified caller, built by the LoadIdentity middleware.
 	 * @returns {Promise<AIServiceResult>} The response to send, plus <code>retryAfterSeconds</code> when the controller should set the <code>Retry-After</code> header.
 	 *
 	 * @example <caption>cURL (first message, no history)</caption>
@@ -42,7 +42,8 @@ export class AIService {
 	 *     "message": "Prompt answered (OK)",
 	 *     "data": {
 	 *       "reply": "You earn training points by joining verified activities such as volunteering, clubs and academic events...",
-	 *       "blocked": false
+	 *       "blocked": false,
+	 *       "request_id": "6f1c2a9e-0b7d-4a51-9c43-2f8e1d5a7b10"
 	 *     }
 	 *   }
 	 * }
@@ -62,7 +63,8 @@ export class AIService {
 	 *     "message": "Prompt answered (OK)",
 	 *     "data": {
 	 *       "reply": "The Blood Donation Club runs a donation day each semester...",
-	 *       "blocked": false
+	 *       "blocked": false,
+	 *       "request_id": "6f1c2a9e-0b7d-4a51-9c43-2f8e1d5a7b10"
 	 *     }
 	 *   }
 	 * }
@@ -117,34 +119,28 @@ export class AIService {
 	 * - `200 OK` - Successful request. If the AI refuses for safety reasons, `blocked` is `true` and `reply` is a fixed polite refusal
 	 * - `400 BAD_REQUEST` - Invalid body; `payload.data.details` lists every problem (missing/blank/too long message, bad history)
 	 * - `401 UNAUTHORIZED` - Missing, malformed or invalid Bearer token
+	 * - `403 FORBIDDEN` - The caller's roles do not include the `ai.chat` permission
 	 * - `405 METHOD_NOT_ALLOWED` - The endpoint does not support the HTTP method specified
 	 * - `415 UNSUPPORTED_MEDIA_TYPE` - Content-Type is not exactly `application/json`
 	 * - `429 TOO_MANY_REQUESTS` - More than 10 requests in a minute; see the `Retry-After` header
 	 * - `503 SERVICE_UNAVAILABLE` - The AI service is down, slow, out of free quota or not configured; try again later (`Retry-After: 30` when the quota is used up)
 	 */
 
-	async prompt(request: PromptRequest, userId: string): Promise<AIServiceResult> {
-		const turns = [...request.history, { role: 'user' as const, text: request.message }];
-		try {
-			const result = await this.llm.generate(turns, AI_SYSTEM_PROMPT);
-			const data: PromptResult = result.blocked
-				? { reply: BLOCKED_REPLY, blocked: true }
-				: { reply: result.text, blocked: false };
-
-			const response = new ServiceResponse;
-			response.success = true;
-			response.statusCode = 200;
-			response.payload = { message: 'Prompt answered', data };
-			return { response };
-		} catch (err) {
-			const kind = err instanceof LLMError ? err.kind : 'unavailable';
-			const detail = err instanceof LLMError ? err.message : 'unexpected error';
-			// never log the student's message or the API key (FR-014)
-			console.error(`[AI] ${new Date().toISOString()} user=${userId} kind=${kind} detail=${detail}`);
+	async prompt(request: PromptRequest, identity: AIIdentity): Promise<AIServiceResult> {
+		const result = await this.gateway.chat(identity, request);
+		if (result.statusCode !== 200) {
 			return {
-				response: generate503Response(UNAVAILABLE_MESSAGE),
-				retryAfterSeconds: kind === 'quota' ? QUOTA_RETRY_AFTER_SECONDS : undefined
+				response: generate503Response(result.message),
+				retryAfterSeconds: result.retryAfterSeconds
 			};
 		}
+		const response = new ServiceResponse;
+		response.success = true;
+		response.statusCode = 200;
+		response.payload = {
+			message: 'Prompt answered',
+			data: { reply: result.reply, blocked: result.blocked, request_id: result.requestId }
+		};
+		return { response };
 	}
 }

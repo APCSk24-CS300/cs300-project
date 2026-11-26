@@ -6,5 +6,8 @@
     ],
     "entryPointStrategy": "expand",
     "tsconfig": "tsconfig.json",
-    "out": "../docs"
+    "out": "../docs",
+    "intentionallyNotExported": [
+        "AIGateway"
+    ]
 }

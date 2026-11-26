@@ -34,7 +34,8 @@ test('sends system instruction, mapped roles in order, key in header (not URL)',
 	});
 	const result = await c.generate(turns, 'SYSTEM');
 
-	assert.deepEqual(result, { text: 'The second club is...', blocked: false });
+	assert.equal(result.text, 'The second club is...');
+	assert.equal(result.blocked, false);
 	assert.ok(url.endsWith('/models/test-model:generateContent'));
 	assert.ok(!url.includes(KEY));
 	assert.equal(init.headers['x-goog-api-key'], KEY);
@@ -86,7 +87,22 @@ test('unreadable or empty answers -> bad_response', async () => {
 
 test('safety blocks -> blocked result, not an error', async () => {
 	const a = client(async () => jsonResponse(200, { promptFeedback: { blockReason: 'SAFETY' } }));
-	assert.deepEqual(await a.generate(turns, 'S'), { text: '', blocked: true });
+	assert.equal((await a.generate(turns, 'S')).blocked, true);
 	const b = client(async () => jsonResponse(200, { candidates: [{ finishReason: 'SAFETY' }] }));
-	assert.deepEqual(await b.generate(turns, 'S'), { text: '', blocked: true });
+	assert.equal((await b.generate(turns, 'S')).blocked, true);
+});
+
+test('reports token usage, counting thinking tokens as output, and the model', async () => {
+	const c = client(async () => jsonResponse(200, {
+		candidates: [{ content: { parts: [{ text: 'Hi' }] } }],
+		usageMetadata: { promptTokenCount: 40, candidatesTokenCount: 12, thoughtsTokenCount: 8 }
+	}));
+	const result = await c.generate(turns, 'S');
+	assert.deepEqual(result.usage, { inputTokens: 40, outputTokens: 20 });
+	assert.equal(result.model, 'test-model');
+});
+
+test('missing usageMetadata leaves usage undefined', async () => {
+	const c = client(async () => jsonResponse(200, { candidates: [{ content: { parts: [{ text: 'Hi' }] } }] }));
+	assert.equal((await c.generate(turns, 'S')).usage, undefined);
 });

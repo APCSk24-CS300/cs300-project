@@ -176,6 +176,7 @@ description: "Task list for AI Assistant Safety, Usage Limits and Admin Monitori
 - [ ] T063 [P] [US5] Repository tests for every `ai_*_v` view and the `ai_gateway` grants in `server/tests/integration/aiViews.test.ts` (role cannot read `User.password_hash` or other students' rows)
 - [ ] T064 [P] [US5] Unit tests `server/tests/unit/ai/Chunker.test.ts`, `Retriever.test.ts` (filter parameters come only from identity), `ToolRegistry.test.ts` (tools by role, argument validation, row limits)
 - [ ] T065 [P] [US5] Integration test `server/tests/integration/aiGrounding.test.ts`: faculty-restricted and draft activities never appear; own points match; other student's id returns nothing; poisoned description flagged
+- [ ] T086 [P] [US5] Unit tests `server/tests/unit/ai/tools/RecommendActivities.test.ts`: only eligible open activities, already-registered excluded, ranking by interest, history and score gap, conflicts marked, reasons present, no-interest fallback (US5 scenarios 7 to 9)
 
 ### Implementation for User Story 5
 
@@ -187,6 +188,8 @@ description: "Task list for AI Assistant Safety, Usage Limits and Admin Monitori
 - [ ] T071 [US5] Add grounding checks (activities and points must come from sources) to `OutputGuard`; return `sources`
 - [ ] T072 [US5] Add the 5-minute re-index of changed activities to `aiMaintenance` and the `POST /knowledge/reindex` endpoint
 - [ ] T073 [P] [US5] Create `client/src/features/ai-assistant/components/SourceList.tsx` under each answer
+- [ ] T087 [US5] Add the views `ai_my_interest_v` and `ai_my_schedule_v` and their `ai_gateway` grants to `src/db/ai_schema.sql`
+- [ ] T088 [US5] Create `server/src/ai/tools/student/recommendActivities.ts`: select and rank candidates in code (FR-039), return up to 5 with reason codes; register it in `ToolRegistry`; add the recommendation cases to `cases.jsonl`
 
 **Checkpoint**: US5 works; SC-010 measured on the grounding test set.
 

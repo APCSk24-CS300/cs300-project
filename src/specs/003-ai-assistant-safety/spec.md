@@ -18,6 +18,7 @@ This feature builds on phase 1 (`002-ai-prompt-endpoint`), which already lets a 
 
 - Refusing off-topic requests (such as writing program code or homework) and attempts to override the assistant's rules.
 - Answers grounded in myHCMUS information: published activities, scoring rules, official procedures, and the asking user's own records.
+- Personalized activity recommendations based on the student's interests, schedule, participation history and training-score needs (UC-06).
 - Manager help for planning events: hosting rules, allowed venues, and suggested training-points sections.
 - Two usage bars per user (5-hour and weekly), plus spam protection.
 - A disclaimer about what is and is not stored.
@@ -111,7 +112,7 @@ Before the first use, a user sees a notice: conversations are not saved; only us
 
 ### User Story 5 - Answers are grounded in myHCMUS information and the user's own records (Priority: P3)
 
-A student asks "Which volunteer activities can I still register for this semester?" or "How many training points do I have in section 5.2?" The assistant answers using published activities the student is eligible for, the active scoring rules, official procedures, and only that student's own registrations and points. Answers show which sources they came from. If the information is not available, the assistant says it is not sure and points to the right office instead of guessing.
+A student asks "Which volunteer activities can I still register for this semester?", "How many training points do I have in section 5.2?" or "Recommend some activities for me." The assistant answers using published activities the student is eligible for, the active scoring rules, official procedures, and only that student's own registrations and points. Answers show which sources they came from. If the information is not available, the assistant says it is not sure and points to the right office instead of guessing.
 
 **Why this priority**: This makes the assistant genuinely useful, but it reads real data, so it must come after the protections in US1 to US4 exist.
 
@@ -125,6 +126,9 @@ A student asks "Which volunteer activities can I still register for this semeste
 4. **Given** any phrasing, including naming another student's ID or email, **When** a student asks for another student's records, **Then** no other student's data is returned.
 5. **Given** a question the stored information does not answer, **When** the student asks it, **Then** the assistant says the information may be incomplete and suggests contacting the Student Affairs Office.
 6. **Given** an activity description that contains text trying to instruct the assistant, **When** it is used as a source, **Then** the assistant does not follow it, and the description is flagged for an administrator.
+7. **Given** a student with saved interests, confirmed registrations and points below a criterion's semester cap, **When** they ask for recommendations, **Then** the assistant suggests up to 5 eligible activities with open registration, each with the reason it was chosen (matching interest, criterion it helps with, no schedule conflict), and none the student is already registered for.
+8. **Given** a student with no saved interests and no participation history, **When** they ask for recommendations, **Then** the assistant asks about their interests or recommends by training-score needs, and says which information was missing (UC-06 A3).
+9. **Given** no eligible activity matches, **When** a student asks for recommendations, **Then** the assistant says so and suggests changing the criteria, and a full or closed activity is shown with its current status without promising a seat (UC-06 A7, A9).
 
 ---
 
@@ -179,7 +183,7 @@ A manager asks "What rules apply to an outdoor event with 200 people?", "Which v
 
 - **FR-009**: The AI MUST NOT be able to run database queries of its own. It may only request a fixed list of read-only lookups, which the system runs.
 - **FR-010**: Every lookup MUST use the identity of the logged-in user as verified by the system, never an identity supplied in the message or chosen by the AI.
-- **FR-011**: Lookups MUST return only: published or ongoing activities the user is eligible for; the active scoring rules; official documents for the user's role; the user's own registrations, attendance and points; for managers, their own managed activities as totals without student names.
+- **FR-011**: Lookups MUST return only: published or ongoing activities the user is eligible for; the active scoring rules; official documents for the user's role; the user's own registrations, attendance, points, saved interests and schedule; for managers, their own managed activities as totals without student names.
 - **FR-012**: Information used to answer a question MUST be filtered by the user's role and faculty before it is selected, not after.
 - **FR-013**: Data sent to the external AI service MUST NOT include names, emails, phone numbers, student IDs or user IDs.
 - **FR-014**: Point suggestions for managers MUST be marked as suggestions needing confirmation, and MUST NOT change any stored points.
@@ -219,6 +223,7 @@ A manager asks "What rules apply to an outdoor event with 200 people?", "Which v
 - **FR-036**: Activity information used as a source MUST be updated within 5 minutes of an activity being published, changed or cancelled.
 - **FR-037**: Administrators MUST be able to add official documents (procedures, hosting rules, venue list, FAQ) as sources for chosen roles.
 - **FR-038**: Source text that contains phrases trying to instruct the assistant MUST be flagged for an administrator.
+- **FR-039**: The system MUST select recommended activities in code, not by the AI: eligible, published or ongoing, registration open, not already registered by the student, ranked by matching interests, past participation categories and criteria where the student is below the semester cap, with schedule conflicts marked. The AI only explains the selected list, and each recommendation MUST show the reason it was chosen.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -257,4 +262,5 @@ A manager asks "What rules apply to an outdoor event with 200 people?", "Which v
 - Official hosting rules and the venue list are provided by the Student Affairs Office as documents. The database has no venue table, so venues come from that document.
 - "Eligible" means the activity has no faculty restriction or lists the student's faculty.
 - The 30-day retention of flagged content is accepted by the team as a change to `002` FR-014, on condition of the notice in US4.
-- Roles today are student, manager and administrator (`Role` table). New AI permissions are added to the existing permission tables.
+- Roles today are student, manager and administrator (`Role` table), with one assigned role per account (vision document 1.1.0). New AI permissions are added to the existing permission tables.
+- UC-06 currently lists only the Student as actor. The team decided on 18/11/2026 that Activity Managers also use the assistant (US6); UC-06 is to be amended by the requirements owner to add Activity Manager as an actor.

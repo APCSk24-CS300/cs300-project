@@ -4,8 +4,8 @@
 **Reviewer(s):**  
 **Editor(s):** Phan Minh Khôi
 
-**Version:** 0.3.0  
-**Amendment:** 20/11/2026
+**Version:** 0.4.0  
+**Amendment:** 26/11/2026
 
 ---
 This document describes how the AI Student Assistant (UC-06 "Chat with AI Student Assistant") is built into myHCMUS so that it stays on topic, cannot be turned against the system, and can be monitored and controlled by administrators. It extends phase 1 (`specs/002-ai-prompt-endpoint`). The implementation plan, tasks and API contracts are in `src/specs/003-ai-assistant-safety`; the schema is `src/db/ai_schema.sql`.
@@ -166,6 +166,7 @@ The gateway runs each tool itself. Parameters are schema-validated, queries are 
 | `search_activities`, `get_activity` | Student | Published or ongoing; eligible for the user's faculty | Public activity fields, seats left |
 | `get_my_registrations` | Student | `user_id = verified user` | Own registrations and attendance |
 | `get_my_training_score` | Student | `user_id = verified user` | Own points per criterion |
+| `recommend_activities` | Student | Eligible, open, not yet registered; ranked in code by interests, history and score gaps; conflicts marked | Up to 5 activities, each with its reason |
 | `get_scoring_rules` | Both | Active `ScoringPolicyVersion` | Criteria and point ranges |
 | `get_hosting_rules` | Manager | `hosting_rule`, `official`, manager audience | Rule passages with section ids |
 | `get_allowed_venues` | Manager | `venue_list`, `official` | Venue names, capacity, booking notes |
@@ -173,6 +174,8 @@ The gateway runs each tool itself. Parameters are schema-validated, queries are 
 | `get_my_managed_activities` | Manager | `ActivityManage.user_id = verified user` | Own activities with counts, no student names |
 
 `suggest_score_criterion` only suggests: replies say "Suggestion, to be confirmed by the Student Affairs Office", and nothing writes `ActivityScore`. Point values in a reply must appear in a policy row returned in that request. Venues live in an official document until the schema has a venue table.
+
+`recommend_activities` covers the recommendation part of UC-06. The gateway, not the model, picks and ranks the candidates from `UserInterest`, past participation, criteria where the student is below the semester cap, and the student's confirmed schedule. The model only explains the list, so it cannot recommend an activity the student cannot join. Without interests or history, the assistant asks about interests or ranks by score needs only.
 
 ### 6.3 Filtered retrieval
 
@@ -193,7 +196,7 @@ Only public and role-level knowledge is embedded. Personal records are never emb
 
 ### 6.4 Database role
 
-The `ai_gateway` role can `SELECT` only the six `ai_*_v` views, `AiKnowledgeChunk`, `SystemSetting` and `AiUserQuota`, and can write only the `Ai*` tables (full grants in `data-model.md`). Even with an injection bug in the gateway, it cannot read `password_hash` or other students' rows.
+The `ai_gateway` role can `SELECT` only the `ai_*_v` views, `AiKnowledgeChunk`, `SystemSetting` and `AiUserQuota`, and can write only the `Ai*` tables (full grants in `data-model.md`). Even with an injection bug in the gateway, it cannot read `password_hash` or other students' rows.
 
 ## 7. Admin visibility and control
 
@@ -265,7 +268,7 @@ All objects are created by `src/db/ai_schema.sql`, run after `schema.sql`. Exist
 | **AiUserQuota** | `user_id` (PK, FK), `limit_5h`, `limit_week`, `ai_disabled`, `cooldown_until`, `reason` | Per-user overrides and pauses. |
 | **AiConsent** | `user_id`, `notice_version` (PK), `accepted_at` | Notice acceptance. |
 
-The six read-only views (`ai_activity_public_v`, `ai_my_registration_v`, `ai_my_score_v`, `ai_scoring_rule_v`, `ai_managed_activity_v`, `ai_service_link_v`) expose only allowed columns. New permissions are `ai.chat`, `ai.chat.manager_tools`, `ai.usage.read`, `ai.flags.review`, `ai.settings.manage` and `ai.knowledge.manage`.
+The read-only views (`ai_activity_public_v`, `ai_my_registration_v`, `ai_my_score_v`, `ai_scoring_rule_v`, `ai_managed_activity_v`, `ai_service_link_v`, and later `ai_my_interest_v` and `ai_my_schedule_v` for recommendations) expose only allowed columns. New permissions are `ai.chat`, `ai.chat.manager_tools`, `ai.usage.read`, `ai.flags.review`, `ai.settings.manage` and `ai.knowledge.manage`.
 
 ## 9. Endpoints
 
@@ -309,6 +312,8 @@ All endpoints use `ServiceResponse`. Request and response details are in `contra
 | 4 | Assistant for managers? | Yes: hosting rules, venues, points sections. | 6.2 |
 | 5 | Gemini tier? | Free tier, with data minimization and hard limits. | 7.6 |
 | 6 | Spam and DDoS? | Three layers, with a 5-hour and a weekly bar. | 7.5 |
+| 7 | UC-06 lists only students (26/11/2026) | Keep the manager tools; UC-06 to add Activity Manager as an actor. | 6.2 |
+| 8 | Recommendations in UC-06 (26/11/2026) | Add `recommend_activities`, ranked in code. | 6.2 |
 
 ### 12.1 Login token design
 

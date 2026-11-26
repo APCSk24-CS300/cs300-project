@@ -122,7 +122,8 @@ src/server/
 │   │   ├── retrieval/Retriever.ts
 │   │   ├── tools/ToolRegistry.ts         #   tools by role
 │   │   ├── tools/student/*.ts            #   search_activities, get_activity, get_my_registrations,
-│   │   │                                 #   get_my_training_score, get_scoring_rules
+│   │   │                                 #   get_my_training_score, get_scoring_rules,
+│   │   │                                 #   recommend_activities (ranking in code)
 │   │   ├── tools/manager/*.ts            #   get_hosting_rules, get_allowed_venues,
 │   │   │                                 #   suggest_score_criterion, get_my_managed_activities
 │   │   ├── logging/UsageLogger.ts

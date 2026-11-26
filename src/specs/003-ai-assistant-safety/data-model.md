@@ -113,12 +113,14 @@ The current version is `SystemSetting` `ai.notice.version`; the text lives in `s
 | `ai_scoring_rule_v` | semester, criterion code, name, description, weight, min, max, semester cap | active `ScoringPolicyVersion` (`activation_at <= now()`, latest per criterion and semester) |
 | `ai_managed_activity_v` | `manager_user_id` (filter only), activity id, title, status, registration counts by status | none; query adds `WHERE manager_user_id = $verified` |
 | `ai_service_link_v` | name, url | `is_active` |
+| `ai_my_interest_v` | `user_id` (filter only), category id and name | none; query adds `WHERE user_id = $verified` |
+| `ai_my_schedule_v` | `user_id` (filter only), activity id, category, session start and end | confirmed registrations; query adds `WHERE user_id = $verified` |
 
 Optional hardening: row-level security on the two `ai_my_*` views' base access using `current_setting('app.user_id')`, set by the module with `SET LOCAL` per transaction.
 
 ## Database role
 
-`ai_gateway`: `SELECT` on the six views, `AiKnowledgeChunk`, `SystemSetting`, `AiUserQuota`; `INSERT` on `AiRequestLog`, `AiToolCall`, `AiFlag`; `SELECT, INSERT, UPDATE` on `AiUsageWindow`, `AiConsent`; `UPDATE (cooldown_until)` on `AiUserQuota`. Nothing else. Indexing and admin actions run through the API Server's normal role.
+`ai_gateway`: `SELECT` on the eight views, `AiKnowledgeChunk`, `SystemSetting`, `AiUserQuota`; `INSERT` on `AiRequestLog`, `AiToolCall`, `AiFlag`; `SELECT, INSERT, UPDATE` on `AiUsageWindow`, `AiConsent`; `UPDATE (cooldown_until)` on `AiUserQuota`. Nothing else. Indexing and admin actions run through the API Server's normal role.
 
 ## Rows added to existing tables
 

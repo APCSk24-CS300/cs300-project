@@ -1,5 +1,9 @@
 # Backend Component Architecture
 
+**Worker:** Trần Tôn Minh Kỳ<br>
+**Reviewer(s):** Quách Thiên Lạc<br>
+**Editor(s):** Trần Tôn Minh Kỳ
+
 **Project:** myHCMUS  
 **Container:** Backend REST API  
 **Architecture Model:** C4 Model - Level 3 (Component Diagram)  
@@ -33,11 +37,11 @@ The diagram reflects the source code in `src/server/src`. Some platform capabili
 
 ## 2. Level 3 - Backend Component Diagram
 
-The following diagram illustrates the internal components of the Backend REST API and its dependencies on PostgreSQL, the frontend client, and the external Gemini API.
+The following diagram illustrates the internal components of the Backend REST API and its dependencies on the Database container, the frontend application, and the external AI API.
 
 ```mermaid
 flowchart LR
-    Frontend["Next.js Frontend<br/>(External Container)"]
+    Frontend["Frontend Application"]
 
     subgraph Backend["myHCMUS Backend REST API - Express / TypeScript"]
         subgraph Composition["Application Composition"]
@@ -93,7 +97,7 @@ flowchart LR
 
         AuthController --> AuthService
         AuthController --> AuthRepository
-        AuthController --> Helpers
+        AuthController --> Responses
         AuthService --> AuthRepository
         AuthService --> Responses
         AuthService --> Config
@@ -105,9 +109,11 @@ flowchart LR
         AIService --> Responses
         AIService --> Helpers
         LLMPort -. "Implemented by" .-> GeminiClient
-        GeminiClient --> Config
+        App --> GeminiClient
 
         AuthRepository --> DbConnection
+        Validator --> Config
+        DbConnection --> Config
         AuthController --> Types
         AuthService --> Types
         AIController --> Types
@@ -115,10 +121,10 @@ flowchart LR
         ErrorHandling --> Responses
     end
 
-    Database[(PostgreSQL Database)]
-    Gemini["Google Gemini API<br/>(External Software System)"]
+    Database[(Database)]
+    Gemini["External AI API (Google Gemini)"]
 
-    Frontend -->|"JSON over HTTPS"| App
+    Frontend -. "Development-only; mock services; local HTTP when enabled" .-> App
     DbConnection -->|"SQL queries and transactions"| Database
     GeminiClient -->|"HTTPS generateContent"| Gemini
 
@@ -135,11 +141,11 @@ flowchart LR
     class Frontend,Gemini external;
 ```
 
-Solid arrows represent direct runtime dependencies. The dashed arrow identifies the `LLMClient` abstraction and its `GeminiClient` implementation. The frontend and Gemini API are outside the backend container; PostgreSQL is an external data store from the backend's component perspective.
+Solid arrows represent direct runtime dependencies. Dashed arrows represent an abstraction, implementation, or development-only relationship. The frontend application and external AI API are outside the backend container; the Database is a container of the myHCMUS system.
 
 ## 3. Relationship Notes
 
-- `createApp()` is the composition root. It creates the AI client and service, registers both route modules, and installs global fallback handlers.
+- `createApp()` is the composition root. It creates the Gemini client and AI service, registers both route modules, and installs global fallback handlers.
 - `index.ts` starts the HTTP server by calling `createApp()` and owns graceful shutdown.
 - Authentication routes validate HTTP method and content type before invoking the authentication controller.
 - The AI route validates method, access token, and content type, then applies the in-memory per-user rate limiter before invoking the AI controller.
@@ -147,7 +153,7 @@ Solid arrows represent direct runtime dependencies. The dashed arrow identifies 
 - Authentication currently uses `AuthRepository` directly in `AuthController` for duplicate checks and through `AuthService` for registration and login operations.
 - `AuthService` hashes passwords with bcrypt, verifies credentials, and signs JWT access tokens using configured secrets.
 - `AuthRepository` uses the shared PostgreSQL pool and wraps user registration inserts in a database transaction.
-- `AIService` depends on the `LLMClient` interface rather than Gemini-specific code. This allows tests to inject a fake client and keeps provider details in `GeminiClient`.
+- `AIService` depends on the `LLMClient` interface rather than Gemini-specific code. This allows tests to inject a fake client and keeps provider details in `GeminiClient`. `createApp()` supplies the configured client implementation.
 - AI provider failures are converted to a generic `503` response. Quota failures additionally produce a `Retry-After` value.
 - Shared response factories and validation helpers keep endpoint error shapes consistent.
 - The backend is the authorization boundary for protected API operations. The frontend does not access PostgreSQL directly.
@@ -191,9 +197,9 @@ The controller validates the prompt body and delegates to `AIService`. The servi
 
 ### 4.5 Shared Support
 
-**Location:** `src/server/src/types/`, `src/server/src/helper/`
+**Location:** `src/server/src/types/`, `src/server/src/helper/`, `src/server/src/services/`
 
-**Responsibility:** Defines request and domain shapes, response envelopes, endpoint validation, system prompts, and HTTP error response factories.
+**Responsibility:** Defines request and domain shapes, response envelopes, endpoint validation, system prompts, and HTTP error response factories. The system prompt is implemented in `services/aiSystemPrompt.ts`.
 
 These components support the route, controller, and service layers but do not own transport, business orchestration, or persistence.
 

@@ -51,8 +51,8 @@ flowchart TB
         k1["Person"]
         k2["Container"]
         k3["External software system"]
-        k4["A"] -->|"Solid: working on dev"| k5["B"]
-        k6["A"] -.->|"Dashed: not working on dev yet,<br/>or hyperlink only"| k7["B"]
+        k4["A"] -->|"Solid: implemented in the code on dev"| k5["B"]
+        k6["A"] -.->|"Dashed: not connected in the code yet,<br/>or hyperlink only"| k7["B"]
     end
 
     classDef person fill:#E8F1FD,stroke:#2864A0,color:#18385B,stroke-width:1.5px
@@ -67,7 +67,7 @@ flowchart TB
     style key fill:none,stroke:#BBBBBB
 ```
 
-**Key.** Light blue boxes are people, dark blue boxes are containers of myHCMUS, and grey boxes are external software systems. The dashed border is the boundary of myHCMUS. Each arrow points in the direction of the request and is labelled with its purpose and, in brackets, its technology or protocol. A solid arrow is a connection that works on `dev`. A dashed arrow is either not working on `dev` yet (see [section 5](#5-current-state-of-the-connections)) or, for University Services, a plain hyperlink with no data exchange, as in the System Context Diagram.
+**Key.** Light blue boxes are people, dark blue boxes are containers of myHCMUS, and grey boxes are external software systems. The dashed border is the boundary of myHCMUS. Each arrow points in the direction of the request and is labelled with its purpose and, in brackets, its technology or protocol. A solid arrow is a connection that is implemented in the code on `dev`. A dashed arrow is a connection that is planned or not connected in the code yet, or, for University Services, a plain hyperlink with no data exchange, as in the System Context Diagram. A solid arrow does not mean the connection is free of bugs: [section 5](#5-current-state-of-the-connections) lists what works today.
 
 ## 3. Explanation of the diagram
 
@@ -161,18 +161,18 @@ These are outside the system boundary and are not containers of myHCMUS. Their n
 
 ## 5. Current state of the connections
 
-PA4 requires the diagrams to match the code. This table states which connections work on `dev`, so the dashed arrows are not read as finished work.
+PA4 requires the diagrams to match the code. This table states, for each arrow, whether the code exists and whether it works end to end on `dev` (commit `1b1081a`), so the diagram is not read as finished work.
 
-| Connection | State on `dev` | Evidence |
-|---|---|---|
-| People to Frontend Application | Working. | `src/client/src/app` |
-| Backend REST API to Database | Working for registration and login. | `src/server/src/repositories/AuthRepository.ts` |
-| Backend REST API to External AI API | Working. | `src/server/src/clients/GeminiClient.ts`, `src/server/src/routes/AIRoute.ts` |
-| Frontend Application to Backend REST API | Not working yet. The real services exist (`auth.service.ts`, `activity.service.ts`), but `AuthProvider` uses `mockAuthService`, activities use mock data unless `NEXT_PUBLIC_DATA_SOURCE=api`, and the paths do not match the backend (section 6). | `src/client/src/features/auth/provider/AuthProvider.tsx`, `src/client/src/libs/service-mode.ts` |
-| Backend REST API to External Email Service | Not started. The database models email delivery (`NotificationDelivery`), but no code sends email. | none |
-| Frontend Application to University Services | Hyperlinks only, by design. The links are defined, but the service cards on the landing page are currently always shown locked and display-only, so no link can be opened yet. | `src/client/src/features/landing/config/services.ts` |
+| Connection | Arrow | State on `dev` | Evidence |
+|---|---|---|---|
+| People to Frontend Application | Solid | Working. | `src/client/src/app` |
+| Backend REST API to Database | Solid | Implemented, but registration and login do not work end to end yet. (1) `checkUserExistsWithEmail` and `checkUserExistsWithPhoneNumber` return `result != null`, which is always true because `pg` always returns a result object, so registration always answers `409` and login never answers "Email not found". (2) `getUserFromEmail`, `getUserPasswordHash` and `getName` return the whole row (for example `{ password_hash: ... }`) instead of the value, so `bcrypt.compare` receives an object and login fails with `500`. (3) `config.ts` reads `POSTGRES_USER`, `POSTGRES_PASSWORD` and `POSTGRES_DB`, but Docker Compose only gives the server `server/.env`, and `server/.env.example` lists `DATABASE_URL` instead, so the connection pool has no credentials unless they are added by hand. | `src/server/src/repositories/AuthRepository.ts`, `src/server/src/services/AuthService.ts`, `src/server/src/config/config.ts`, `src/docker-compose.yml` |
+| Backend REST API to External AI API | Solid | Implemented and covered by unit and integration tests that use a fake AI client. `/api/ai/prompt` needs a backend access token, which login cannot issue yet (row above), so today it can only be called with a hard-coded development token accepted by `validateAccessToken`. That token must be removed before release. | `src/server/src/clients/GeminiClient.ts`, `src/server/src/routes/AIRoute.ts`, `src/server/src/middleware/ValidatorMiddleware.ts`, `src/server/tests` |
+| Frontend Application to Backend REST API | Dashed | Not connected. The real services exist (`auth.service.ts`, `activity.service.ts`), but `AuthProvider` uses `mockAuthService`, activities use mock data unless `NEXT_PUBLIC_DATA_SOURCE=api`, and the paths do not match the backend (section 6). | `src/client/src/features/auth/provider/AuthProvider.tsx`, `src/client/src/libs/service-mode.ts` |
+| Backend REST API to External Email Service | Dashed | Not started. The database models email delivery (`NotificationDelivery`), but no code sends email. | none |
+| Frontend Application to University Services | Dashed | Hyperlinks only, by design. The links are defined, but the service cards on the landing page are currently always shown locked and display-only, so no link can be opened yet. | `src/client/src/features/landing/config/services.ts` |
 
-**Update rule:** when one of these connections starts working, change its arrow from dashed (`-.->`) to solid (`-->`) and update this table in the same pull request.
+**Update rule:** when a connection is implemented, change its arrow from dashed (`-.->`) to solid (`-->`). When a bug in this table is fixed or a new one is found, update the table. Do both in the same pull request as the code change.
 
 ## 6. Issues found while drawing the diagram
 

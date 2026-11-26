@@ -34,7 +34,7 @@ C4Deployment
     Rel(web, api, "Forwards API requests", "REST / JSON over HTTPS :443")
     Rel(api, db, "Reads and writes data", "PostgreSQL / TLS (pooled)")
     Rel(api, emailService, "Sends notifications", "HTTPS / JSON")
-    Rel(api, aiService, "Sends user questions", "MCP")
+    Rel(api, aiService, "Sends user questions", "Gemini REST / JSON over HTTPS :443")
 
     %% Blue: browser UI; amber: Vercel frontend; teal: containerized API;
     %% violet: managed database.

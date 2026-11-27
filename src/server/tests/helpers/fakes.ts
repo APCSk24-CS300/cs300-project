@@ -65,3 +65,64 @@ export async function captureErrors<T>(fn: () => Promise<T>): Promise<{ result: 
 		console.error = original;
 	}
 }
+
+// ---- University Services Hub (specs/004-university-service-hub) ----
+import type {
+	ChangeContext, CreateServiceLinkInput, ServiceLink, ServiceLinkChange, ServiceLinkStore
+} from '../../src/types/ServiceLink.ts';
+import { DuplicateNameError } from '../../src/types/ServiceLink.ts';
+
+export interface FakeAuditRow { actorUserId: string, action: string, entityId: string, reason: string, before: ServiceLink | null, after: ServiceLink }
+
+/** In-memory ServiceLinkStore with the same ordering, uniqueness and version rules as ServiceLinkRepository. */
+export class FakeServiceLinkStore implements ServiceLinkStore {
+	links: ServiceLink[] = [];
+	audit: FakeAuditRow[] = [];
+	fail = false;
+	private nextId = 1;
+
+	constructor(seed: Partial<ServiceLink>[] = []) {
+		for (const s of seed) {
+			this.links.push({
+				id: String(this.nextId++), name: s.name ?? `Service ${this.nextId}`, description: s.description ?? null,
+				url: s.url ?? 'https://example.edu/', displayOrder: s.displayOrder ?? 0, isActive: s.isActive ?? true, version: s.version ?? 1
+			});
+		}
+	}
+
+	private check() { if (this.fail) throw new Error('db down'); }
+	private nameTaken(name: string, exceptId?: string) {
+		const key = name.trim().toLowerCase();
+		return this.links.some((l) => l.id !== exceptId && l.name.trim().toLowerCase() === key);
+	}
+
+	async list(includeInactive: boolean) {
+		this.check();
+		return this.links.filter((l) => includeInactive || l.isActive)
+			.sort((a, b) => a.displayOrder - b.displayOrder || a.name.toLowerCase().localeCompare(b.name.toLowerCase()) || Number(a.id) - Number(b.id))
+			.map((l) => ({ ...l }));
+	}
+	async findById(id: string) { this.check(); const l = this.links.find((x) => x.id === id); return l ? { ...l } : null; }
+	async maxDisplayOrder() { this.check(); return this.links.reduce((m, l) => Math.max(m, l.displayOrder), -1); }
+
+	async create(input: Required<CreateServiceLinkInput>, context: ChangeContext) {
+		this.check();
+		if (this.nameTaken(input.name)) throw new DuplicateNameError();
+		const link: ServiceLink = { id: String(this.nextId++), ...input, version: 1 };
+		this.links.push(link);
+		this.audit.push({ actorUserId: context.actorUserId, action: 'service_link.create', entityId: link.id, reason: context.reason ?? 'service_link.create', before: null, after: { ...link } });
+		return { ...link };
+	}
+
+	async update(change: ServiceLinkChange, context: ChangeContext) {
+		this.check();
+		const index = this.links.findIndex((l) => l.id === change.id && l.version === change.expectedVersion);
+		if (index < 0) return null;
+		if (this.nameTaken(change.next.name, change.id)) throw new DuplicateNameError();
+		const before = this.links[index]!;
+		const after: ServiceLink = { ...before, ...change.next, version: before.version + 1 };
+		this.links[index] = after;
+		this.audit.push({ actorUserId: context.actorUserId, action: change.action, entityId: after.id, reason: context.reason ?? change.action, before: { ...before }, after: { ...after } });
+		return { ...after };
+	}
+}

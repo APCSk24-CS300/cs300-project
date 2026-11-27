@@ -124,21 +124,19 @@ paths:
       tags:
       - Profile
       summary: Upload or update profile avatar
-      description: Upload a JPG or PNG image up to 5 MB. The new image replaces the current avatar.
+      description: Upload a JPG or PNG image up to 10 MB inclusive. File content is validated, not only its filename
+        or client-provided media type. A successful upload replaces the authenticated user's current avatar. The
+        storage provider is implementation-defined and is not specified by this contract.
       operationId: uploadMyAvatar
       requestBody:
         required: true
         content:
           multipart/form-data:
             schema:
-              type: object
-              required:
-              - avatar
-              properties:
-                avatar:
-                  type: string
-                  format: binary
-                  description: JPG or PNG image, maximum 5 MB.
+              $ref: '#/components/schemas/AvatarUploadRequest'
+            encoding:
+              avatar:
+                contentType: image/jpeg, image/png
       responses:
         '200':
           description: Avatar updated successfully.
@@ -147,25 +145,45 @@ paths:
               schema:
                 $ref: '#/components/schemas/AvatarResponse'
         '400':
-          description: 'File is not JPG/PNG or exceeds 5 MB (`code: UNSUPPORTED_FILE`). Existing avatar is kept
-            (UC-03 A8).'
+          description: 'File content is not JPG/PNG or file size exceeds 10 MB (`code: UNSUPPORTED_FILE`). The
+            existing avatar is kept (UC-03 A8).'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          description: Avatar storage or profile update failed; the existing avatar is kept.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
       - Profile
       summary: Remove profile avatar
-      description: Remove the current avatar and restore the default avatar.
+      description: No request body is accepted. Remove the authenticated user's current avatar and restore the default
+        avatar; the user ID is derived from authentication context.
       operationId: deleteMyAvatar
       responses:
         '200':
-          $ref: '#/components/responses/MessageSuccess'
+          description: Avatar removed and default avatar restored.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiMessage'
+              example:
+                success: true
+                message: Avatar removed successfully
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          description: Avatar removal failed; the existing avatar is kept.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /profile/interests:
     get:
       tags:
@@ -2111,6 +2129,16 @@ components:
           example: true
         data:
           $ref: '#/components/schemas/Profile'
+    AvatarUploadRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - avatar
+      properties:
+        avatar:
+          type: string
+          format: binary
+          description: JPG or PNG image. Maximum file size is 10 MB inclusive; files larger than 10 MB are rejected.
     AvatarResponse:
       type: object
       required:
@@ -2125,10 +2153,13 @@ components:
           example: Avatar updated successfully
         data:
           type: object
+          required:
+          - avatarUrl
           properties:
             avatarUrl:
               type: string
               format: uri
+              description: URI for the newly active avatar; storage provider is implementation-defined.
     ChangePasswordRequest:
       type: object
       additionalProperties: false

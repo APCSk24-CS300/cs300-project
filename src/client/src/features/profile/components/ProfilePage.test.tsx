@@ -40,7 +40,7 @@ describe("ProfilePage", () => {
       }),
     );
 
-    renderWithProviders(<ProfilePage />);
+    const { container } = renderWithProviders(<ProfilePage />);
 
     expect(screen.getByText("Loading your profile")).toBeInTheDocument();
     resolveProfile(profile);
@@ -52,6 +52,11 @@ describe("ProfilePage", () => {
     expect(screen.getByText("Read only")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Change password" })).toBeInTheDocument();
     expect(screen.getByLabelText("Current password")).toBeInTheDocument();
+    expect(container.querySelector('[name="fullName"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[name="studentNumber"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[name="faculty"]')).not.toBeInTheDocument();
+    expect(screen.getByText("22120001").tagName).toBe("DD");
+    expect(screen.getByText("Faculty of Science").tagName).toBe("DD");
     expect(
       screen.getByRole("img", { name: "Student Example's profile picture" }),
     ).toHaveAttribute("src", profile.avatarUrl);

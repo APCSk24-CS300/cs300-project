@@ -8,6 +8,7 @@ import { renderWithProviders } from "../../../../tests/test-utils";
 vi.mock("@/features/profile/services/profile.service", () => ({
   profileService: {
     getProfile: vi.fn(),
+    updatePhoneNumber: vi.fn(),
   },
 }));
 

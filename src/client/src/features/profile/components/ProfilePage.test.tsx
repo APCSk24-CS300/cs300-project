@@ -90,6 +90,9 @@ describe("ProfilePage", () => {
     renderWithProviders(<ProfilePage />);
 
     expect(await screen.findByText("Profile could not be loaded")).toBeInTheDocument();
+    expect(screen.queryByText("Student Example")).not.toBeInTheDocument();
+    expect(screen.queryByText("0901234567")).not.toBeInTheDocument();
+    expect(screen.queryByText("Phone number updated successfully.")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
 
     await waitFor(() =>
@@ -163,5 +166,10 @@ describe("ProfilePage", () => {
       "Phone number already in use",
     );
     expect(phoneInput).toHaveValue("0911111111");
+    expect(screen.queryByText("Phone number updated successfully.")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.getByText("0901234567")).toBeInTheDocument();
+    expect(screen.queryByText("Phone number updated successfully.")).not.toBeInTheDocument();
   });
 });

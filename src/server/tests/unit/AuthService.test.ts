@@ -200,6 +200,8 @@ test('returns a generic error without logging password values when storage fails
 			code: 'INTERNAL_ERROR',
 			message: 'Password could not be changed. Please try again.'
 		});
+		assert.equal(credentials.passwordHash, 'old-hash');
+		assert.deepEqual(credentials.updates, []);
 		assert.equal(JSON.stringify(logged).includes('old-password'), false);
 		assert.equal(JSON.stringify(logged).includes('new-password-8'), false);
 	} finally {

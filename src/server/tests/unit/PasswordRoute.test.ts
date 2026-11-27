@@ -6,10 +6,14 @@ import { ProfileController } from '../../src/controllers/ProfileController.ts';
 import { PasswordController } from '../../src/controllers/PasswordController.ts';
 import { createProfileRoute } from '../../src/routes/ProfileRoute.ts';
 import type { ProfileService } from '../../src/services/ProfileService.ts';
-import type { AuthService } from '../../src/services/AuthService.ts';
+import {
+	AuthService,
+	type PasswordHasher
+} from '../../src/services/AuthService.ts';
 import {
 	type PasswordChangeResult
 } from '../../src/services/AuthService.ts';
+import type { PasswordCredentialStore } from '../../src/repositories/AuthRepository.ts';
 import { generate200Response } from '../../src/helper/generate200Response.ts';
 
 class FakeProfileService implements Pick<ProfileService, 'getProfile' | 'updateProfile'> {
@@ -29,22 +33,56 @@ class FakePasswordService implements Pick<AuthService, 'changePassword'> {
 	}
 }
 
+class FakeCredentials implements PasswordCredentialStore {
+	passwordHash: string | null = 'old-hash';
+	reads: string[] = [];
+	updates: { userId: string; currentHash: string; newHash: string }[] = [];
+
+	async getUserPasswordHash(userId: string): Promise<string | null> {
+		this.reads.push(userId);
+		return this.passwordHash;
+	}
+
+	async updateUserPasswordHash(
+		userId: string,
+		currentHash: string,
+		newHash: string
+	): Promise<boolean> {
+		this.updates.push({ userId, currentHash, newHash });
+		if (this.passwordHash !== currentHash) return false;
+		this.passwordHash = newHash;
+		return true;
+	}
+}
+
+class FakeHasher implements PasswordHasher {
+	match = true;
+
+	async compare(): Promise<boolean> {
+		return this.match;
+	}
+
+	async hash(): Promise<string> {
+		return 'new-hash';
+	}
+}
+
 async function withServer(
-	run: (baseUrl: string, passwords: FakePasswordService) => Promise<void>
+	passwordService: Pick<AuthService, 'changePassword'>,
+	run: (baseUrl: string) => Promise<void>
 ): Promise<void> {
-	const passwords = new FakePasswordService();
 	const app = express();
 	app.use(express.json());
 	app.use('/api/v1/profile', createProfileRoute(
 		new ProfileController(new FakeProfileService()),
-		new PasswordController(passwords)
+		new PasswordController(passwordService)
 	));
 
 	const server = app.listen(0);
 	try {
 		await new Promise<void>((resolve) => server.once('listening', resolve));
 		const address = server.address() as AddressInfo;
-		await run(`http://127.0.0.1:${address.port}`, passwords);
+		await run(`http://127.0.0.1:${address.port}`);
 	} finally {
 		await new Promise<void>((resolve, reject) => {
 			server.close((error) => error ? reject(error) : resolve());
@@ -53,7 +91,8 @@ async function withServer(
 }
 
 test('exposes authenticated PATCH /profile/password and accepts only the contract body', async () => {
-	await withServer(async (baseUrl, passwords) => {
+	const passwords = new FakePasswordService();
+	await withServer(passwords, async (baseUrl) => {
 		const request = {
 			currentPassword: 'old-password',
 			newPassword: 'new-password-8'
@@ -76,8 +115,38 @@ test('exposes authenticated PATCH /profile/password and accepts only the contrac
 	});
 });
 
+test('validates password-change input through the authenticated API before accessing credentials', async () => {
+	const credentials = new FakeCredentials();
+	const authService = new AuthService(credentials, new FakeHasher());
+
+	await withServer(authService, async (baseUrl) => {
+		const currentPassword = 'private-current-password';
+		const newPassword = 'private-new-password';
+		const response = await fetch(`${baseUrl}/api/v1/profile/password`, {
+			method: 'PATCH',
+			headers: {
+				Authorization: 'Bearer MIKU_MIKU_OO_EE_OO',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				currentPassword,
+				newPassword,
+				confirmPassword: newPassword
+			})
+		});
+		const responseText = await response.text();
+
+		assert.equal(response.status, 400);
+		assert.equal(responseText.includes(currentPassword), false);
+		assert.equal(responseText.includes(newPassword), false);
+		assert.deepEqual(credentials.reads, []);
+		assert.deepEqual(credentials.updates, []);
+	});
+});
+
 test('requires authentication and rejects unsupported methods', async () => {
-	await withServer(async (baseUrl, passwords) => {
+	const passwords = new FakePasswordService();
+	await withServer(passwords, async (baseUrl) => {
 		const unauthorized = await fetch(`${baseUrl}/api/v1/profile/password`, {
 			method: 'PATCH',
 			headers: { 'Content-Type': 'application/json' },

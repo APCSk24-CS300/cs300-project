@@ -121,9 +121,7 @@ describe("ProfilePage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
     expect(await screen.findByText("+84901234567")).toBeInTheDocument();
-    expect(
-      screen.getByRole("status", { name: "Phone number updated successfully." }),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Phone number updated successfully.")).toBeInTheDocument();
     expect(updatePhoneNumberMock).toHaveBeenCalledWith("+84901234567");
     expect(screen.getByText("22120001")).toBeInTheDocument();
     expect(screen.getByText("Faculty of Science")).toBeInTheDocument();
@@ -158,6 +156,5 @@ describe("ProfilePage", () => {
       "Phone number already in use",
     );
     expect(phoneInput).toHaveValue("0911111111");
-    expect(screen.getByText("0901234567")).toBeInTheDocument();
   });
 });

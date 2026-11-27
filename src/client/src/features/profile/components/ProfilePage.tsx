@@ -16,24 +16,23 @@ type LoadState =
 
 function ProfileLoading() {
   return (
-    <SurfaceCard
-      aria-label="Loading profile"
-      className="mt-8 grid gap-8 p-6 sm:p-8"
-    >
-      <div className="flex items-center gap-5">
-        <Skeleton className="size-20 rounded-full" />
-        <div className="flex-1 space-y-3">
-          <Skeleton className="h-6 w-48 max-w-full" />
-          <Skeleton className="h-4 w-56 max-w-full" />
+    <div role="status" aria-label="Loading profile">
+      <SurfaceCard className="mt-8 grid gap-8 p-6 sm:p-8">
+        <div className="flex items-center gap-5">
+          <Skeleton className="size-20 rounded-full" />
+          <div className="flex-1 space-y-3">
+            <Skeleton className="h-6 w-48 max-w-full" />
+            <Skeleton className="h-4 w-56 max-w-full" />
+          </div>
         </div>
-      </div>
-      <div className="grid gap-6 sm:grid-cols-2">
-        <Skeleton className="h-20" />
-        <Skeleton className="h-20" />
-        <Skeleton className="h-20" />
-        <Skeleton className="h-20" />
-      </div>
-    </SurfaceCard>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+        </div>
+      </SurfaceCard>
+    </div>
   );
 }
 

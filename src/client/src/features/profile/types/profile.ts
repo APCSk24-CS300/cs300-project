@@ -19,6 +19,7 @@ export type ProfileResponseDTO =
   | {
       success: boolean;
       payload: {
+        message?: string;
         data?: unknown;
       };
     };

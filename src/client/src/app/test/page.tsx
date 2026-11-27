@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
                 <LoginForm/>
             </div>
 
-            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onClick={() => {router.push(`/${role}/dashboard`)}}>
+            <button className="bg-primary text-on-primary px-4 py-2 rounded hover:bg-primary-dark" onClick={() => {router.push(`/${role}/dashboard`)}}>
                 Click Me
             </button>
 

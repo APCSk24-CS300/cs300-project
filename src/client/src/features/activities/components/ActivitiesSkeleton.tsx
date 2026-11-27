@@ -14,7 +14,7 @@ function FeaturedSkeleton() {
         <Skeleton className="h-3 w-3/5" />
         <Skeleton className="h-3 w-1/2" />
       </div>
-      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+      <div className="mt-5 flex items-center justify-between border-t border-surface-muted pt-4">
         <Skeleton className="h-3 w-28" />
         <Skeleton className="h-3 w-8" />
       </div>

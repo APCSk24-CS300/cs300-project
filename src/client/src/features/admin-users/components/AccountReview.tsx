@@ -102,7 +102,7 @@ export function AccountReview({
           </div>
         ) : (
           <div className="mt-3 flex flex-wrap items-center gap-3">
-            <code data-testid="generated-password" className="rounded-lg bg-black/5 px-3 py-1.5 font-mono text-sm text-heading">
+            <code data-testid="generated-password" className="rounded-lg bg-hover-tint px-3 py-1.5 font-mono text-sm text-heading">
               {generatedPassword}
             </code>
             <Button

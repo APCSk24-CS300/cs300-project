@@ -5,7 +5,7 @@ export function ComingSoonBadge({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-pill bg-black/5 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-text-muted",
+        "inline-flex items-center rounded-pill bg-hover-tint px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-text-muted",
         className,
       )}
     >

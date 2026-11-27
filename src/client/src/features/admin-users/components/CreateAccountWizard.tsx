@@ -147,7 +147,7 @@ export function CreateAccountWizard() {
           <li
             key={s}
             aria-current={step === s ? "step" : undefined}
-            className={step === s ? "rounded-pill bg-primary px-3 py-1 text-white" : "rounded-pill bg-black/5 px-3 py-1 text-text-muted"}
+            className={step === s ? "rounded-pill bg-primary px-3 py-1 text-on-primary" : "rounded-pill bg-hover-tint px-3 py-1 text-text-muted"}
           >
             {i + 1}. {s === "form" ? "Details" : s === "review" ? "Review" : "Result"}
           </li>

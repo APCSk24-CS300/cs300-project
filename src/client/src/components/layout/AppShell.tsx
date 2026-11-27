@@ -70,7 +70,7 @@ export function AppShell({
                 aria-label="Close navigation"
                 tabIndex={-1}
                 onClick={() => setDrawerOpen(false)}
-                className="fixed inset-0 z-30 bg-black/30 lg:hidden"
+                className="fixed inset-0 z-30 bg-overlay/30 lg:hidden"
               />
             ) : null}
             <nav

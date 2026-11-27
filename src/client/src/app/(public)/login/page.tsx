@@ -31,7 +31,7 @@ async function LoginPage({ searchParams }: LoginPageProps) {
         <Link
           href="/"
           aria-label="Back to home"
-          className="absolute left-2 top-2 flex h-11 w-16 items-center justify-center rounded-pill bg-primary text-white transition-colors hover:bg-primary-dark"
+          className="absolute left-2 top-2 flex h-11 w-16 items-center justify-center rounded-pill bg-primary text-on-primary transition-colors hover:bg-primary-dark"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-6 w-6" aria-hidden="true">
             <path d="M19 12H5M12 19l-7-7 7-7" />

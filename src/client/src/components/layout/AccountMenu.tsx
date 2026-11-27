@@ -63,9 +63,9 @@ export function AccountMenu({ user, onLogout, pending = false }: AccountMenuProp
         aria-expanded={open}
         aria-controls={menuId}
         onClick={() => setOpen((v) => !v)}
-        className="flex min-h-11 items-center gap-3 rounded-pill px-2 py-1 text-left hover:bg-black/5"
+        className="flex min-h-11 items-center gap-3 rounded-pill px-2 py-1 text-left hover:bg-hover-tint"
       >
-        <span aria-hidden="true" className="flex size-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+        <span aria-hidden="true" className="flex size-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-on-primary">
           {initials}
         </span>
         <span className="hidden flex-col sm:flex">

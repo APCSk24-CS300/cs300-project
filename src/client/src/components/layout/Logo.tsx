@@ -25,7 +25,7 @@ export function Logo({
       )}
     >
       <span className="font-serif italic text-accent-gold">my</span>
-      <span className={variant === "light" ? "text-white" : "text-primary"}>
+      <span className={variant === "light" ? "text-on-primary" : "text-primary"}>
         HCMUS
       </span>
     </Link>

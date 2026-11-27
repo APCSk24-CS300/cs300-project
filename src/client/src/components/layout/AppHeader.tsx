@@ -26,7 +26,7 @@ export function AppHeader({ user, homeHref, onLogout, logoutPending, demoMode = 
             aria-expanded={nav.open}
             aria-controls={nav.controlsId}
             aria-label={nav.open ? "Close navigation" : "Open navigation"}
-            className="flex size-11 items-center justify-center rounded-pill text-heading hover:bg-black/5 lg:hidden"
+            className="flex size-11 items-center justify-center rounded-pill text-heading hover:bg-hover-tint lg:hidden"
           >
             <MenuIcon className="size-6" />
           </button>

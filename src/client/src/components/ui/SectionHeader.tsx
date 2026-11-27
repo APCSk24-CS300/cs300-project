@@ -24,7 +24,7 @@ export function SectionHeader({
       id={id}
       className={cn(
         "text-3xl font-bold leading-tight tracking-tight md:text-4xl",
-        tone === "dark" ? "text-white" : "text-text",
+        tone === "dark" ? "text-on-primary" : "text-text",
       )}
     >
       {title}
@@ -35,7 +35,7 @@ export function SectionHeader({
     <p
       className={cn(
         "mb-3 text-sm font-semibold uppercase tracking-[0.14em]",
-        tone === "dark" ? "text-white/75" : "text-primary",
+        tone === "dark" ? "text-on-primary/75" : "text-primary",
       )}
     >
       {eyebrow}
@@ -58,7 +58,7 @@ export function SectionHeader({
           <p
             className={cn(
               "max-w-md text-sm leading-6 lg:justify-self-end",
-              tone === "dark" ? "text-white/80" : "text-text-muted",
+              tone === "dark" ? "text-on-primary/80" : "text-text-muted",
             )}
           >
             {description}
@@ -82,7 +82,7 @@ export function SectionHeader({
         <p
           className={cn(
             "mt-3 text-sm leading-6",
-            tone === "dark" ? "text-white/80" : "text-text-muted",
+            tone === "dark" ? "text-on-primary/80" : "text-text-muted",
           )}
         >
           {description}

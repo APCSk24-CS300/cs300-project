@@ -49,7 +49,7 @@ export function ConfirmDialog({
         event.preventDefault();
         onCancel();
       }}
-      className="m-auto w-[min(92vw,28rem)] rounded-card bg-surface p-6 text-text shadow-card backdrop:bg-black/40"
+      className="m-auto w-[min(92vw,28rem)] rounded-card bg-surface p-6 text-text shadow-card backdrop:bg-overlay/40"
     >
       <h2 id={titleId} className="text-lg font-semibold text-heading">
         {title}

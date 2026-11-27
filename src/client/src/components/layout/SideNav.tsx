@@ -44,7 +44,7 @@ export function SideNav({ items, currentPath, onNavigate }: SideNavProps) {
               aria-current={current ? "page" : undefined}
               className={cn(
                 "flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold transition-colors",
-                current ? "bg-primary text-white" : "text-heading hover:bg-black/5",
+                current ? "bg-primary text-on-primary" : "text-heading hover:bg-hover-tint",
               )}
             >
               {item.label}

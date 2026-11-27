@@ -38,7 +38,7 @@ export function GuideCard({ guide }: GuideCardProps) {
     return (
       <Link
         href={guide.href}
-        className="group flex min-h-24 items-center justify-between gap-4 rounded-2xl border border-slate-200/80 bg-gradient-to-b from-guide-gradient-from to-guide-gradient-to px-6 py-5 shadow-sm transition hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+        className="group flex min-h-24 items-center justify-between gap-4 rounded-2xl border border-divider/80 bg-gradient-to-b from-guide-gradient-from to-guide-gradient-to px-6 py-5 shadow-sm transition hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
       >
         {content}
       </Link>
@@ -48,7 +48,7 @@ export function GuideCard({ guide }: GuideCardProps) {
   return (
     <SurfaceCard
       gradient
-      className="flex min-h-24 items-center justify-between gap-4 border border-slate-200/80 px-6 py-5"
+      className="flex min-h-24 items-center justify-between gap-4 border border-divider/80 px-6 py-5"
     >
       {content}
     </SurfaceCard>

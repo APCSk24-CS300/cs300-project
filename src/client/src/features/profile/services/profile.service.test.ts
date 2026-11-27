@@ -5,10 +5,12 @@ import { RealProfileService } from "@/features/profile/services/profile.service"
 vi.mock("@/libs/api-client", () => ({
   api: {
     get: vi.fn(),
+    patch: vi.fn(),
   },
 }));
 
 const getMock = vi.mocked(api.get);
+const patchMock = vi.mocked(api.patch);
 
 describe("RealProfileService", () => {
   it("requests and maps the server profile response", async () => {
@@ -67,5 +69,49 @@ describe("RealProfileService", () => {
     await expect(new RealProfileService().getProfile()).rejects.toThrow(
       "The profile response is invalid",
     );
+  });
+
+  it("updates only the phone number and maps the returned profile", async () => {
+    patchMock.mockResolvedValueOnce({
+      success: true,
+      payload: {
+        message: "OK",
+        data: {
+          email: "student@example.edu",
+          fullName: "Student Example",
+          phoneNumber: "+84901234567",
+          avatarUrl: null,
+          academicInfo: null,
+        },
+      },
+    });
+
+    await expect(
+      new RealProfileService().updatePhoneNumber("+84901234567"),
+    ).resolves.toMatchObject({ phoneNumber: "+84901234567" });
+    expect(patchMock).toHaveBeenCalledWith("/api/v1/profile", {
+      phoneNumber: "+84901234567",
+    });
+  });
+
+  it("sends null when clearing the phone number", async () => {
+    patchMock.mockResolvedValueOnce({
+      success: true,
+      payload: {
+        data: {
+          email: "student@example.edu",
+          fullName: "Student Example",
+          phoneNumber: null,
+          academicInfo: null,
+        },
+      },
+    });
+
+    await expect(
+      new RealProfileService().updatePhoneNumber(null),
+    ).resolves.toMatchObject({ phoneNumber: null });
+    expect(patchMock).toHaveBeenCalledWith("/api/v1/profile", {
+      phoneNumber: null,
+    });
   });
 });

@@ -66,12 +66,21 @@ function getProfileData(response: ProfileResponseDTO): unknown {
 
 export interface ProfileService {
   getProfile(signal?: AbortSignal): Promise<Profile>;
+  updatePhoneNumber(phoneNumber: string | null): Promise<Profile>;
 }
 
 export class RealProfileService implements ProfileService {
   async getProfile(signal?: AbortSignal): Promise<Profile> {
     const response = await api.get<ProfileResponseDTO>("/api/v1/profile", {
       signal,
+    });
+
+    return mapProfile(getProfileData(response));
+  }
+
+  async updatePhoneNumber(phoneNumber: string | null): Promise<Profile> {
+    const response = await api.patch<ProfileResponseDTO>("/api/v1/profile", {
+      phoneNumber,
     });
 
     return mapProfile(getProfileData(response));

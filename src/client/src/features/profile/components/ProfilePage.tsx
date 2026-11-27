@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Container } from "@/components/ui/Container";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { SurfaceCard } from "@/components/ui/SurfaceCard";
 import type { Profile } from "@/features/profile/types";
 import { profileService } from "@/features/profile/services/profile.service";
+import { getPhoneNumberError } from "@/features/profile/validation/profile.validation";
 
 type LoadState =
   | { status: "loading" }
@@ -56,6 +57,12 @@ function ProfileField({
 export function ProfilePage() {
   const [state, setState] = useState<LoadState>({ status: "loading" });
   const [requestNumber, setRequestNumber] = useState(0);
+  const [isEditingPhone, setIsEditingPhone] = useState(false);
+  const [phoneDraft, setPhoneDraft] = useState("");
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -84,6 +91,65 @@ export function ProfilePage() {
     setState({ status: "loading" });
     setRequestNumber((current) => current + 1);
   };
+
+  const handleStartEditingPhone = () => {
+    if (!profile) {
+      return;
+    }
+
+    setPhoneDraft(profile.phoneNumber ?? "");
+    setPhoneError(null);
+    setSaveError(null);
+    setSaveSuccess(false);
+    setIsEditingPhone(true);
+  };
+
+  const handleCancelEditingPhone = () => {
+    setIsEditingPhone(false);
+    setPhoneDraft("");
+    setPhoneError(null);
+    setSaveError(null);
+    setSaveSuccess(false);
+  };
+
+  const handleSavePhone = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!profile) {
+      return;
+    }
+
+    const validationError = getPhoneNumberError(phoneDraft);
+    if (validationError) {
+      setPhoneError(validationError);
+      setSaveError(null);
+      setSaveSuccess(false);
+      return;
+    }
+
+    setPhoneError(null);
+    setSaveError(null);
+    setSaveSuccess(false);
+    setIsSaving(true);
+
+    try {
+      const updatedProfile = await profileService.updatePhoneNumber(
+        phoneDraft === "" ? null : phoneDraft,
+      );
+      setState({ status: "success", profile: updatedProfile });
+      setIsEditingPhone(false);
+      setPhoneDraft("");
+      setSaveSuccess(true);
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : "Unable to save your phone number. Please try again.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const profile = state.status === "success" ? state.profile : null;
   const academicInfo = profile?.academicInfo ?? null;
 
@@ -165,9 +231,90 @@ export function ProfilePage() {
                   Contact information
                 </h2>
                 <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-                  <ProfileField label="Phone number" value={profile.phoneNumber} />
+                  {isEditingPhone ? (
+                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                      <label
+                        htmlFor="profile-phone-number"
+                        className="text-sm font-medium text-text-muted"
+                      >
+                        Phone number
+                      </label>
+                      <form className="mt-2" onSubmit={handleSavePhone} noValidate>
+                        <input
+                          id="profile-phone-number"
+                          name="phoneNumber"
+                          type="tel"
+                          autoComplete="tel"
+                          inputMode="tel"
+                          value={phoneDraft}
+                          onChange={(event) => {
+                            setPhoneDraft(event.target.value);
+                            setPhoneError(null);
+                            setSaveError(null);
+                          }}
+                          aria-invalid={phoneError !== null}
+                          aria-describedby={
+                            phoneError ? "profile-phone-error" : undefined
+                          }
+                          className="min-h-11 w-full rounded-xl border border-slate-300 px-3 text-base text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+                          disabled={isSaving}
+                        />
+                        {phoneError ? (
+                          <p
+                            id="profile-phone-error"
+                            className="mt-2 text-sm text-red-700"
+                            role="alert"
+                          >
+                            {phoneError}
+                          </p>
+                        ) : null}
+                        <p className="mt-2 text-sm text-text-muted">
+                          Use 0 followed by 9 digits, or +84 followed by 9 digits.
+                          Leave blank to remove your phone number.
+                        </p>
+                        {saveError ? (
+                          <p className="mt-2 text-sm text-red-700" role="alert">
+                            {saveError}
+                          </p>
+                        ) : null}
+                        <div className="mt-4 flex flex-wrap gap-3">
+                          <button
+                            type="submit"
+                            disabled={isSaving}
+                            className="inline-flex min-h-11 items-center justify-center rounded-pill bg-primary px-5 text-sm font-semibold text-white hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {isSaving ? "Saving…" : "Save"}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={isSaving}
+                            onClick={handleCancelEditingPhone}
+                            className="inline-flex min-h-11 items-center justify-center rounded-pill border border-slate-300 px-5 text-sm font-semibold text-text hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  ) : (
+                    <div>
+                      <ProfileField label="Phone number" value={profile.phoneNumber} />
+                      <button
+                        type="button"
+                        onClick={handleStartEditingPhone}
+                        className="mt-3 inline-flex min-h-11 items-center justify-center rounded-pill border border-primary px-5 text-sm font-semibold text-primary hover:bg-primary/5"
+                      >
+                        Edit phone number
+                      </button>
+                    </div>
+                  )}
                   <ProfileField label="Email address" value={profile.email} />
                 </dl>
+                {saveSuccess ? (
+                  <p className="mt-4 text-sm font-medium text-green-700" role="status">
+                    Phone number updated successfully.
+                  </p>
+                ) : null}
               </section>
 
               <section

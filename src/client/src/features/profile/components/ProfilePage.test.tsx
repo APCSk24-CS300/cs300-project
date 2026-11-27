@@ -12,6 +12,7 @@ vi.mock("@/features/profile/services/profile.service", () => ({
 }));
 
 const getProfileMock = vi.mocked(profileService.getProfile);
+const updatePhoneNumberMock = vi.mocked(profileService.updatePhoneNumber);
 
 const profile: Profile = {
   email: "student@example.edu",
@@ -26,6 +27,7 @@ const profile: Profile = {
 
 beforeEach(() => {
   getProfileMock.mockReset();
+  updatePhoneNumberMock.mockReset();
 });
 
 describe("ProfilePage", () => {
@@ -86,5 +88,75 @@ describe("ProfilePage", () => {
       expect(screen.getByText("Student Example")).toBeInTheDocument(),
     );
     expect(getProfileMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("validates the phone number without discarding the entered value", async () => {
+    getProfileMock.mockResolvedValueOnce(profile);
+    renderWithProviders(<ProfilePage />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Edit phone number" }));
+    const phoneInput = screen.getByRole("textbox", { name: "Phone number" });
+    fireEvent.change(phoneInput, { target: { value: "12345" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Enter a 10-digit number",
+    );
+    expect(phoneInput).toHaveValue("12345");
+    expect(updatePhoneNumberMock).not.toHaveBeenCalled();
+    expect(screen.queryByRole("textbox", { name: "Student number" })).not.toBeInTheDocument();
+  });
+
+  it("saves a valid phone number and refreshes the displayed profile", async () => {
+    const updatedProfile = { ...profile, phoneNumber: "+84901234567" };
+    getProfileMock.mockResolvedValueOnce(profile);
+    updatePhoneNumberMock.mockResolvedValueOnce(updatedProfile);
+    renderWithProviders(<ProfilePage />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Edit phone number" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Phone number" }), {
+      target: { value: "+84901234567" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    expect(await screen.findByText("+84901234567")).toBeInTheDocument();
+    expect(
+      screen.getByRole("status", { name: "Phone number updated successfully." }),
+    ).toBeInTheDocument();
+    expect(updatePhoneNumberMock).toHaveBeenCalledWith("+84901234567");
+    expect(screen.getByText("22120001")).toBeInTheDocument();
+    expect(screen.getByText("Faculty of Science")).toBeInTheDocument();
+  });
+
+  it("discards unsaved edits when canceled", async () => {
+    getProfileMock.mockResolvedValueOnce(profile);
+    renderWithProviders(<ProfilePage />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Edit phone number" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Phone number" }), {
+      target: { value: "0911111111" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(screen.getByText("0901234567")).toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: "Phone number" })).not.toBeInTheDocument();
+    expect(updatePhoneNumberMock).not.toHaveBeenCalled();
+  });
+
+  it("shows save errors and keeps the entered phone number for correction", async () => {
+    getProfileMock.mockResolvedValueOnce(profile);
+    updatePhoneNumberMock.mockRejectedValueOnce(new Error("Phone number already in use"));
+    renderWithProviders(<ProfilePage />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Edit phone number" }));
+    const phoneInput = screen.getByRole("textbox", { name: "Phone number" });
+    fireEvent.change(phoneInput, { target: { value: "0911111111" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Phone number already in use",
+    );
+    expect(phoneInput).toHaveValue("0911111111");
+    expect(screen.getByText("0901234567")).toBeInTheDocument();
   });
 });

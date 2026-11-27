@@ -5,6 +5,7 @@ import { AuthContext } from "@/features/auth/context/AuthContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { RoleNav } from "@/components/layout/RoleNav";
 
 
 export default function DashboardPage() {
@@ -27,6 +28,8 @@ export default function DashboardPage() {
     }
   }
   return (
+    <>
+    <RoleNav />
     <div className="flex flex-col items-center justify-center gap-4">
       <h1 className="text-2xl font-bold">Admin Dashboard</h1>
       <p>Welcome to the admin dashboard!</p>
@@ -38,5 +41,6 @@ export default function DashboardPage() {
 
 
     </div>
+    </>
   );
 }

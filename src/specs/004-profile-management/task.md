@@ -10,7 +10,7 @@
 
 ## Phase 1: Foundation and contract verification
 
-**Purpose**: Confirm existing capabilities and decisions that profile work depends on.
+**Purpose**: Confirm existing capabilities and decisions that profile work depends on
 
 - [x] T001 Inspect the authenticated current-user and change-password flows in `src/client/src/features/auth/` and matching `src/server/src/routes/`, controllers, services, and repositories; record which UC-03 behaviors already exist so they are reused rather than duplicated. **Verified:** the client declares `getMe()` and `changePassword()`, but its provider uses a mock service; the server exposes register/login only and has no current-user or password-change endpoint.
 - [ ] T002 Confirm the authenticated identity fields and profile data available from `src/db/schema.sql`; identify the approved source for student number without making protected identity fields user-editable. **Blocked:** the current schema provides `Student.faculty_id` but has no student-number field. An authoritative student-number source must be identified; do not infer it from `user_id`.

@@ -20,7 +20,7 @@ The project uses GitHub Spec Kit (or a Spec Kit-style specification
 workflow). Find and read the relevant files in the repository,
 including, where present:
 
--   Naming file and variable follow what wrote in `docs/management/teamcontract.md`
+-   Naming file and variable follow what wrote in `docs/management/team-contract.md`
 -   Read carefully the rule/guide in `docs/guides/spec-kit-convention.md`
 -   Existing source code that demonstrates the established frontend,
     backend, database, authentication, API, validation, error-handling,

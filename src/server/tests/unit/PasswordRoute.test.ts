@@ -115,7 +115,7 @@ test('exposes authenticated PATCH /profile/password and accepts only the contrac
 	});
 });
 
-test('validates password-change input through the authenticated API before accessing credentials', async () => {
+test('validates input and integrates AuthService through the authenticated API', async () => {
 	const credentials = new FakeCredentials();
 	const authService = new AuthService(credentials, new FakeHasher());
 
@@ -141,6 +141,30 @@ test('validates password-change input through the authenticated API before acces
 		assert.equal(responseText.includes(newPassword), false);
 		assert.deepEqual(credentials.reads, []);
 		assert.deepEqual(credentials.updates, []);
+
+		const successResponse = await fetch(`${baseUrl}/api/v1/profile/password`, {
+			method: 'PATCH',
+			headers: {
+				Authorization: 'Bearer MIKU_MIKU_OO_EE_OO',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ currentPassword, newPassword })
+		});
+		const successBody = await successResponse.json();
+
+		assert.equal(successResponse.status, 200);
+		assert.deepEqual(successBody, {
+			success: true,
+			message: 'Password changed successfully'
+		});
+		assert.equal(JSON.stringify(successBody).includes(currentPassword), false);
+		assert.equal(JSON.stringify(successBody).includes(newPassword), false);
+		assert.deepEqual(credentials.reads, ['dev']);
+		assert.deepEqual(credentials.updates, [{
+			userId: 'dev',
+			currentHash: 'old-hash',
+			newHash: 'new-hash'
+		}]);
 	});
 });
 

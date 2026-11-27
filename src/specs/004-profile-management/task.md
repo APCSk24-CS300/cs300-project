@@ -15,7 +15,7 @@
 - [x] T001 Inspect the authenticated current-user and change-password flows in `src/client/src/features/auth/` and matching `src/server/src/routes/`, controllers, services, and repositories; record which UC-03 behaviors already exist so they are reused rather than duplicated. **Verified:** the client declares `getMe()` and `changePassword()`, but its provider uses a mock service; the server exposes register/login only and has no current-user or password-change endpoint.
 - [ ] T002 Confirm the authenticated identity fields and profile data available from `src/db/schema.sql`; identify the approved source for student number without making protected identity fields user-editable. **Blocked:** the current schema provides `Student.faculty_id` but has no student-number field. An authoritative student-number source must be identified; do not infer it from `user_id`.
 - [x] T003 Confirm the existing phone-number validation and error-response conventions; document any phone-format rule not already established before implementing validation. **Verified:** no phone-format rule was found. Registration checks for a nonempty number and exact-value duplicates; the profile API contract allows a nullable string without format constraints. The format and nullable/duplicate behavior still need agreement before T009.
-- [ ] T004 Confirm the approved avatar storage mechanism and verify it supports JPG/PNG validation, the 10 MB limit, replacement, and removal. Do not add a storage provider or dependency without approval. **Blocked:** no approved avatar storage provider or implementation was found. The API contract now specifies JPG/PNG files up to 10 MB inclusive, matching UC-03; storage approval is still required before implementation.
+- [ ] T004 Confirm the approved avatar storage mechanism and verify it supports JPG/PNG validation, the 10 MB limit, replacement, and removal. Do not add a storage provider or dependency without approval. **Blocked:** no approved avatar storage mechanism has been selected, and no existing implementation was found. The API contract specifies JPG/PNG files up to 10 MB inclusive, matching UC-03, but does not select a provider or establish that these behaviors are implemented. Storage approval is required before implementation.
 - [ ] T005 Resolve the frontend platform mismatch between the constitution and the current Next.js client with the team before frontend implementation. **Blocked:** the constitution specifies Flutter, while the team contract and current client use Next.js/React. Team resolution is required before frontend implementation.
 
 ## Phase 2: User Story 1 - View and update my profile (Priority: P1)
@@ -52,7 +52,7 @@
 - [ ] T014 [US2] Enforce current-password verification and the eight-character minimum in the server business layer; retain secure hashing and message-only success responses. Password confirmation is frontend-only and is not sent to the server.
 - [ ] T015 [US2] Add or integrate the password-change form in the approved profile experience; clear sensitive form values after completion or rejection. **Blocked:** T005 must resolve the frontend platform.
 
-## Phase 4: User Story 3 - Set or remove my profile picture (Priority: P2) (Put on hold because of haven't figured out a design yet.)
+## Phase 4: User Story 3 - Set or remove my profile picture (Priority: P2) (Deferred pending storage approval)
 
 **Goal**: Users can set a valid image or remove it to restore the default picture, without losing the previous picture on failure.
 
@@ -68,6 +68,8 @@
 - [ ] T018 [US3] Implement authenticated picture upload and removal using the storage approach approved in T004; validate content type and size at the server boundary. **Blocked:** T004 has not identified an approved storage mechanism.
 - [ ] T019 [US3] Persist the picture reference only after successful storage; retain the existing reference on upload or persistence failure. **Blocked:** T004 must approve storage before the persistence flow can be implemented.
 - [ ] T020 [US3] Integrate upload, removal, and default-picture states into the approved profile UI with explicit operation feedback. **Blocked:** T004 and T005 must resolve storage/default-picture behavior and frontend platform.
+
+**US3 status**: Deferred and blocked on T004 storage approval. Avatar requirements remain in `spec.md` and `docs/api/openapi.yaml`; the OpenAPI contract is documentation only and does not select a storage provider or prove runtime behavior. Avatar upload, removal, JPG/PNG content validation, the 10 MB boundary, and failure preservation have not been implemented or verified by tests. Keep T016-T020 unchecked, and do not report avatar acceptance criteria as complete until implementation and focused verification are performed.
 
 ## Phase 5: Verification
 

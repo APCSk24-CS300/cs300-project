@@ -6,15 +6,15 @@
 
 **Organization**: Tasks are ordered by user story and keep each workflow independently testable. Test work is included to satisfy the project constitution's testing requirements.
 
-**Investigation status (2026-11-27)**: T001 and T003 are complete based on repository inspection. T002, T004, and T005 are blocked as noted below. No implementation task is complete.
+**Verification status (2026-11-28)**: The full client and server test suites passed for the current worktree. US1/US2 code and test status is recorded per task below. T002, T004, and T005 remain unresolved; the shared authentication bypass and unapproved phone-number rule prevent final acceptance of US1/US2. US3 remains deferred and unverified.
 
 ## Phase 1: Foundation and contract verification
 
 **Purpose**: Confirm existing capabilities and decisions that profile work depends on.
 
-- [x] T001 Inspect the authenticated current-user and change-password flows in `src/client/src/features/auth/` and matching `src/server/src/routes/`, controllers, services, and repositories; record which UC-03 behaviors already exist so they are reused rather than duplicated. **Verified:** the client declares `getMe()` and `changePassword()`, but its provider uses a mock service; the server exposes register/login only and has no current-user or password-change endpoint.
+- [x] T001 Inspect the current-user, profile, and password-change flows in the client and server; record which UC-03 behaviors exist so they are reused rather than duplicated. **Verified:** the client calls `GET/PATCH /api/v1/profile` and `PATCH /api/v1/profile/password`; server routes, controllers, services, and repositories implement these operations. The shared access-token middleware still contains a hard-coded bearer-token bypass; see T006/T008/T013.
 - [ ] T002 Confirm the authenticated identity fields and profile data available from `src/db/schema.sql`; identify the approved source for student number without making protected identity fields user-editable. **Blocked:** the current schema provides `Student.faculty_id` but has no student-number field. An authoritative student-number source must be identified; do not infer it from `user_id`.
-- [x] T003 Confirm the existing phone-number validation and error-response conventions; document any phone-format rule not already established before implementing validation. **Verified:** no phone-format rule was found. Registration checks for a nonempty number and exact-value duplicates; the profile API contract allows a nullable string without format constraints. The format and nullable/duplicate behavior still need agreement before T009.
+- [x] T003 Confirm existing phone-number validation and error-response conventions. **Verified:** no established phone format was found; registration checks nonempty values and exact duplicates. The feature currently enforces `0` plus 9 digits or `+84` plus 9 digits, permits `null`, and checks equivalent-format duplicates. This format is not specified in `spec.md`/`openapi.yaml`; obtain product/team approval before treating T009 as accepted.
 - [ ] T004 Confirm the approved avatar storage mechanism and verify it supports JPG/PNG validation, the 10 MB limit, replacement, and removal. Do not add a storage provider or dependency without approval. **Blocked:** no approved avatar storage mechanism has been selected, and no existing implementation was found. The API contract specifies JPG/PNG files up to 10 MB inclusive, matching UC-03, but does not select a provider or establish that these behaviors are implemented. Storage approval is required before implementation.
 - [ ] T005 Resolve the frontend platform mismatch between the constitution and the current Next.js client with the team before frontend implementation. **Blocked:** the constitution specifies Flutter, while the team contract and current client use Next.js/React. Team resolution is required before frontend implementation.
 
@@ -26,14 +26,14 @@
 
 ### Tests
 
-- [ ] T006 [P] [US1] Add server tests for self-only profile reads and updates, including unauthenticated access, cross-user target attempts, invalid phone input, and protected identity-field tampering. **Blocked:** T002 and the phone-format/nullable policy from T003 must be resolved to define the expected profile fields and validation cases.
-- [ ] T007 [P] [US1] Add client tests for profile loading, valid phone updates, validation feedback, and discarding edits on cancel. **Blocked:** T005 must resolve the client platform; phone validation behavior also depends on the policy from T003.
+- [ ] T006 [P] [US1] Add server tests for self-only profile reads and updates, including unauthenticated access, cross-user target attempts, invalid phone input, and protected identity-field tampering. **Partially verified:** route/service tests pass for missing/invalid JWTs, ownership, field protection, and rejected updates. **Blocked:** `ValidatorMiddleware.validateAccessToken` accepts the hard-coded bearer token `MIKU_MIKU_OO_EE_OO` and assigns `sub: 'dev'`, so unauthenticated access is not fully denied. Fixing this shared middleware is broader than Profile Management and remains outstanding.
+- [x] T007 [P] [US1] Add client tests for profile loading, valid phone updates, validation feedback, failure handling, and discarding edits on cancel. **Verified:** covered by `ProfilePage.test.tsx`; full client suite passed (127 tests).
 
 ### Implementation
 
-- [ ] T008 [US1] Add or extend the authenticated profile read/update API using the existing route, controller, service, and repository patterns; derive the target user only from verified request identity. **Blocked:** confirm the real client/server authentication contract and resolve T002's student-number source before finalizing the profile response.
-- [ ] T009 [US1] Limit profile writes to the permitted phone field and apply the established phone validation before persistence. **Blocked:** no established phone-format rule exists; define accepted formats and nullable/duplicate behavior first.
-- [ ] T010 [US1] Build the profile view and edit flow under the approved client feature structure; render available academic identity fields read-only and preserve entered values when validation fails. **Blocked:** T005 and T002 require resolution before the client platform and academic fields can be finalized.
+- [ ] T008 [US1] Add or extend the authenticated profile read/update API using the existing route, controller, service, and repository patterns; derive the target user only from verified request identity. **Implemented and tested, but blocked from acceptance:** routes derive the user ID from verified JWT `sub` and ownership tests pass; the shared hard-coded bearer bypass described in T006 means the authentication requirement is not satisfied for all requests. Student number remains unavailable in the schema (T002) and is returned as `null`, not fabricated.
+- [ ] T009 [US1] Limit profile writes to the permitted phone field and apply the approved phone validation before persistence. **Implemented and tested, but blocked from acceptance:** only phone-number changes are persisted and rejected requests leave data unchanged. The current domestic/`+84` rule is not established by existing project convention or specified in the contract; approval is needed before treating this rule as final.
+- [ ] T010 [US1] Build the profile view and edit flow under the approved client feature structure; render available academic identity fields read-only and preserve entered values when validation fails. **Implemented and client-tested; pending T005:** current code uses Next.js, while the constitution names Flutter and team resolution is not recorded.
 
 ## Phase 3: User Story 2 - Change my password (Priority: P1)
 
@@ -43,14 +43,14 @@
 
 ### Tests
 
-- [ ] T011 [P] [US2] Add or extend server tests for current-password verification, the eight-character minimum, and unchanged credentials after rejection. Password confirmation is validated by the frontend and is not sent to the server.
-- [ ] T012 [P] [US2] Add client tests for current/new password validation, eight-character minimum, matching confirmation, success feedback, and error handling without echoing password values. **Blocked:** T005 must resolve the client platform.
+- [x] T011 [P] [US2] Add or extend server tests for current-password verification, the eight-character minimum, secure hashing, and unchanged credentials after rejection. Password confirmation is validated by the frontend and is not sent to the server. **Verified:** focused service/route tests pass, including bcrypt replacement and message-only responses; full server suite passed (87 tests).
+- [x] T012 [P] [US2] Add client tests for current/new password validation, eight-character minimum, matching confirmation, success feedback, and error handling without echoing password values. **Verified:** covered by `PasswordChangeForm.test.tsx`; full client suite passed (127 tests).
 
 ### Implementation
 
-- [ ] T013 [US2] Implement the authenticated `PATCH /profile/password` endpoint and integrate the existing client auth service with this official path; do not add a parallel password mechanism.
-- [ ] T014 [US2] Enforce current-password verification and the eight-character minimum in the server business layer; retain secure hashing and message-only success responses. Password confirmation is frontend-only and is not sent to the server.
-- [ ] T015 [US2] Add or integrate the password-change form in the approved profile experience; clear sensitive form values after completion or rejection. **Blocked:** T005 must resolve the frontend platform.
+- [ ] T013 [US2] Implement the authenticated `PATCH /profile/password` endpoint and integrate the existing client auth service with this official path; do not add a parallel password mechanism. **Implemented and contract-tested, but blocked from acceptance:** the official path and request/response match the contract; the shared hard-coded bearer bypass described in T006 prevents verifying that authentication is mandatory for every request.
+- [x] T014 [US2] Enforce current-password verification and the eight-character minimum in the server business layer; retain secure hashing and message-only success responses. Password confirmation is frontend-only and is not sent to the server. **Verified:** focused tests cover incorrect/short-password rejection without modification, bcrypt hash replacement, old-password invalidation, and response/log secrecy.
+- [ ] T015 [US2] Add or integrate the password-change form in the approved profile experience; clear sensitive form values after completion or rejection. **Implemented and client-tested; pending T005:** current code is in the Next.js client, while the constitution specifies Flutter and team resolution is not recorded.
 
 ## Phase 4: User Story 3 - Set or remove my profile picture (Priority: P2) (Deferred pending storage approval)
 

@@ -23,7 +23,8 @@ scoping the frontend keeps ownership clear and prevents silent contract drift.
 - Request/response fields MUST match the OpenAPI schemas, including the `{ success, data | message }`
   envelope and `ErrorResponse`. Endpoints or fields MUST NOT be invented.
 - When a required endpoint or field is missing, the spec MUST list it under "API gaps" and the UI
-  MUST NOT fake it with hard-coded or mocked production data.
+  MUST NOT fake it with hard-coded data. The development mock MAY serve a recorded gap so the flow
+  can be built and tested, but in real mode the UI MUST NOT substitute mock or invented data for it.
 - Business rules MUST follow `docs/analysis-and-design/business-rules.md`; NFRs follow
   `docs/requirements/vision-document.md`.
 
@@ -92,6 +93,12 @@ and keeps behavior predictable across roles.
 - The API contract is `docs/api/openapi.yaml` v1.2.0. Client types for requests and responses
   MUST be derived from or kept in sync with that file.
 - Authentication uses the bearer scheme defined in the OpenAPI document.
+- Every service contract MUST have a real implementation that calls the shared API client. The
+  mock MAY be a network-level mock (MSW handlers following `docs/api/openapi.yaml` paths, envelope
+  and status codes) that drives the real implementation, instead of a separate mock class.
+  Switching mock ↔ real MUST require configuration only (`NEXT_PUBLIC_API_MODE`,
+  `NEXT_PUBLIC_API_BASE_URL`), with no change to pages or components (client constitution
+  Principle IV).
 - New runtime dependencies MUST be justified in the feature plan.
 
 ## Development Workflow & Quality Gates
@@ -116,4 +123,4 @@ and keeps behavior predictable across roles.
 - All PR reviews MUST verify compliance with Principles I–VI; `/speckit-analyze` SHOULD be run
   before implementation to catch inconsistencies.
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-27 | **Last Amended**: 2026-11-27
+**Version**: 1.1.0 | **Ratified**: 2026-11-27 | **Last Amended**: 2026-11-27

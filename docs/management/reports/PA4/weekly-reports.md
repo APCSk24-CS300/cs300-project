@@ -63,17 +63,11 @@ Issues/Obstacles:
 
 ### Status reports - Khôi
 Completed tasks:
-- Implement the endpoint api/ai/prompt(chatbot phase 1)
-  Obstacles: none
+1. Review Peers' work
+- Obstacles: The team documents updated rapidly, so at some points, I commented something that is outdated (i.e., they did follow the latest documents and did the right thing, while I commented on their works base on the old, outdated documents and those comments are invalid).
 
-- Implement AI assistant guard (chatbot phase 2)
-  Obstacles: blocked by the late merge of [Implement the endpoint api/ai/prompt], so the works is discontinuous
-
-- Draft the first version of [Describe the tech stack of the software]
-  Obstacles: the main reviewer is irresponsive
-
-- Draft the first version of [Draw and explain the container diagram]
-  Obstacles: Required the C4 level 1 diagrams (of both FE and BE) on the dev branch to have proper work done
+2. Describe the tech stack of the software
+- Obstacles: Needs everyone in the team done their works to do (the first draft is immature) 
 
 To-do tasks:
 Finish all drafted items
@@ -154,7 +148,11 @@ Issues/Obstacles:
 
 ### Status reports - Khôi
 Completed tasks:
-- Finish drafts of tasks from weekly meeting 1
+1. Draw and explain the container diagram
+- Obstacles: Needs everyone in the team done their works to do (the first draft is immature)
+
+2. Created a checklist of functional groups for the team to keep track 
+- Obstacles: None
 
 To-do tasks:
 - Implement functional group #12: University service hub

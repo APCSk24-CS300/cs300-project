@@ -15,7 +15,7 @@ interface AuthRepository {
 
     checkUserExistsWithEmail(email: string): Promise<boolean>;
 
-    checkUserExistsWithPhoneNumber(phone: string): Promise<boolean>;
+    checkUserExistsWithPhoneNumber(phone: string, excludingUserId?: string): Promise<boolean>;
 
     getUserEmail(id: string): Promise<string>;
 
@@ -242,14 +242,13 @@ class InMemoryAuthRepository implements AuthRepository {
         return result != null;
     }
 
-    public async checkUserExistsWithPhoneNumber(phone: string): Promise<boolean> {
-        const query = ` 
-            SELECT *
-            FROM "User"
-            WHERE phone_number = $1
-        `;
-        const result = await DbConnection.pool.query<User>(query, [phone]);
-        return result != null;
+    public async checkUserExistsWithPhoneNumber(phone: string, excludingUserId?: string): Promise<boolean> {
+        const query = excludingUserId === undefined
+            ? `SELECT 1 FROM "User" WHERE phone_number = $1 LIMIT 1`
+            : `SELECT 1 FROM "User" WHERE phone_number = $1 AND user_id <> $2 LIMIT 1`;
+        const values = excludingUserId === undefined ? [phone] : [phone, excludingUserId];
+        const result = await DbConnection.pool.query(query, values);
+        return result.rows.length > 0;
     }
 
     public async getUserEmail(id: string): Promise<string> {

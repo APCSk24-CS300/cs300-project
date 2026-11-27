@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import bcrypt from 'bcrypt';
 import {
 	AuthService,
 	type PasswordHasher
@@ -102,6 +103,7 @@ test('rejects short passwords and confirmPassword without accessing credentials'
 	assert.deepEqual(credentials.reads, []);
 	assert.deepEqual(credentials.updates, []);
 	assert.deepEqual(hasher.hashes, []);
+	assert.equal(credentials.passwordHash, 'old-hash');
 });
 
 test('rejects an incorrect current password without updating the stored hash', async () => {
@@ -117,9 +119,50 @@ test('rejects an incorrect current password without updating the stored hash', a
 	assert.equal(result.body.success, false);
 	if (result.body.success) assert.fail('Expected a current-password error');
 	assert.equal(result.body.code, 'CURRENT_PASSWORD_INCORRECT');
+	assert.equal(JSON.stringify(result.body).includes('wrong-password'), false);
+	assert.equal(JSON.stringify(result.body).includes('new-password-8'), false);
 	assert.equal(credentials.passwordHash, 'old-hash');
 	assert.deepEqual(credentials.updates, []);
 	assert.deepEqual(hasher.hashes, []);
+});
+
+test('uses bcrypt so the old password stops matching and the new password matches after success', async () => {
+	const oldPassword = 'current-password';
+	const wrongPassword = 'incorrect-password';
+	const newPassword = 'new-password-8';
+	const credentials = new FakeCredentials();
+	credentials.passwordHash = await bcrypt.hash(oldPassword, 10);
+	const originalHash = credentials.passwordHash;
+	const service = new AuthService(credentials);
+
+	const rejected = await service.changePassword('user-1', {
+		currentPassword: wrongPassword,
+		newPassword
+	});
+
+	assert.equal(rejected.statusCode, 400);
+	assert.equal(credentials.passwordHash, originalHash);
+	assert.deepEqual(credentials.updates, []);
+
+	const changed = await service.changePassword('user-1', {
+		currentPassword: oldPassword,
+		newPassword
+	});
+
+	assert.equal(changed.statusCode, 200);
+	assert.deepEqual(changed.body, {
+		success: true,
+		message: 'Password changed successfully'
+	});
+	assert.equal(JSON.stringify(changed.body).includes(oldPassword), false);
+	assert.equal(JSON.stringify(changed.body).includes(newPassword), false);
+
+	const updatedHash = credentials.passwordHash;
+	assert.ok(updatedHash);
+	assert.notEqual(updatedHash, originalHash);
+	assert.match(updatedHash, /^\$2[aby]\$10\$/);
+	assert.equal(await bcrypt.compare(oldPassword, updatedHash), false);
+	assert.equal(await bcrypt.compare(newPassword, updatedHash), true);
 });
 
 test('does not overwrite a password changed by a concurrent request', async () => {

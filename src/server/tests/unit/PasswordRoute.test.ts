@@ -117,7 +117,8 @@ test('exposes authenticated PATCH /profile/password and accepts only the contrac
 
 test('validates input and integrates AuthService through the authenticated API', async () => {
 	const credentials = new FakeCredentials();
-	const authService = new AuthService(credentials, new FakeHasher());
+	const hasher = new FakeHasher();
+	const authService = new AuthService(credentials, hasher);
 
 	await withServer(authService, async (baseUrl) => {
 		const currentPassword = 'private-current-password';
@@ -142,6 +143,43 @@ test('validates input and integrates AuthService through the authenticated API',
 		assert.deepEqual(credentials.reads, []);
 		assert.deepEqual(credentials.updates, []);
 
+		const shortPassword = '1234567';
+		const shortResponse = await fetch(`${baseUrl}/api/v1/profile/password`, {
+			method: 'PATCH',
+			headers: {
+				Authorization: 'Bearer MIKU_MIKU_OO_EE_OO',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ currentPassword, newPassword: shortPassword })
+		});
+		const shortResponseText = await shortResponse.text();
+		assert.equal(shortResponse.status, 400);
+		assert.equal(shortResponseText.includes(currentPassword), false);
+		assert.equal(shortResponseText.includes(shortPassword), false);
+		assert.deepEqual(credentials.reads, []);
+		assert.deepEqual(credentials.updates, []);
+
+		hasher.match = false;
+		const wrongCurrentPassword = 'private-wrong-current-password';
+		const incorrectResponse = await fetch(`${baseUrl}/api/v1/profile/password`, {
+			method: 'PATCH',
+			headers: {
+				Authorization: 'Bearer MIKU_MIKU_OO_EE_OO',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				currentPassword: wrongCurrentPassword,
+				newPassword
+			})
+		});
+		const incorrectResponseText = await incorrectResponse.text();
+		assert.equal(incorrectResponse.status, 400);
+		assert.equal(incorrectResponseText.includes(wrongCurrentPassword), false);
+		assert.equal(incorrectResponseText.includes(newPassword), false);
+		assert.equal(credentials.passwordHash, 'old-hash');
+		assert.deepEqual(credentials.updates, []);
+
+		hasher.match = true;
 		const successResponse = await fetch(`${baseUrl}/api/v1/profile/password`, {
 			method: 'PATCH',
 			headers: {
@@ -159,7 +197,7 @@ test('validates input and integrates AuthService through the authenticated API',
 		});
 		assert.equal(JSON.stringify(successBody).includes(currentPassword), false);
 		assert.equal(JSON.stringify(successBody).includes(newPassword), false);
-		assert.deepEqual(credentials.reads, ['dev']);
+		assert.deepEqual(credentials.reads, ['dev', 'dev']);
 		assert.deepEqual(credentials.updates, [{
 			userId: 'dev',
 			currentHash: 'old-hash',

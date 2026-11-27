@@ -127,7 +127,7 @@ description: "Task list for 003-auth-dashboard-admin-users"
 - [X] T017 [P] Create the mock utilities:
   - `src/client/src/mocks/utils/envelope.ts`: `ok(data, status)`, `fail(status, code, message, errors?, headers?)`;
   - `src/client/src/mocks/utils/latency.ts`: `delay(ms)` using `msw`'s `delay`; 300 ms for login, 200 ms otherwise;
-  - `src/client/src/mocks/utils/token.ts`: `issueToken(user)` with jose `SignJWT` HS256 and a constant mock key (claims `sub`, `name`, `jti`, `exp = now + 3600`), and `verifyToken(token)`, which returns the claims or `null` for an invalid, expired or revoked token;
+  - `src/client/src/mocks/utils/token.ts`: `issueToken(user)` issues an **unsigned** jose `UnsecuredJWT` (claims `sub`, `name`, `jti`, `exp = now + 3600`) and records `jti → user id` in the store's `issuedTokens` (research R3). `verifyToken(token)` returns the claims only if the `jti` was issued by this store for that `sub`, isn't in `revokedTokenIds` and hasn't expired; otherwise `null`, so a forged token is rejected;
   - `src/client/src/mocks/utils/token.test.ts`.
 - [X] T018 Create `src/client/src/mocks/handlers/guards.ts` with `withAuth(resolver, { requireRole?, allowWhenMustChange?, skipAccountChecks?, skipStatusAndRoleChecks? })`, implementing `contracts/mock-api.md`:
   - a missing or invalid token → 401 `UNAUTHENTICATED`;
@@ -231,8 +231,9 @@ description: "Task list for 003-auth-dashboard-admin-users"
 
   Register both in `src/client/src/mocks/handlers/index.ts`.
 - [X] T038 [US1] Rewrite `src/client/src/features/auth/context/AuthContext.tsx` and `src/client/src/features/auth/provider/AuthProvider.tsx`, following the state machine in data-model §3.1. The `status` values are `unknown | signedOut | loadingContext | signedIn | mustChangePassword`.
-  - **`signOutLocally()`**: one private helper that calls `clearToken()` and `clearHint()` and sets `signedOut`. **Every** transition to `signedOut` goes through it, so a stale hint can never survive without a token and cause a dashboard ↔ `/login` loop (analysis H5, FR-018c).
-  - **Bootstrap**: if `getToken()` exists, call `getCurrentUser()`, pass the result through `applyContext()` (T048), then `writeHint`. If there is no token, or the call returns 401, call `signOutLocally()`.
+  - **`signOutLocally(reason?)`**: one helper that calls `clearToken()` and `clearHint()` and sets `signedOut`. **Every** transition to `signedOut` goes through it, so a stale hint can never survive without a token and cause a dashboard ↔ `/login` loop (analysis H5, FR-018c). With a `reason`, it stores `signOutReason` and navigates to `/login?reason=<reason>` itself; see the redirect-ownership rule in T042.
+  - **`applyContext(data)`**: create it here (analysis M11). It turns `/auth/me` data into a `CurrentUser`; `status: 'inactive'` → `ApiError ACCOUNT_DISABLED`, and an invalid or `null` role → `ApiError ROLE_MISSING`. It's used by the bootstrap and by `login()`.
+  - **Bootstrap**: if `getToken()` exists, call `getCurrentUser()`, pass the result through `applyContext()`, then `writeHint`. If there is no token, or the call returns 401, call `signOutLocally()`.
   - **`login(email, password)`**: call `authService.login`, then `setToken` (localStorage), `getCurrentUser`, `toCurrentUser`, and `writeHint({ role, mustChangePassword, exp: getTokenExp() })`. Return the `CurrentUser`.
   - **On mount**: register `setTokenProvider(getToken)`, `setUnauthorizedHandler` and `setAccountDisabledHandler` (the bodies come in T055), and subscribe via `subscribeToken`.
   - Expose `signOutLocally` to `RequireSession` through the context (internal API, not used by other features).
@@ -254,9 +255,11 @@ description: "Task list for 003-auth-dashboard-admin-users"
   Delete `src/client/proxy.ts`, `src/client/src/libs/session.ts` and `src/client/src/app/api/auth/login/route.ts`. Add `src/client/src/proxy.test.ts`, covering no hint → `/login?redirectTo=…`, wrong role → `/forbidden`, and allowed.
 - [X] T042 [US1] Create `src/client/src/features/auth/components/RequireSession.tsx`:
   - while `status` is `unknown` or `loadingContext`, render a full-page `LoadingState`;
-  - when `signedOut`, `router.replace(getLoginHref(pathname))`;
+  - when `signedOut` **and `signOutReason === null`**, `router.replace(getLoginHref(pathname))`;
   - otherwise apply `resolveRouteAccess` to the client state and render the children.
-  - If the bootstrap fails with a 5xx or network error, keep the token and render `ErrorState` with retry. Inactive or role-less accounts are not errors here: `applyContext()` (T048) signs them out and redirects with a reason.
+  - If the bootstrap fails with a 5xx or network error, keep the token and render `ErrorState` with retry. Inactive or role-less accounts are not errors here: `applyContext()` (T038) signs them out and the provider redirects with a reason.
+
+  **Redirect ownership (analysis M12)**: when the provider signs the user out *with a reason* (`expired`, `disabled`, `role-missing`, `signed-out`, `logout-unconfirmed`), the provider alone navigates to `/login?reason=…`. `RequireSession` redirects only when there's no reason, for example no token at bootstrap. This makes exactly one redirect happen, so the reason notice can't be overwritten by a second `/login?redirectTo=…` redirect.
 
   Create `src/client/src/app/(protected)/layout.tsx`, wrapping `RequireSession` and `AppShell`, with the header showing the user.
 - [X] T043 [US1] Replace the stub pages `src/client/src/app/(protected)/student/dashboard/page.tsx`, `src/client/src/app/(protected)/manager/dashboard/page.tsx` and `src/client/src/app/(protected)/admin/dashboard/page.tsx` with thin pages rendering `PageHeader` "Dashboard" and the text "Welcome, {fullName}". Remove their own logout buttons and raw classes (completed in US4). (done: the pages render the final `RoleDashboard` directly, so T091 needed no further change)
@@ -303,7 +306,7 @@ description: "Task list for 003-auth-dashboard-admin-users"
 
   Wrap the handler with `withFailureSwitch('login', …)`, and wrap `GET /auth/me` with `withFailureSwitch('me', …)`.
 - [X] T047 [US2] In `src/client/src/features/auth/components/LoginForm.tsx`, map `ApiError` through `toUserMessage(err, 'login')` into `Alert`. Map `fieldErrors` from 400 `VALIDATION_FAILED` onto the fields. Keep the email, clear the password after a failure, and move focus to the alert.
-- [X] T048 [US2] In `src/client/src/features/auth/provider/AuthProvider.tsx`, create **`applyContext(dto): CurrentUser`**, used by **both** `login()` and the bootstrap (analysis H6). It throws a typed `ApiError` for:
+- [X] T048 [US2] In `src/client/src/features/auth/provider/AuthProvider.tsx`, extend `login()` and the bootstrap around **`applyContext(dto): CurrentUser`** (analysis H6). Note: `applyContext()` itself was **folded into T038** (analysis M11); this task adds the login and bootstrap error handling below. It throws a typed `ApiError` for:
   - `status: 'inactive'` → `ACCOUNT_DISABLED`;
   - an `InvalidRoleError` from `toCurrentUser`, or a 403 `ROLE_MISSING` / `FORBIDDEN` → `ROLE_MISSING`.
 
@@ -349,10 +352,11 @@ description: "Task list for 003-auth-dashboard-admin-users"
 
 - [X] T054 [US3] Add `POST /auth/logout` to `src/client/src/mocks/handlers/auth.ts`, wrapped in `withAuth(…, { skipStatusAndRoleChecks: true })` and `withFailureSwitch('logout', …)`. It adds `jti` to `revokedTokenIds` and returns 200 `ApiMessage`.
 - [X] T055 [US3] In `src/client/src/features/auth/provider/AuthProvider.tsx`:
-  - **`logout()`**: call `authService.logout()`; in `finally`, always call `signOutLocally()`. Return `'confirmed'` on 200, `'already-expired'` on 401, and `'unconfirmed'` on a network error or 5xx. The caller navigates to `/login?reason=signed-out` or `/login?reason=logout-unconfirmed`.
-  - **Unauthorized handler**: `signOutLocally()`, then `router.replace('/login?reason=expired&redirectTo=' + encodeURIComponent(current path))`.
-  - **Account-disabled handler**: `signOutLocally()`, then `router.replace('/login?reason=disabled')`.
-  - **`subscribeToken` callback**: when the token disappears in another tab, `signOutLocally()`, then `router.replace('/login?reason=signed-out')`.
+  - **`logout()`**: call `authService.logout()`; in `finally`, always call `signOutLocally('signed-out')`, or `signOutLocally('logout-unconfirmed')` after a network error or 5xx. Return `'confirmed'` on 200, `'already-expired'` on 401 and `'unconfirmed'` otherwise. **The provider performs the navigation**; the caller doesn't navigate (redirect ownership, T042 / analysis M12).
+  - **Unauthorized handler**: `signOutLocally('expired')`, which navigates to `/login?reason=expired&redirectTo=<current path>`.
+  - **Account-disabled handler**: `signOutLocally('disabled')`, which navigates to `/login?reason=disabled`.
+  - **`subscribeToken` callback**: when the token disappears in another tab, `signOutLocally('signed-out')`, which navigates to `/login?reason=signed-out`.
+  - Every reason-specific redirect above is done by the provider only; `RequireSession` doesn't redirect again while `signOutReason` is set (T042).
 - [X] T056 [US3] Wire `AccountMenu.onLogout` in `src/client/src/components/layout/AppHeader.tsx` (through the `(protected)/layout.tsx` props) to `logout()` and navigation, with a pending state.
 - [X] T057 [US3] Create `src/client/src/features/auth/components/LogoutNotice.tsx`, mapping `?reason=`:
   - `signed-out` → info "You have been signed out.";
@@ -438,7 +442,7 @@ description: "Task list for 003-auth-dashboard-admin-users"
 - [X] T068 [US6] Create `src/client/src/mocks/handlers/admin-users.ts` with `POST /admin/users`, using `withAuth({ requireRole: 'administrator' })` and `withFailureSwitch('createUser')`. Validate in the order given in `contracts/mock-api.md`. Create the user with `id = 'user-' + n`, `version: 1`, `status: 'active'`, `mustChangePassword: true`, `passwordPlain = initialPassword` and `createdAt = now`. Return 201 `AdminUserResponse` with permissions.
 
   Create `src/client/src/mocks/handlers/reference.ts` with `GET /admin/faculties`, `GET /admin/roles` and `GET /admin/roles/:roleId/permissions` (administrator only; failure switches `listFaculties` and `listRoles`). Register both in `src/client/src/mocks/handlers/index.ts`.
-- [X] T069 [US6] Create these hooks. Each read hook returns `{ status: 'loading' | 'error' | 'forbidden' | 'success', data, error, retry }`, and maps errors with `isForbiddenError` from `src/client/src/hooks/useForbidden.ts` (no `useForbidden()` inside hooks, per the T030 wiring rule):
+- [X] T069 [US6] Create these hooks. Each read hook returns `{ status: 'loading' | 'error' | 'forbidden' | 'success', data, error, retry }`, and maps errors with `isForbiddenError` from `src/client/src/hooks/useForbidden.ts` (no `useForbidden()` inside hooks, per the T030 wiring rule). The read hooks share **`src/client/src/features/admin-users/hooks/useAsyncResource.ts`**. It derives `loading` from a request key instead of setting state inside the effect, drops stale responses, and returns `status: 'forbidden'` via `isForbiddenError`. `useAccountList` (T097) uses it too.
   - `src/client/src/features/admin-users/hooks/useFaculties.ts` (`Faculty[]`);
   - `src/client/src/features/admin-users/hooks/useRolePermissions.ts` (keyed by role);
   - `src/client/src/features/admin-users/hooks/useCreateAccount.ts` (mutation: returns `{ submit, pending }`, rejects with the `ApiError`), which keeps one in-flight promise and ignores re-entry (FR-037).
@@ -593,12 +597,18 @@ description: "Task list for 003-auth-dashboard-admin-users"
 - [X] T102 [P] Update `src/client/DEV_NOTES.md`: mock mode (`NEXT_PUBLIC_API_MODE`, `window.__myhcmusMock`, seed accounts), the session decision (token in `localStorage`, hint cookie only), the `proxy.ts` relocation, and a link to `specs/003-auth-dashboard-admin-users/docs-changes.md` for the open proposals.
 - [X] T103 [P] Update `src/client/README.md`: setup (`npm install`, `npx msw init public`, `.env.example`), `npm run gen:api`, and how to switch to the real backend.
 - [X] T104 Run `npm run lint`, `npm run test` and `npm run build` in `src/client/`, and fix every new error and warning. (done 2026-11-27: `npm run test` 48 files / 296 tests passed; `npx eslint .` 0 problems; `npm run build` exit 0 on retry — the first attempt was halted only by the Next.js security advisory, see HANDOFF §3)
-- [ ] T105 Walk through `src/client/specs/003-auth-dashboard-admin-users/quickstart.md` in `npm run dev` with mock mode: (in progress: only a production-server smoke test of the route guard was done (no session → /login, wrong role → /forbidden, no-store header, A7, worker served). Still to do: the manual browser walkthrough of every scenario, the SC-007 timing table, the SC-011 consistency review, and the real-mode `git status` check)
+- [ ] T105 Walk through `src/client/specs/003-auth-dashboard-admin-users/quickstart.md` in `npm run dev` with mock mode: (in progress: tick off `t105-checklist.md` sections A–G and the H config-only check. The real-mode flows against the backend are **blocked: waiting for BE**, because `src/server` has no `/api/v1`, `/auth/me`, `/auth/logout`, `/profile/password`, `/admin/*` or CORS; see GAP-E)
   - run every scenario, and record any failure as a new task;
   - **fill in the "Manual timing (SC-007)" table**, noting that SC-007 isn't measurable on the mock and must be re-checked against the real backend;
   - **do the "Consistency review (SC-011)"** across all three roles, recording any one-off variant as a task;
   - confirm `docs-changes.md` lists every deviation found during implementation;
   - switch to `NEXT_PUBLIC_API_MODE=real`, rebuild, and confirm that `git status` shows no changes under `src/client/src/app`, `src/client/src/components` or `src/client/src/features` (SC-009).
+- [X] T106 Replace every raw Tailwind palette color in `src/client/src` with theme tokens (constitution C-VI, analysis C1), including the existing `Button.tsx`, `Skeleton.tsx` and landing components:
+  - add `--color-on-primary`, `--color-hover-tint`, `--color-overlay`, `--color-skeleton`, `--color-surface-muted`, `--color-divider`, `--color-hero-headline` and `--color-hero-shadow` to `@theme` in `src/client/src/app/globals.css`, with the **exact previous values**, so nothing changes visually;
+  - swap `text-white`, `bg-black/*`, `bg/border-slate-*`, the gradient `*-white` utilities and HeroSection's `[#FFA800]` and `rgba` shadow for those tokens;
+  - the only visual change is the dev-only `/test` page button, from `bg-blue-500/600` to `bg-primary/primary-dark`;
+  - a grep of `src/client/src` (excluding `globals.css` and tests) for raw palette colors, hex or `rgba` returns nothing;
+  - lint, tests and build pass.
 
 ---
 

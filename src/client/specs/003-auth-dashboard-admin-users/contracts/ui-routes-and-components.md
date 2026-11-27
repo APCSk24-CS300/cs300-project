@@ -36,6 +36,12 @@ Both are cosmetic; the API enforces access (FR-021).
 
 The hint is advisory. Whenever the client finds no valid token (bootstrap, `pageshow`, `storage` event, 401), it clears the hint before redirecting to `/login`. Without that, rule 1 would send a stale-hint user back to a protected page and loop (FR-018c).
 
+**Redirect ownership (analysis M12).** Exactly one component redirects on sign-out:
+- **With a reason** (`expired`, `disabled`, `role-missing`, `signed-out`, `logout-unconfirmed`): `AuthProvider.signOutLocally(reason)` clears the token and the hint, stores `signOutReason`, and navigates to `/login?reason=<reason>`. For `expired` it also adds `&redirectTo=<current path>`.
+- **Without a reason** (for example, no token at bootstrap): `RequireSession` redirects to `/login?redirectTo=<path>`, and only when `signOutReason === null`.
+
+This ensures the `?reason=` notice on `/login` is never overwritten by a second redirect.
+
 `redirectTo` is accepted only if `isSafeRedirectPath()` passes and the path is allowed for the signed-in role. Otherwise the user goes to their dashboard.
 
 ## 3. Shared layout components (`src/components/layout`)

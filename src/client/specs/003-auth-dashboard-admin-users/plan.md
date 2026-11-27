@@ -142,7 +142,8 @@ src/client/
 │   │   │   └── types/ auth.dto.ts ~ (re-export gen + gaps), auth.ts ~ (CurrentUser)
 │   │   ├── dashboard/                   + components/RoleDashboard…, config/dashboard-sections.ts
 │   │   └── admin-users/                 + services/admin-users.service.ts (interface + Http impl),
-│   │                                      hooks/useAccountList, useCreateAccount, useRolePermissions, useFaculties,
+│   │                                      hooks/useAsyncResource (shared read-hook core: derived loading, 'forbidden' status),
+│   │                                      useAccountList, useCreateAccount, useRolePermissions, useFaculties,
 │   │                                      mappers/, types/, schema/new-account.schema.ts,
 │   │                                      lib/temporary-password.ts, components/…
 │   ├── libs/

@@ -91,4 +91,6 @@ Record any finding as a task.
 
 ### Switch to real backend (SC-009)
 
+> **Backend flows blocked, waiting for BE.** Only the config-only part below can be checked now (build in real mode, then `git status`). `src/server` starts, but it serves only `/api/auth/register`, `/api/auth/login` and `/api/ai`: there's no `/api/v1` base path, no `/auth/me`, `/auth/logout`, `/profile/password` or `/admin/*`, a different response format, and no CORS (spec GAP-E, docs-changes DOC-03/DOC-04).
+
 Set `NEXT_PUBLIC_API_MODE=real` and point `NEXT_PUBLIC_API_BASE_URL` at the backend, then run `npm run build`. `git status` must show no changes under `src/app`, `src/components` or `src/features`. Real-mode success also depends on the BE accepting GAP-A/B/C/M and fixing GAP-E (see spec).

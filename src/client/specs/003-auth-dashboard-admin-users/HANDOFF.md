@@ -14,7 +14,9 @@ Nothing is pushed.
   - T100–T103 are done.
   - **T104 is done**: on the latest code, tests pass (48 files, 296 tests), lint reports 0 problems, and the build exits 0. After the Next.js upgrade to 16.4.6 all three checks were re-run and still pass (296/296 tests, 0 lint problems, build exit 0 on the first try).
   - **T105 is not done**: only a server smoke test was run.
-- **tasks.md**: 104 of 105 tasks are checked `[X]`. T105 is unchecked with an "(in progress: …)" note.
+- **tasks.md**: 105 of 106 tasks are checked `[X]`. T105 is unchecked with an "(in progress: …)" note.
+- **T106 (theme tokens, analysis C1) is done**: every raw palette color in `src/client/src` now uses `@theme` tokens with the same values (`--color-on-primary`, `--color-hover-tint`, `--color-overlay`, `--color-skeleton`, `--color-surface-muted`, `--color-divider`, `--color-hero-headline`, `--color-hero-shadow`). The only visual change is the dev-only `/test` button. After it, tests pass (296/296), lint is clean and the build exits 0.
+- **Analysis pass 4 doc fixes are applied** (M1–M4, L1, L2): tasks T017/T038/T042/T048/T055/T069, the UI contract §2 redirect-ownership rule, `useAsyncResource` in the plan structure, the contrast check in `t105-checklist.md`, and the blocked note in the quickstart.
 
 ## 2. Verification state
 
@@ -75,7 +77,7 @@ These are FE-internal. None of them changes `docs/`, so `docs-changes.md` needs 
 
 ## 6. Exact next action when resuming
 
-1. Do **T105**:
+1. Do **T105** using [`t105-checklist.md`](./t105-checklist.md), sections A–G plus the H config-only check. The **real-mode flows against the backend are blocked: waiting for BE**. `src/server` starts, but it has no `/api/v1` base path, no `/auth/me`, `/auth/logout`, `/profile/password` or `/admin/*`, a different response format, and no CORS (spec GAP-E). Original steps, for reference:
    - run `npm run dev` with `NEXT_PUBLIC_API_MODE=mock`;
    - walk through every row of `quickstart.md` in the browser, running `__myhcmusMock.reset()` first;
    - fill in the SC-007 timing table;

@@ -1,8 +1,19 @@
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { useState } from "react";
+import { describe, expect, it, vi } from "vitest";
 import { UserListView } from "@/features/admin-users/components/UserListView";
 import { setMockFailures, updateDb } from "@/mocks/db/store";
-import { expectNoA11yViolations, mockRouter, renderWithProviders, screen, signInAs, waitFor, within } from "../../../../tests/test-utils";
+import {
+  act,
+  expectNoA11yViolations,
+  fireEvent,
+  mockRouter,
+  renderWithProviders,
+  screen,
+  signInAs,
+  waitFor,
+  within,
+} from "../../../../tests/test-utils";
 
 async function setup() {
   signInAs("admin@example.invalid");
@@ -32,6 +43,39 @@ describe("UserListView (US5)", () => {
     await userEvent.click(screen.getByRole("button", { name: "Clear filters" }));
     await waitFor(() => expect(screen.getAllByRole("row")).toHaveLength(7));
     expect(screen.getByRole("searchbox", { name: /search/i })).toHaveValue("");
+  });
+
+  it("updates the URL without updating the Router during render", async () => {
+    // A state-backed stand-in for Next's Router, so updating it during another component's
+    // render triggers React's real "Cannot update a component while rendering" warning.
+    let setRouterUrl: (url: string) => void = () => undefined;
+    function RouterProbe() {
+      const [url, setUrl] = useState("/admin/users");
+      setRouterUrl = setUrl;
+      return <output data-testid="router-url">{url}</output>;
+    }
+    mockRouter.replace.mockImplementation((href: string) => setRouterUrl(href));
+    const errors = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    signInAs("admin@example.invalid");
+    renderWithProviders(
+      <>
+        <RouterProbe />
+        <UserListView />
+      </>,
+      { route: "/admin/users" },
+    );
+    await screen.findByText("Đặng Thu Mai");
+    const search = screen.getByRole("searchbox", { name: /search/i });
+    // Two queued updates in one batch: the second updater cannot be computed eagerly.
+    act(() => {
+      fireEvent.change(search, { target: { value: "a" } });
+      fireEvent.change(search, { target: { value: "an" } });
+    });
+
+    await waitFor(() => expect(screen.getByTestId("router-url")).toHaveTextContent("/admin/users?search=an"));
+    const renderUpdates = errors.mock.calls.filter((args) => String(args[0]).includes("Cannot update a component"));
+    expect(renderUpdates).toEqual([]);
   });
 
   it("filters by role", async () => {

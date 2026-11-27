@@ -59,16 +59,17 @@ export function useAccountList() {
     [router, pathname],
   );
 
+  // The URL is updated in the event handler, never inside a state updater: React runs
+  // updaters during render, and updating the Router there triggers "Cannot update a
+  // component (`Router`) while rendering a different component".
   const setQuery = useCallback(
     (patch: Partial<AccountListState>) => {
-      setQueryState((current) => {
-        const filterChanged = patch.search !== undefined || patch.role !== undefined;
-        const next = { ...current, ...patch, page: filterChanged ? 1 : (patch.page ?? current.page) };
-        syncUrl(next);
-        return next;
-      });
+      const filterChanged = patch.search !== undefined || patch.role !== undefined;
+      const next = { ...query, ...patch, page: filterChanged ? 1 : (patch.page ?? query.page) };
+      setQueryState(next);
+      syncUrl(next);
     },
-    [syncUrl],
+    [query, syncUrl],
   );
 
   const clearFilters = useCallback(() => {

@@ -249,7 +249,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
-          description: The password could not be changed. The stored password remains unchanged.
+          description: The password change could not be completed.
           content:
             application/json:
               schema:

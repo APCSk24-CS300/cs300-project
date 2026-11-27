@@ -5,5 +5,5 @@ export function getPhoneNumberError(phoneNumber: string): string | null {
     return null;
   }
 
-  return "Enter a 10-digit number starting with 0 or +84 followed by 9 digits.";
+  return "Enter a 9-digit number starting with 0 or +84 followed by 9 digits.";
 }

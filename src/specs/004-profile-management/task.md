@@ -52,7 +52,7 @@
 - [ ] T014 [US2] Enforce current-password verification and the eight-character minimum in the server business layer; retain secure hashing and message-only success responses. Password confirmation is frontend-only and is not sent to the server.
 - [ ] T015 [US2] Add or integrate the password-change form in the approved profile experience; clear sensitive form values after completion or rejection. **Blocked:** T005 must resolve the frontend platform.
 
-## Phase 4: User Story 3 - Set or remove my profile picture (Priority: P2)
+## Phase 4: User Story 3 - Set or remove my profile picture (Priority: P2) (Put on hold because of haven't figured out a design yet.)
 
 **Goal**: Users can set a valid image or remove it to restore the default picture, without losing the previous picture on failure.
 

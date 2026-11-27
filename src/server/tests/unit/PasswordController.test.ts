@@ -2,9 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { Request, Response } from 'express';
 import {
-	PasswordService,
+	AuthService,
 	type PasswordChangeResult
-} from '../../src/services/PasswordService.ts';
+} from '../../src/services/AuthService.ts';
 import { PasswordController } from '../../src/controllers/PasswordController.ts';
 
 interface ResponseCapture {
@@ -13,7 +13,7 @@ interface ResponseCapture {
 	headers?: Record<string, string>;
 }
 
-class FakePasswordService implements Pick<PasswordService, 'changePassword'> {
+class FakePasswordService implements Pick<AuthService, 'changePassword'> {
 	calls: { userId: string; request: unknown }[] = [];
 	result: PasswordChangeResult = {
 		statusCode: 200,

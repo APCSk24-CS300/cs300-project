@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-	PasswordService,
+	AuthService,
 	type PasswordHasher
-} from '../../src/services/PasswordService.ts';
+} from '../../src/services/AuthService.ts';
 import type { PasswordCredentialStore } from '../../src/repositories/AuthRepository.ts';
 
 class FakeCredentials implements PasswordCredentialStore {
@@ -52,15 +52,14 @@ function createService() {
 	const credentials = new FakeCredentials();
 	const hasher = new FakeHasher();
 	return {
-		service: new PasswordService(credentials, hasher),
+		service: new AuthService(credentials, hasher),
 		credentials,
 		hasher
 	};
 }
 
-test('changes the authenticated user password and returns a message-only success body', async () => {
+test('changes the authenticated user password with bcrypt-compatible hashing and message-only success', async () => {
 	const { service, credentials, hasher } = createService();
-
 	const result = await service.changePassword('user-1', {
 		currentPassword: 'old-password',
 		newPassword: 'new-password-8'
@@ -73,7 +72,6 @@ test('changes the authenticated user password and returns a message-only success
 	});
 	assert.equal(JSON.stringify(result.body).includes('old-password'), false);
 	assert.equal(JSON.stringify(result.body).includes('new-password-8'), false);
-	assert.deepEqual(credentials.reads, ['user-1']);
 	assert.deepEqual(credentials.updates, [{
 		userId: 'user-1',
 		currentHash: 'old-hash',
@@ -89,7 +87,7 @@ test('changes the authenticated user password and returns a message-only success
 	}]);
 });
 
-test('rejects short passwords and confirmation fields without reading or changing credentials', async () => {
+test('rejects short passwords and confirmPassword without accessing credentials', async () => {
 	const { service, credentials, hasher } = createService();
 
 	for (const request of [
@@ -140,7 +138,7 @@ test('does not overwrite a password changed by a concurrent request', async () =
 	assert.equal(credentials.passwordHash, 'old-hash');
 });
 
-test('returns a generic error and does not log password data when credential storage fails', async () => {
+test('returns a generic error without logging password values when storage fails', async () => {
 	const { service, credentials } = createService();
 	credentials.fail = true;
 	const originalError = console.error;

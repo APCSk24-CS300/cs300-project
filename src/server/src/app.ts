@@ -23,9 +23,9 @@ import { AiRequestLogRepository } from './repositories/AiRequestLogRepository.ts
 import type { RequestLogStore } from './repositories/AiRequestLogRepository.ts';
 import { ProfileRepository } from './repositories/ProfileRepository.ts';
 import InMemoryAuthRepository from './repositories/AuthRepository.ts';
+import AuthService from './services/AuthService.ts';
 import { ProfileService } from './services/ProfileService.ts';
 import { ProfileController } from './controllers/ProfileController.ts';
-import { PasswordService } from './services/PasswordService.ts';
 import { PasswordController } from './controllers/PasswordController.ts';
 import DbConnection from './connections/db.ts';
 import { getAiPool } from './connections/aiDb.ts';
@@ -72,7 +72,7 @@ export function createApp(options: AppOptions = {}) {
 		InMemoryAuthRepository
 	));
 	const passwordController = new PasswordController(
-		new PasswordService(InMemoryAuthRepository)
+		AuthService
 	);
 
 	app.use('/api/auth', AuthRoute);

@@ -6,10 +6,10 @@ import { ProfileController } from '../../src/controllers/ProfileController.ts';
 import { PasswordController } from '../../src/controllers/PasswordController.ts';
 import { createProfileRoute } from '../../src/routes/ProfileRoute.ts';
 import type { ProfileService } from '../../src/services/ProfileService.ts';
+import type { AuthService } from '../../src/services/AuthService.ts';
 import {
-	PasswordService,
 	type PasswordChangeResult
-} from '../../src/services/PasswordService.ts';
+} from '../../src/services/AuthService.ts';
 import { generate200Response } from '../../src/helper/generate200Response.ts';
 
 class FakeProfileService implements Pick<ProfileService, 'getProfile' | 'updateProfile'> {
@@ -17,7 +17,7 @@ class FakeProfileService implements Pick<ProfileService, 'getProfile' | 'updateP
 	async updateProfile() { return generate200Response({}); }
 }
 
-class FakePasswordService implements Pick<PasswordService, 'changePassword'> {
+class FakePasswordService implements Pick<AuthService, 'changePassword'> {
 	calls: { userId: string; request: unknown }[] = [];
 
 	async changePassword(userId: string, request: unknown): Promise<PasswordChangeResult> {

@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
-import type { PasswordService } from '../services/PasswordService.ts';
+import type { AuthService } from '../services/AuthService.ts';
 
-type PasswordServicePort = Pick<PasswordService, 'changePassword'>;
+type AuthServicePort = Pick<AuthService, 'changePassword'>;
 
 function getAuthenticatedUserId(response: Response): string | null {
 	const user: unknown = response.locals.user;
@@ -19,9 +19,9 @@ function getAuthenticatedUserId(response: Response): string | null {
 }
 
 export class PasswordController {
-	private readonly service: PasswordServicePort;
+	private readonly service: AuthServicePort;
 
-	constructor(service: PasswordServicePort) {
+	constructor(service: AuthServicePort) {
 		this.service = service;
 	}
 

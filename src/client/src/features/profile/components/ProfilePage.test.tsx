@@ -50,6 +50,8 @@ describe("ProfilePage", () => {
     expect(screen.getByText("22120001")).toBeInTheDocument();
     expect(screen.getByText("Faculty of Science")).toBeInTheDocument();
     expect(screen.getByText("Read only")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Change password" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Current password")).toBeInTheDocument();
     expect(
       screen.getByRole("img", { name: "Student Example's profile picture" }),
     ).toHaveAttribute("src", profile.avatarUrl);

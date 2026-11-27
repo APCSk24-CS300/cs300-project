@@ -21,12 +21,17 @@ import { IdentityRepository } from './repositories/IdentityRepository.ts';
 import { AiSettingsRepository } from './repositories/AiSettingsRepository.ts';
 import { AiRequestLogRepository } from './repositories/AiRequestLogRepository.ts';
 import type { RequestLogStore } from './repositories/AiRequestLogRepository.ts';
+import { ProfileRepository } from './repositories/ProfileRepository.ts';
+import InMemoryAuthRepository from './repositories/AuthRepository.ts';
+import { ProfileService } from './services/ProfileService.ts';
+import { ProfileController } from './controllers/ProfileController.ts';
 import DbConnection from './connections/db.ts';
 import { getAiPool } from './connections/aiDb.ts';
 
 // routes
 import AuthRoute from './routes/AuthRoute.ts';
 import { createAIRoute } from './routes/AIRoute.ts';
+import { createProfileRoute } from './routes/ProfileRoute.ts';
 
 // callbacks
 import errorHandler from './middleware/errorHandler.ts';
@@ -60,6 +65,10 @@ export function createApp(options: AppOptions = {}) {
 		logger: new UsageLogger(options.requestLogStore ?? new AiRequestLogRepository(getAiPool()))
 	});
 	const aiController = new AIController(new AIService(gateway));
+	const profileController = new ProfileController(new ProfileService(
+		new ProfileRepository(DbConnection.pool),
+		InMemoryAuthRepository
+	));
 
 	app.use('/api/auth', AuthRoute);
 	app.use('/api/ai', createAIRoute(aiController, {
@@ -67,6 +76,7 @@ export function createApp(options: AppOptions = {}) {
 		loadIdentity: createLoadIdentity(identityStore),
 		requirePermission: createRequirePermission(identityStore)
 	}));
+	app.use('/api/v1/profile', createProfileRoute(profileController));
 	app.get('/', rootCallback);
 	app.get('/health', healthCallback);
 	app.use(nonexistentRouteCallback);

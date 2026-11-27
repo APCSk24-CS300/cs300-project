@@ -176,3 +176,34 @@ test('rejects a client-supplied owner ID and updates only the authenticated user
 		assert.equal(profiles.profiles.get('user-2')?.phoneNumber, '0907654321');
 	});
 });
+
+test('rejects invalid phone numbers and protected identity fields without changing the saved profile', async () => {
+	await withServer(async (baseUrl, profiles) => {
+		const headers = {
+			...authHeaders('user-1'),
+			'Content-Type': 'application/json'
+		};
+		const rejectedRequests = [
+			{ phoneNumber: '12345' },
+			{ phoneNumber: '+8490123456' },
+			{ phoneNumber: '0901234567', fullName: 'Changed Name' },
+			{ phoneNumber: '0901234567', studentNumber: '123456789' },
+			{ phoneNumber: '0901234567', faculty: { id: 'other-faculty' } },
+			{ phoneNumber: '0901234567', academicInfo: { faculty: { id: 'other-faculty' } } }
+		];
+
+		for (const body of rejectedRequests) {
+			const response = await fetch(`${baseUrl}/api/v1/profile`, {
+				method: 'PATCH',
+				headers,
+				body: JSON.stringify(body)
+			});
+
+			assert.equal(response.status, 400);
+			assert.equal(profiles.profiles.get('user-1')?.phoneNumber, '0901234567');
+			assert.equal(profiles.profiles.get('user-2')?.phoneNumber, '0907654321');
+		}
+
+		assert.deepEqual(profiles.updates, []);
+	});
+});

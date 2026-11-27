@@ -110,6 +110,7 @@ test('rejects invalid phone formats without checking duplicates or updating', as
 
 	assert.deepEqual(profiles.updates, []);
 	assert.deepEqual(phoneNumbers.checks, []);
+	assert.equal(profiles.profile?.phoneNumber, '0901234567');
 });
 
 test('rejects protected identity fields and all other unsupported fields', async () => {
@@ -117,8 +118,9 @@ test('rejects protected identity fields and all other unsupported fields', async
 
 	for (const request of [
 		{ phoneNumber: '0901234567', fullName: 'Changed Name' },
-		{ studentNumber: '123456789' },
-		{ academicInfo: { faculty: { id: 'other' } } },
+		{ phoneNumber: '0901234567', studentNumber: '123456789' },
+		{ phoneNumber: '0901234567', faculty: { id: 'other' } },
+		{ phoneNumber: '0901234567', academicInfo: { faculty: { id: 'other' } } },
 		{ email: 'changed@example.edu' }
 	]) {
 		assert.equal((await service.updateProfile('user-1', request)).statusCode, 400);
@@ -126,6 +128,7 @@ test('rejects protected identity fields and all other unsupported fields', async
 
 	assert.deepEqual(profiles.updates, []);
 	assert.deepEqual(phoneNumbers.checks, []);
+	assert.equal(profiles.profile?.phoneNumber, '0901234567');
 });
 
 test('rejects duplicate numbers owned by another user', async () => {

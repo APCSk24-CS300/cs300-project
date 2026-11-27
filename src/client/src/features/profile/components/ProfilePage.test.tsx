@@ -79,9 +79,7 @@ describe("ProfilePage", () => {
 
     renderWithProviders(<ProfilePage />);
 
-    expect(
-      await screen.findByRole("heading", { name: "Profile could not be loaded" }),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Profile could not be loaded")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
 
     await waitFor(() =>

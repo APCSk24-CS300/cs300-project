@@ -61,7 +61,6 @@ export function ProfilePage() {
     const controller = new AbortController();
     let active = true;
 
-    setState({ status: "loading" });
     profileService
       .getProfile(controller.signal)
       .then((profile) => {
@@ -81,7 +80,10 @@ export function ProfilePage() {
     };
   }, [requestNumber]);
 
-  const handleRetry = () => setRequestNumber((current) => current + 1);
+  const handleRetry = () => {
+    setState({ status: "loading" });
+    setRequestNumber((current) => current + 1);
+  };
   const profile = state.status === "success" ? state.profile : null;
   const academicInfo = profile?.academicInfo ?? null;
 

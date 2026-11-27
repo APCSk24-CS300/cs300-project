@@ -27,13 +27,13 @@ export function SideNav({ items, currentPath, onNavigate }: SideNavProps) {
             <li key={item.id}>
               <span
                 aria-disabled="true"
-                className="flex min-h-10 cursor-not-allowed items-center justify-between gap-2 rounded-xl px-3 py-1.5 text-sm text-text-muted/85"
+                className="flex min-h-10 cursor-not-allowed items-center justify-between gap-2 rounded-xl px-3 py-1.5 text-sm text-text-muted/80"
               >
                 <span className="flex min-w-0 items-center gap-2.5">
-                  <NavItemIcon id={item.id} className="size-4 shrink-0 text-text-muted/65" />
-                  <span className="truncate">{item.label}</span>
+                  <NavItemIcon id={item.id} className="size-4 shrink-0 text-text-muted/60" />
+                  <span>{item.label}</span>
                 </span>
-                <ComingSoonBadge className="shrink-0 bg-surface-muted text-[10px] text-text-muted/90" />
+                <ComingSoonBadge className="shrink-0 bg-transparent px-0 text-[10px] font-medium tracking-normal text-text-muted/70" />
                 <span className="sr-only">(unavailable)</span>
               </span>
             </li>
@@ -54,7 +54,7 @@ export function SideNav({ items, currentPath, onNavigate }: SideNavProps) {
               )}
             >
               <NavItemIcon id={item.id} className={cn("size-4 shrink-0", current ? "text-on-primary" : "text-text-muted")} />
-              <span className="truncate">{item.label}</span>
+              <span>{item.label}</span>
             </Link>
           </li>
         );

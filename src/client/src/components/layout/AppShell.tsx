@@ -80,10 +80,10 @@ export function AppShell({
               id={navId}
               aria-label="Main"
               className={cn(
-                "w-64 shrink-0 rounded-2xl border border-divider bg-surface p-3 shadow-xs",
+                "w-68 shrink-0 rounded-2xl border border-divider bg-surface p-3 shadow-xs",
                 "lg:sticky lg:top-22 lg:block lg:self-start",
                 drawerOpen
-                  ? "fixed inset-y-0 left-0 z-40 flex w-72 flex-col overflow-y-auto rounded-none border-y-0 border-l-0 p-4 shadow-card lg:w-64 lg:rounded-2xl lg:border lg:p-3 lg:shadow-xs"
+                  ? "fixed inset-y-0 left-0 z-40 flex w-72 flex-col overflow-y-auto rounded-none border-y-0 border-l-0 p-4 shadow-card lg:w-68 lg:rounded-2xl lg:border lg:p-3 lg:shadow-xs"
                   : "hidden",
               )}
             >

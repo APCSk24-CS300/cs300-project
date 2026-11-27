@@ -59,19 +59,19 @@ export function AccountReview({
 
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-sm text-text-muted">Review the new account. Nothing is saved until you confirm.</p>
-      <dl className="grid gap-4 rounded-2xl border border-border p-4 sm:grid-cols-2">
+      <p className="text-sm text-text-muted">Review the new account details below. Nothing is saved until you confirm.</p>
+      <dl className="grid gap-4 rounded-2xl border border-divider bg-surface-muted/40 p-4 sm:grid-cols-2 sm:p-5">
         {rows.map(([term, value]) => (
           <div key={term}>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-text-muted">{term}</dt>
-            <dd className="mt-0.5 break-words text-sm text-heading">{value}</dd>
+            <dt className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">{term}</dt>
+            <dd className="mt-0.5 break-words text-sm font-medium text-heading">{value}</dd>
           </div>
         ))}
       </dl>
 
       <RolePermissionsPanel role={fields.role} />
 
-      <section aria-labelledby="temp-password-heading" className="rounded-2xl border border-border p-4">
+      <section aria-labelledby="temp-password-heading" className="rounded-2xl border border-divider bg-surface-muted/40 p-4 sm:p-5">
         <h3 id="temp-password-heading" className="text-sm font-semibold text-heading">
           Temporary password
         </h3>
@@ -102,12 +102,13 @@ export function AccountReview({
           </div>
         ) : (
           <div className="mt-3 flex flex-wrap items-center gap-3">
-            <code data-testid="generated-password" className="rounded-lg bg-hover-tint px-3 py-1.5 font-mono text-sm text-heading">
+            <code data-testid="generated-password" className="rounded-lg border border-divider bg-surface px-3 py-1.5 font-mono text-sm font-semibold text-heading">
               {generatedPassword}
             </code>
             <Button
-              variant="white"
+              variant="ghost"
               size="sm"
+              className="border border-divider bg-surface hover:bg-surface-muted"
               onClick={() => {
                 onOverrideChange(generatedPassword);
                 setEditing(true);
@@ -125,11 +126,16 @@ export function AccountReview({
         </Alert>
       ) : null}
 
-      <div className="flex flex-wrap justify-end gap-3">
+      <div className="flex flex-wrap justify-end gap-3 border-t border-divider pt-5">
         <Button variant="ghost" onClick={onCancel} disabled={submitting}>
           Cancel
         </Button>
-        <Button variant="white" onClick={onBack} disabled={submitting}>
+        <Button
+          variant="ghost"
+          className="border border-divider bg-surface hover:bg-surface-muted"
+          onClick={onBack}
+          disabled={submitting}
+        >
           Back
         </Button>
         <Button onClick={onConfirm} isLoading={submitting} disabled={Boolean(overrideError)}>

@@ -48,44 +48,46 @@ export function ChangePasswordForm({ redirectTo }: { redirectTo?: string }) {
   }
 
   return (
-    <form
-      noValidate
-      className="flex max-w-xl flex-col gap-5"
-      onSubmit={(event) => {
-        // Double-submit guard (FR-048).
-        if (submitting.current) {
-          event.preventDefault();
-          return;
-        }
-        void form.handleSubmit(async (values) => {
-          submitting.current = true;
-          await submit(values);
-        })(event);
-      }}
-    >
-      <Alert variant="info">For your security, set a new password before continuing.</Alert>
-      <FormField label="Current (temporary) password" required error={errors.currentPassword?.message}>
-        <PasswordInput autoComplete="current-password" {...form.register("currentPassword")} />
-      </FormField>
-      <FormField label="New password" required hint="At least 8 characters." error={errors.newPassword?.message}>
-        <PasswordInput autoComplete="new-password" {...form.register("newPassword")} />
-      </FormField>
-      <FormField label="Confirm new password" required error={errors.confirmPassword?.message}>
-        <PasswordInput autoComplete="new-password" {...form.register("confirmPassword")} />
-      </FormField>
-      {error ? (
-        <Alert ref={alertRef} variant="error">
-          {error}
-        </Alert>
-      ) : null}
-      <div className="flex flex-wrap justify-end gap-3">
-        <Button variant="ghost" onClick={() => void logout()} disabled={isSubmitting}>
-          Log out
-        </Button>
-        <Button type="submit" isLoading={isSubmitting}>
-          Set a new password
-        </Button>
-      </div>
-    </form>
+    <div className="max-w-xl rounded-2xl border border-divider bg-surface p-6 shadow-xs sm:p-8">
+      <form
+        noValidate
+        className="flex flex-col gap-5"
+        onSubmit={(event) => {
+          // Double-submit guard (FR-048).
+          if (submitting.current) {
+            event.preventDefault();
+            return;
+          }
+          void form.handleSubmit(async (values) => {
+            submitting.current = true;
+            await submit(values);
+          })(event);
+        }}
+      >
+        <Alert variant="info">For your security, set a new password before continuing.</Alert>
+        <FormField label="Current (temporary) password" required error={errors.currentPassword?.message}>
+          <PasswordInput autoComplete="current-password" {...form.register("currentPassword")} />
+        </FormField>
+        <FormField label="New password" required hint="At least 8 characters." error={errors.newPassword?.message}>
+          <PasswordInput autoComplete="new-password" {...form.register("newPassword")} />
+        </FormField>
+        <FormField label="Confirm new password" required error={errors.confirmPassword?.message}>
+          <PasswordInput autoComplete="new-password" {...form.register("confirmPassword")} />
+        </FormField>
+        {error ? (
+          <Alert ref={alertRef} variant="error">
+            {error}
+          </Alert>
+        ) : null}
+        <div className="flex flex-wrap justify-end gap-3 border-t border-divider pt-5">
+          <Button variant="ghost" onClick={() => void logout()} disabled={isSubmitting}>
+            Log out
+          </Button>
+          <Button type="submit" isLoading={isSubmitting}>
+            Set a new password
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }

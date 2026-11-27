@@ -19,7 +19,17 @@ type AccountFormProps = {
   onCancel: () => void;
 };
 
-const ROLE_OPTIONS = ROLE_CODES.map((code) => ({ value: code, label: ROLE_LABEL[code] }));
+const ROLE_DESCRIPTION: Record<(typeof ROLE_CODES)[number], string> = {
+  student: "Discover activities & track scores",
+  manager: "Manage activities & attendance",
+  administrator: "Manage users & system settings",
+};
+
+const ROLE_OPTIONS = ROLE_CODES.map((code) => ({
+  value: code,
+  label: ROLE_LABEL[code],
+  description: ROLE_DESCRIPTION[code],
+}));
 
 /** UC-29 steps 3–4: one account, exactly one role (FR-030, FR-031). */
 export function AccountForm({ form, faculties, onReview, onCancel }: AccountFormProps) {
@@ -104,7 +114,7 @@ export function AccountForm({ form, faculties, onReview, onCancel }: AccountForm
         </div>
       ) : null}
 
-      <div className="flex flex-wrap justify-end gap-3 pt-2">
+      <div className="flex flex-wrap justify-end gap-3 border-t border-divider pt-5">
         <Button variant="ghost" onClick={onCancel}>
           Cancel
         </Button>

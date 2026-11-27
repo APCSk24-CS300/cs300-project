@@ -10,7 +10,7 @@ export function RolePermissionsPanel({ role }: { role: RoleCode }) {
   const permissions = useRolePermissions(role);
 
   return (
-    <section aria-labelledby="permissions-heading" className="rounded-2xl border border-border p-4">
+    <section aria-labelledby="permissions-heading" className="rounded-2xl border border-divider bg-surface p-4 sm:p-5">
       <h3 id="permissions-heading" className="text-sm font-semibold text-heading">
         Permissions granted by {ROLE_LABEL[role]}
       </h3>
@@ -18,10 +18,11 @@ export function RolePermissionsPanel({ role }: { role: RoleCode }) {
         <LoadingState label="Loading permissions…" />
       ) : permissions.status === "success" ? (
         permissions.data && permissions.data.permissions.length > 0 ? (
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-text">
+          <ul className="mt-3 divide-y divide-divider rounded-xl border border-divider bg-surface-muted/30">
             {permissions.data.permissions.map((p) => (
-              <li key={p.code}>
-                {p.description || p.code} <span className="text-xs text-text-muted">({p.code})</span>
+              <li key={p.code} className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 text-sm text-text">
+                <span>{p.description || p.code}</span>
+                <span className="rounded-md bg-surface px-2 py-0.5 font-mono text-xs text-text-muted">({p.code})</span>
               </li>
             ))}
           </ul>
@@ -31,7 +32,7 @@ export function RolePermissionsPanel({ role }: { role: RoleCode }) {
       ) : (
         <div className="mt-2 flex items-center gap-3">
           <p className="text-sm text-danger">The permissions could not be loaded.</p>
-          <Button variant="white" size="sm" onClick={permissions.retry}>
+          <Button variant="ghost" size="sm" className="border border-divider" onClick={permissions.retry}>
             Retry
           </Button>
         </div>

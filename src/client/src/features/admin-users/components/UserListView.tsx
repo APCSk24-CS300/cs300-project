@@ -16,9 +16,20 @@ import { UserFilters } from "@/features/admin-users/components/UserFilters";
 const dateFormat = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Ho_Chi_Minh", day: "2-digit", month: "2-digit", year: "numeric" });
 
 const COLUMNS: Column<AccountSummary>[] = [
-  { key: "name", header: "Full name", cell: (u) => <span className="font-semibold">{u.fullName}</span> },
-  { key: "email", header: "Email", cell: (u) => <span className="break-all">{u.email}</span> },
-  { key: "role", header: "Role", cell: (u) => (u.role ? ROLE_LABEL[u.role] : "—") },
+  { key: "name", header: "Full name", cell: (u) => <span className="font-semibold text-heading">{u.fullName}</span> },
+  { key: "email", header: "Email", cell: (u) => <span className="break-all text-text-muted">{u.email}</span> },
+  {
+    key: "role",
+    header: "Role",
+    cell: (u) =>
+      u.role ? (
+        <span className="inline-flex rounded-pill bg-surface-muted px-2.5 py-0.5 text-xs font-medium text-heading">
+          {ROLE_LABEL[u.role]}
+        </span>
+      ) : (
+        "—"
+      ),
+  },
   {
     key: "status",
     header: "Status",
@@ -28,7 +39,11 @@ const COLUMNS: Column<AccountSummary>[] = [
       </Badge>
     ),
   },
-  { key: "created", header: "Created", cell: (u) => dateFormat.format(u.createdAt) },
+  {
+    key: "created",
+    header: "Created",
+    cell: (u) => <span className="tabular-nums text-text-muted">{dateFormat.format(u.createdAt)}</span>,
+  },
 ];
 
 /** UC-29 steps 1–2 and A1 (FR-028, FR-029). */
@@ -49,7 +64,13 @@ export function UserListView() {
         role={list.query.role}
         onSearchChange={(search) => list.setQuery({ search })}
         onRoleChange={(role) => list.setQuery({ role })}
+        onClear={list.clearFilters}
       />
+      {page && list.status === "success" && page.totalItems > 0 ? (
+        <p className="text-xs font-medium text-text-muted">
+          Showing {page.items.length} of {page.totalItems} {page.totalItems === 1 ? "account" : "accounts"}
+        </p>
+      ) : null}
       <DataTable
         caption="User accounts"
         columns={COLUMNS}

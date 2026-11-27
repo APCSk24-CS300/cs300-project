@@ -12,6 +12,8 @@ type FormFieldProps = {
   label: string;
   /** Shows "Required" or "Optional" next to the label (NFR-USA-05). */
   required?: boolean;
+  /** Hide the Required/Optional label suffix (e.g. for search/filter controls). */
+  hideRequirementBadge?: boolean;
   hint?: string;
   error?: string;
   /** The single input/select/textarea element. Receives id + aria wiring. */
@@ -22,7 +24,17 @@ type FormFieldProps = {
   footer?: ReactNode;
 };
 
-export function FormField({ label, required = false, hint, error, children, className, id, footer }: FormFieldProps) {
+export function FormField({
+  label,
+  required = false,
+  hideRequirementBadge = false,
+  hint,
+  error,
+  children,
+  className,
+  id,
+  footer,
+}: FormFieldProps) {
   const autoId = useId();
   const controlId = id ?? children.props.id ?? `field-${autoId}`;
   const hintId = hint ? `${controlId}-hint` : undefined;
@@ -42,7 +54,9 @@ export function FormField({ label, required = false, hint, error, children, clas
     <div className={cn("flex flex-col gap-1.5", className)}>
       <label htmlFor={controlId} className="flex items-baseline justify-between gap-3 text-sm font-semibold text-heading">
         <span>{label}</span>
-        <span className="text-xs font-normal text-text-muted">{required ? "Required" : "Optional"}</span>
+        {hideRequirementBadge ? null : (
+          <span className="text-xs font-normal text-text-muted">{required ? "Required" : "Optional"}</span>
+        )}
       </label>
       {control}
       {hint ? (

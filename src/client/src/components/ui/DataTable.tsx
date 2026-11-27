@@ -47,9 +47,9 @@ export function DataTable<T>({ caption, columns, rows, rowKey, loading = false, 
     </tr>
   ) : (
     rows.map((row) => (
-      <tr key={rowKey(row)} className="border-t border-border/60">
+      <tr key={rowKey(row)} className="border-t border-divider transition-colors hover:bg-surface-muted/40">
         {columns.map((column) => (
-          <td key={column.key} className={cn("px-4 py-3 align-top text-sm text-heading", column.className)}>
+          <td key={column.key} className={cn("px-4 py-3.5 align-middle text-sm text-heading", column.className)}>
             {column.cell(row)}
           </td>
         ))}
@@ -58,13 +58,13 @@ export function DataTable<T>({ caption, columns, rows, rowKey, loading = false, 
   );
 
   return (
-    <div className="overflow-x-auto rounded-card bg-surface shadow-card">
+    <div className="overflow-x-auto rounded-2xl border border-divider bg-surface shadow-xs">
       <table className="w-full min-w-[640px] border-collapse text-left" aria-busy={loading || undefined}>
         <caption className="sr-only">{caption}</caption>
-        <thead>
+        <thead className="bg-surface-muted/60">
           <tr>
             {columns.map((column) => (
-              <th key={column.key} scope="col" className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-text-muted">
+              <th key={column.key} scope="col" className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-text-muted">
                 {column.header}
               </th>
             ))}

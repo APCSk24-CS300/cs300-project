@@ -5,7 +5,12 @@ import { CreateAccountWizard } from "@/features/admin-users/components/CreateAcc
 export default function CreateAccountPage() {
   return (
     <>
-      <PageHeader title="Create account" description="Create one user account with exactly one role." />
+      <PageHeader
+        backHref="/admin/users"
+        backLabel="Back to User Management"
+        title="Create account"
+        description="Create one user account with exactly one role."
+      />
       <CreateAccountWizard />
     </>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NavItemIcon } from "@/components/icons/NavIcons";
 import { cn } from "@/libs/cn";
 import type { NavItem } from "@/libs/navigation";
 import { ComingSoonBadge } from "@/components/ui/ComingSoonBadge";
@@ -26,10 +27,13 @@ export function SideNav({ items, currentPath, onNavigate }: SideNavProps) {
             <li key={item.id}>
               <span
                 aria-disabled="true"
-                className="flex min-h-11 cursor-not-allowed items-center justify-between gap-2 rounded-xl px-3 text-sm text-text-muted"
+                className="flex min-h-10 cursor-not-allowed items-center justify-between gap-2 rounded-xl px-3 py-1.5 text-sm text-text-muted/85"
               >
-                <span>{item.label}</span>
-                <ComingSoonBadge />
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <NavItemIcon id={item.id} className="size-4 shrink-0 text-text-muted/65" />
+                  <span className="truncate">{item.label}</span>
+                </span>
+                <ComingSoonBadge className="shrink-0 bg-surface-muted text-[10px] text-text-muted/90" />
                 <span className="sr-only">(unavailable)</span>
               </span>
             </li>
@@ -43,11 +47,14 @@ export function SideNav({ items, currentPath, onNavigate }: SideNavProps) {
               onClick={onNavigate}
               aria-current={current ? "page" : undefined}
               className={cn(
-                "flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold transition-colors",
-                current ? "bg-primary text-on-primary" : "text-heading hover:bg-hover-tint",
+                "flex min-h-11 items-center gap-2.5 rounded-xl px-3 text-sm font-semibold transition-colors",
+                current
+                  ? "bg-primary text-on-primary shadow-xs"
+                  : "text-heading hover:bg-surface-muted hover:text-primary",
               )}
             >
-              {item.label}
+              <NavItemIcon id={item.id} className={cn("size-4 shrink-0", current ? "text-on-primary" : "text-text-muted")} />
+              <span className="truncate">{item.label}</span>
             </Link>
           </li>
         );

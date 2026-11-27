@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { ChevronDownIcon, LogoutIcon } from "@/components/icons/NavIcons";
+import { cn } from "@/libs/cn";
 import { ROLE_LABEL, type RoleCode } from "@/libs/roles";
 
 export interface AccountMenuUser {
@@ -63,15 +65,16 @@ export function AccountMenu({ user, onLogout, pending = false }: AccountMenuProp
         aria-expanded={open}
         aria-controls={menuId}
         onClick={() => setOpen((v) => !v)}
-        className="flex min-h-11 items-center gap-3 rounded-pill px-2 py-1 text-left hover:bg-hover-tint"
+        className="flex min-h-11 items-center gap-2.5 rounded-pill px-2 py-1 text-left transition-colors hover:bg-surface-muted"
       >
-        <span aria-hidden="true" className="flex size-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-on-primary">
+        <span aria-hidden="true" className="flex size-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-on-primary shadow-xs">
           {initials}
         </span>
         <span className="hidden flex-col sm:flex">
-          <span className="text-sm font-semibold text-heading">{user.fullName}</span>
+          <span className="text-sm font-semibold leading-tight text-heading">{user.fullName}</span>
           <span className="text-xs text-text-muted">{ROLE_LABEL[user.role]}</span>
         </span>
+        <ChevronDownIcon className={cn("hidden size-4 text-text-muted transition-transform sm:block", open && "rotate-180")} />
         <span className="sr-only">Account menu</span>
       </button>
 
@@ -81,26 +84,36 @@ export function AccountMenu({ user, onLogout, pending = false }: AccountMenuProp
           id={menuId}
           role="menu"
           aria-label="Account"
-          className="absolute right-0 z-40 mt-2 w-64 rounded-2xl border border-border bg-surface p-2 shadow-card"
+          className="absolute right-0 z-40 mt-2 w-68 rounded-2xl border border-divider bg-surface p-2 shadow-card"
         >
-          <div className="px-3 py-2">
-            <p className="text-sm font-semibold text-heading">{user.fullName}</p>
-            <p className="truncate text-xs text-text-muted">{user.email}</p>
-            <p className="mt-1 text-xs font-semibold text-primary">{ROLE_LABEL[user.role]}</p>
+          <div className="flex items-start gap-3 px-3 py-2.5">
+            <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+              {initials}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-heading">{user.fullName}</p>
+              <p className="truncate text-xs text-text-muted">{user.email}</p>
+              <span className="mt-1.5 inline-flex rounded-pill bg-info-surface px-2 py-0.5 text-[11px] font-semibold text-primary">
+                {ROLE_LABEL[user.role]}
+              </span>
+            </div>
           </div>
-          <button
-            ref={itemRef}
-            type="button"
-            role="menuitem"
-            disabled={pending}
-            onClick={() => {
-              setOpen(false);
-              onLogout();
-            }}
-            className="mt-1 w-full rounded-xl px-3 py-2 text-left text-sm font-semibold text-danger hover:bg-danger-surface disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {pending ? "Logging out…" : "Log out"}
-          </button>
+          <div className="mt-1 border-t border-divider pt-1">
+            <button
+              ref={itemRef}
+              type="button"
+              role="menuitem"
+              disabled={pending}
+              onClick={() => {
+                setOpen(false);
+                onLogout();
+              }}
+              className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold text-danger transition-colors hover:bg-danger-surface disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <LogoutIcon className="size-4 shrink-0" />
+              <span>{pending ? "Logging out…" : "Log out"}</span>
+            </button>
+          </div>
         </div>
       ) : null}
     </div>

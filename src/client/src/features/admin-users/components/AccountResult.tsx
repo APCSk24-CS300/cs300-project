@@ -16,8 +16,12 @@ export function AccountResult({ created, onCreateAnother }: { created: CreatedAc
       <p className="text-sm text-text-muted">
         This password is shown only once. Share it with the user; they must set a new password at first sign-in.
       </p>
-      <div className="flex flex-wrap justify-end gap-3">
-        <Button variant="white" onClick={onCreateAnother}>
+      <div className="flex flex-wrap justify-end gap-3 border-t border-divider pt-5">
+        <Button
+          variant="ghost"
+          className="border border-divider bg-surface hover:bg-surface-muted"
+          onClick={onCreateAnother}
+        >
           Create another
         </Button>
         <Button href="/admin/users">Back to User Management</Button>

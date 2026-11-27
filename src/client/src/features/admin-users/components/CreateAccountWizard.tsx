@@ -4,9 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { CheckIcon } from "@/components/icons/NavIcons";
 import { ForbiddenView } from "@/components/layout/ForbiddenView";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { SurfaceCard } from "@/components/ui/SurfaceCard";
+import { cn } from "@/libs/cn";
 import { useForbidden } from "@/hooks/useForbidden";
 import { isApiError } from "@/libs/api-client";
 import { toUserMessage } from "@/libs/error-messages";
@@ -140,18 +141,46 @@ export function CreateAccountWizard() {
     setStep("form");
   };
 
+  const steps: { id: Step; label: string }[] = [
+    { id: "form", label: "Details" },
+    { id: "review", label: "Review" },
+    { id: "result", label: "Result" },
+  ];
+  const activeIndex = steps.findIndex((s) => s.id === step);
+
   return (
-    <SurfaceCard className="p-5 sm:p-7">
-      <ol className="mb-6 flex flex-wrap gap-2 text-xs font-semibold" aria-label="Steps">
-        {(["form", "review", "result"] as Step[]).map((s, i) => (
-          <li
-            key={s}
-            aria-current={step === s ? "step" : undefined}
-            className={step === s ? "rounded-pill bg-primary px-3 py-1 text-on-primary" : "rounded-pill bg-hover-tint px-3 py-1 text-text-muted"}
-          >
-            {i + 1}. {s === "form" ? "Details" : s === "review" ? "Review" : "Result"}
-          </li>
-        ))}
+    <div className="max-w-3xl rounded-2xl border border-divider bg-surface p-5 shadow-xs sm:p-7">
+      <ol className="mb-6 flex items-center gap-2 border-b border-divider pb-5 text-xs font-semibold" aria-label="Steps">
+        {steps.map((s, i) => {
+          const isCurrent = step === s.id;
+          const isCompleted = i < activeIndex;
+          return (
+            <li
+              key={s.id}
+              aria-current={isCurrent ? "step" : undefined}
+              className="flex flex-1 items-center gap-2 last:flex-none"
+            >
+              <span
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-pill px-3 py-1.5 transition-colors",
+                  isCurrent
+                    ? "bg-primary text-on-primary shadow-xs"
+                    : isCompleted
+                      ? "bg-success/10 text-success"
+                      : "bg-surface-muted text-text-muted",
+                )}
+              >
+                {isCompleted ? (
+                  <CheckIcon className="size-3.5 shrink-0" />
+                ) : (
+                  <span className="tabular-nums">{i + 1}.</span>
+                )}
+                <span>{s.label}</span>
+              </span>
+              {i < steps.length - 1 ? <span aria-hidden="true" className="hidden h-px flex-1 bg-divider sm:block" /> : null}
+            </li>
+          );
+        })}
       </ol>
 
       {step === "form" ? (
@@ -199,6 +228,6 @@ export function CreateAccountWizard() {
       >
         Nothing has been saved. The information you entered will be lost.
       </ConfirmDialog>
-    </SurfaceCard>
+    </div>
   );
 }

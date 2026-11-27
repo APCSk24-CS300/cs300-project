@@ -38,7 +38,7 @@ class FakePhoneNumberAvailability implements PhoneNumberAvailability {
 	checks: { phoneNumber: string, excludingUserId?: string }[] = [];
 	fail = false;
 
-	async checkUserExistsWithPhoneNumber(phoneNumber: string, excludingUserId?: string) {
+	async checkUserExistsWithPhoneNumber(phoneNumber: string, excludingUserId: string) {
 		if (this.fail) throw new Error('database unavailable');
 		this.checks.push({ phoneNumber, excludingUserId });
 		return (this.taken.get(phoneNumber) ?? []).some(userId => userId !== excludingUserId);
@@ -155,7 +155,7 @@ test('rejects equivalent numbers stored in the alternate format', async () => {
 	assert.deepEqual(profiles.updates, []);
 });
 
-test('does not reject the authenticated user’s existing number as a duplicate', async () => {
+test("does not reject the authenticated user's existing number as a duplicate", async () => {
 	const { service, profiles, phoneNumbers } = createService();
 	phoneNumbers.taken.set('0901234567', ['user-1']);
 

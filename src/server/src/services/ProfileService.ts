@@ -10,7 +10,7 @@ import type { ServiceResponse } from '../types/ServiceResponse.ts';
 type ProfileStore = Pick<ProfileRepository, 'getProfileByUserId' | 'updatePhoneNumber'>;
 
 export interface PhoneNumberAvailability {
-	checkUserExistsWithPhoneNumber(phoneNumber: string, excludingUserId?: string): Promise<boolean>;
+	checkUserExistsWithPhoneNumber(phoneNumber: string, excludingUserId: string): Promise<boolean>;
 }
 
 const PHONE_NUMBER_PATTERN = /^(?:0\d{9}|\+84\d{9})$/;

@@ -218,7 +218,9 @@ paths:
       tags:
       - Profile
       summary: Change current user's password
-      description: Verify the current password before setting a new password.
+      description: Verify the current password before setting a new password. The frontend validates new-password
+        confirmation, which is not sent in the request. The successful response contains only a message and never
+        returns password values.
       operationId: changeMyPassword
       requestBody:
         required: true
@@ -2119,6 +2121,7 @@ components:
               format: uri
     ChangePasswordRequest:
       type: object
+      additionalProperties: false
       required:
       - currentPassword
       - newPassword
@@ -2130,8 +2133,8 @@ components:
           type: string
           format: password
           minLength: 8
-      description: New-password confirmation is checked by the FE before sending. The new password must be at least
-        8 characters.
+      description: The request contains only currentPassword and newPassword. New-password confirmation is checked
+        by the FE before sending. The new password must be at least 8 characters.
     UniversityService:
       type: object
       required:

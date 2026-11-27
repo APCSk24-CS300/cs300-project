@@ -43,13 +43,13 @@
 
 ### Tests
 
-- [ ] T011 [P] [US2] Add or extend server tests for current-password verification, minimum six-character replacement, confirmation mismatch, and unchanged credentials after rejection. **Blocked:** align the UC-03 six-character minimum and confirmation behavior with the OpenAPI contract, which currently specifies eight characters and frontend-only confirmation.
-- [ ] T012 [P] [US2] Add client tests for password-change validation, success feedback, and error handling without echoing password values. **Blocked:** T005 and the password-policy alignment required by T011 must be resolved.
+- [ ] T011 [P] [US2] Add or extend server tests for current-password verification, the eight-character minimum, and unchanged credentials after rejection. Password confirmation is validated by the frontend and is not sent to the server.
+- [ ] T012 [P] [US2] Add client tests for current/new password validation, eight-character minimum, matching confirmation, success feedback, and error handling without echoing password values. **Blocked:** T005 must resolve the client platform.
 
 ### Implementation
 
-- [ ] T013 [US2] Reuse the existing authenticated password-change endpoint and client service if they meet UC-03; otherwise extend the established auth flow without adding a parallel password mechanism. **Blocked:** T001 verified that the server has no password-change endpoint; agree on the authenticated API path and contract before adding one.
-- [ ] T014 [US2] Enforce current-password verification, minimum length, and matching confirmation in the server business layer; retain existing secure hashing and response conventions. **Blocked:** resolve the six-versus-eight-character contract mismatch and confirmation handling noted in T011.
+- [ ] T013 [US2] Implement the authenticated `PATCH /profile/password` endpoint and integrate the existing client auth service with this official path; do not add a parallel password mechanism.
+- [ ] T014 [US2] Enforce current-password verification and the eight-character minimum in the server business layer; retain secure hashing and message-only success responses. Password confirmation is frontend-only and is not sent to the server.
 - [ ] T015 [US2] Add or integrate the password-change form in the approved profile experience; clear sensitive form values after completion or rejection. **Blocked:** T005 must resolve the frontend platform.
 
 ## Phase 4: User Story 3 - Set or remove my profile picture (Priority: P2)
@@ -79,7 +79,7 @@
 
 - T006-T010 depend on T001-T003.
 - T007, T010, T012, T015, T017, and T020 depend on T005.
-- T011-T015 depend on T001 and agreement on the password-change API and policy; T001 verified there is no existing server password-change endpoint.
+- T011-T015 depend on T001 and use the resolved password-change contract: `PATCH /profile/password`, an eight-character minimum, frontend-only confirmation, and a message-only success response. T001 verified that the server endpoint still needs implementation.
 - T016-T020 depend on T004.
 - T021-T023 depend on completion of the user-story implementation tasks.
 

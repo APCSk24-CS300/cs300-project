@@ -26,5 +26,6 @@ export interface ChangePasswordRequest {
 }
 
 export interface MessageResponse {
+  success: boolean;
   message: string;
 }

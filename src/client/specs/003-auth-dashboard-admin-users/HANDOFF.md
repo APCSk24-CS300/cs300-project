@@ -1,14 +1,18 @@
 # Handoff: 003-auth-dashboard-admin-users
 
 **Updated**: 2026-11-27, after resuming: T104 done, M13 fixed. Still in `/speckit-implement`, Phase 10 (Polish).
-**Branch**: `003-auth-dashboard-admin-users`. The spec commit is `0c4c391`. All implementation work is **uncommitted** in the working tree.
+**Branch**: `003-auth-dashboard-admin-users`. Everything is committed; the working tree is clean except this file's latest edit. Commits on top of the spec commit `0c4c391`:
+- `a142e28` and `b046ecf`: the implementation (T001–T104), committed by the user.
+- `fb2a4eb` `chore(deps): upgrade next to 16.4.6 (security)`: only `package.json` and `package-lock.json`.
+
+Nothing is pushed.
 
 ## 1. Current step
 
 - **Phases 1–9 are complete** (Setup, Foundational, US1, US2, US3, US6, US7, US4, US5).
 - **Phase 10 (Polish)**:
   - T100–T103 are done.
-  - **T104 is done**: on the latest code, tests pass (48 files, 296 tests), lint reports 0 problems, and the build exits 0. The build needed one retry because of the Next.js security advisory (§3).
+  - **T104 is done**: on the latest code, tests pass (48 files, 296 tests), lint reports 0 problems, and the build exits 0. After the Next.js upgrade to 16.4.6 all three checks were re-run and still pass (296/296 tests, 0 lint problems, build exit 0 on the first try).
   - **T105 is not done**: only a server smoke test was run.
 - **tasks.md**: 104 of 105 tasks are checked `[X]`. T105 is unchecked with an "(in progress: …)" note.
 
@@ -29,7 +33,7 @@ Edits made after the last full test run:
 ## 3. Known broken things, failing tests, open issues
 
 - **No failing tests are known.** The re-run of the suite is the open item.
-- **Next.js security advisory (not handled)**: `next build` stopped once with a `SecurityFatalError` saying Next.js 16.4.3 is affected by a known vulnerability. It recommends `next upgrade --agent=security --internal-nudge-id=9517a202-b931-4321-ae1d-4df23f81dbe2`. A retry built fine. I did **not** upgrade, because it's a dependency change outside this feature: **this needs a decision from the user**, including whether to run it in a separate worktree.
+- **Next.js security advisory: fixed.** `next` and `eslint-config-next` were upgraded 16.4.3 → **16.4.6** (latest 16.x, exact pins) in commit `fb2a4eb`. This fixes seven moderate advisories affecting next ≤16.4.4 (GHSA-mfr8-8qww-v76h, -vc7v-qv4w-wrv8, -7qx7-33qx-rqx2, -f3mh-rxg3-f5g2, -pc58-hwjq-p385, -rhh4-g77r-r9qj, -vvgp-ww4w-46vf). npm's bulk advisory API reports none for 16.4.6, and `next build` no longer stops with `SecurityFatalError`. No code changes were needed.
 - **Analysis M13 is fixed**: GAP-N in `spec.md` now exempts `GET /auth/me` (returns `status: 'inactive'`) and `POST /auth/logout` from `ACCOUNT_DISABLED`, matching DOC-01, `contracts/mock-api.md` and the code.
 - **Analysis M11 and M12 are implemented in code but not written back into the artifacts** (see §4).
 - **`.next/` cache**: I deleted it once, because a stale `.next/dev/types/validator.ts` still referenced the removed `/forbidden` page and `api/auth/login` route and broke type-checking. If `npx tsc --noEmit` shows `.next/...` errors again, delete `.next/` and rebuild.
@@ -63,7 +67,7 @@ These are FE-internal. None of them changes `docs/`, so `docs-changes.md` needs 
 | `specs/003-…/tasks.md` | Check T105 once it's done. Optionally describe M12 (redirect ownership) in T042/T055. |
 | `specs/003-…/quickstart.md` | Fill in the "Manual timing (SC-007)" table during T105. |
 | `specs/003-…/contracts/ui-routes-and-components.md` | Optionally add the M12 redirect-ownership rule to §2. |
-| All implementation files under `src/client/` | Code is done; just **uncommitted** (see §6). |
+| All implementation files under `src/client/` | Done and committed (`a142e28`, `b046ecf`). |
 
 **Local-only files to be aware of**:
 - `src/client/.env.local` was rewritten with the new keys. The original is backed up as `src/client/.env.local.bak-003`, which git ignores; delete it once it's no longer needed.
@@ -79,5 +83,4 @@ These are FE-internal. None of them changes `docs/`, so `docs-changes.md` needs 
    - then set `NEXT_PUBLIC_API_MODE=real`, rebuild, and confirm `git status` shows no changes under `src/client/src/{app,components,features}`;
    - record any failure as a new task.
 2. Optionally, document M12 in the tasks and the UI contract.
-3. Ask the user about the Next.js security upgrade (§3).
-4. Ask the user how to commit the implementation. A suggested split is one commit per phase or user story on `003-auth-dashboard-admin-users`. Nothing is pushed.
+3. Commit this `HANDOFF.md` update when convenient, and push the branch when the user asks.

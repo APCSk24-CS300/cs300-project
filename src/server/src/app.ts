@@ -25,6 +25,8 @@ import { ProfileRepository } from './repositories/ProfileRepository.ts';
 import InMemoryAuthRepository from './repositories/AuthRepository.ts';
 import { ProfileService } from './services/ProfileService.ts';
 import { ProfileController } from './controllers/ProfileController.ts';
+import { PasswordService } from './services/PasswordService.ts';
+import { PasswordController } from './controllers/PasswordController.ts';
 import DbConnection from './connections/db.ts';
 import { getAiPool } from './connections/aiDb.ts';
 
@@ -69,6 +71,9 @@ export function createApp(options: AppOptions = {}) {
 		new ProfileRepository(DbConnection.pool),
 		InMemoryAuthRepository
 	));
+	const passwordController = new PasswordController(
+		new PasswordService(InMemoryAuthRepository)
+	);
 
 	app.use('/api/auth', AuthRoute);
 	app.use('/api/ai', createAIRoute(aiController, {
@@ -76,7 +81,7 @@ export function createApp(options: AppOptions = {}) {
 		loadIdentity: createLoadIdentity(identityStore),
 		requirePermission: createRequirePermission(identityStore)
 	}));
-	app.use('/api/v1/profile', createProfileRoute(profileController));
+	app.use('/api/v1/profile', createProfileRoute(profileController, passwordController));
 	app.get('/', rootCallback);
 	app.get('/health', healthCallback);
 	app.use(nonexistentRouteCallback);

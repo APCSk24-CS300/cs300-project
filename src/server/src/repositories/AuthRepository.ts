@@ -1,7 +1,7 @@
 import type { User } from "../types/UserRegistrationData.ts";
 import DbConnection from "../connections/db.ts";
 
-interface AuthRepository {
+export interface AuthRepository {
 
     getStudentUserID() : Promise<number>;
 
@@ -19,13 +19,20 @@ interface AuthRepository {
 
     getUserEmail(id: string): Promise<string>;
 
-    getUserPasswordHash(id: string): Promise<string>;
+    getUserPasswordHash(id: string): Promise<string | null>;
+
+    updateUserPasswordHash(id: string, currentHash: string, newHash: string): Promise<boolean>;
 
     getUserRefreshTokenHash(id: string): Promise<string>;
 
     updateUserSessionToken(id: string, newSessionToken: string): Promise<void>;
 
 }
+
+export type PasswordCredentialStore = Pick<
+    AuthRepository,
+    'getUserPasswordHash' | 'updateUserPasswordHash'
+>;
 
 class InMemoryAuthRepository implements AuthRepository {
     private  ROLE_IDS = {
@@ -271,14 +278,29 @@ class InMemoryAuthRepository implements AuthRepository {
         return result.rows[0] ?? null;
     }
 
-    public async getUserPasswordHash(id: string): Promise<string> {
+    public async getUserPasswordHash(id: string): Promise<string | null> {
         const query = `
             SELECT password_hash
             FROM "User"
             WHERE user_id = $1
         `;
-        const result = await DbConnection.pool.query(query, [id]);
-        return result.rows[0] ?? null;
+        const result = await DbConnection.pool.query<{ password_hash: string }>(query, [id]);
+        return result.rows[0]?.password_hash ?? null;
+    }
+
+    public async updateUserPasswordHash(id: string, currentHash: string, newHash: string): Promise<boolean> {
+        const query = `
+            UPDATE "User"
+            SET password_hash = $3
+            WHERE user_id = $1 AND password_hash = $2
+            RETURNING user_id
+        `;
+        const result = await DbConnection.pool.query<{ user_id: string }>(query, [
+            id,
+            currentHash,
+            newHash
+        ]);
+        return result.rows.length > 0;
     }
 
 	public async getUserFromEmail(email: string): Promise<string> {

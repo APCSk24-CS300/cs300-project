@@ -248,6 +248,16 @@ paths:
                   message: Current password is incorrect
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          description: The password could not be changed. The stored password remains unchanged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                code: INTERNAL_ERROR
+                message: Password could not be changed. Please try again.
   /activity-categories:
     get:
       tags:
@@ -1983,8 +1993,8 @@ components:
       - code
       - message
       description: 'Error envelope. `code` values used by this contract: UNAUTHENTICATED, FORBIDDEN, NOT_FOUND,
-        VALIDATION_FAILED, CURRENT_PASSWORD_INCORRECT, UNSUPPORTED_FILE, DUPLICATE_VALUE, INVALID_STATE, ROLE_POLICY_VIOLATION,
-        POLICY_VERSION_IMMUTABLE, IMPORT_EXPIRED, PRECONDITION_FAILED.'
+        VALIDATION_FAILED, CURRENT_PASSWORD_INCORRECT, INTERNAL_ERROR, UNSUPPORTED_FILE, DUPLICATE_VALUE, INVALID_STATE,
+        ROLE_POLICY_VIOLATION, POLICY_VERSION_IMMUTABLE, IMPORT_EXPIRED, PRECONDITION_FAILED.'
       properties:
         success:
           type: boolean

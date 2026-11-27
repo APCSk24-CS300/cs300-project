@@ -55,6 +55,9 @@ class AuthService {
 
 		const userID = await InMemoryAuthRepository.getUserFromEmail(email);
 		const passwordHash = await InMemoryAuthRepository.getUserPasswordHash(userID);
+		if (!passwordHash) {
+			return generate404Response('Email not found');
+		}
 		const passwordMatch = await bcrypt.compare(password, passwordHash);
 		if (!passwordMatch) {
 			const response = generate401Response('Wrong password');

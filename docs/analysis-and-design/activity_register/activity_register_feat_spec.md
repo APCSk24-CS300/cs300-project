@@ -9,6 +9,28 @@
 > business requirements, architecture, coding conventions, naming rules,
 > or repository structure.
 
+------------------------------------------------------------------------
+
+## 0. Mandatory instructions for Copilot Agent
+
+Before changing any code, **inspect the repository and read the team's
+existing specifications and conventions**.
+
+The project uses GitHub Spec Kit (or a Spec Kit-style specification
+workflow). Find and read the relevant files in the repository,
+including, where present:
+
+-   Naming file and variable follow what wrote in `docs/management/teamcontract.md`
+-   Read carefully the rule/guide in `docs/guides/spec-kit-convention.md`
+-   Existing source code that demonstrates the established frontend,
+    backend, database, authentication, API, validation, error-handling,
+    and testing patterns.
+-   Just read the existing file for infomation, DO NOT write in the EXISTING file, you can only write on new files
+
+Use the repository's actual paths and naming conventions; the paths
+above are examples of likely Spec Kit locations, not assumptions that
+those exact files exist.
+
 
 
 

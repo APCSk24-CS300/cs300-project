@@ -80,7 +80,8 @@ vi.mock("next/link", async () => {
   };
 });
 
-Object.defineProperty(window, "matchMedia", {
+// Node-environment tests (e.g. route handlers) have no window.
+if (typeof window !== "undefined") Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: (query: string) => ({
     matches: false,

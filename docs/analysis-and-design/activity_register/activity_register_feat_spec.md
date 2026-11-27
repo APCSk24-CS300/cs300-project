@@ -25,7 +25,7 @@ including, where present:
 -   Existing source code that demonstrates the established frontend,
     backend, database, authentication, API, validation, error-handling,
     and testing patterns.
--   Just read the existing file for infomation, DO NOT write in the EXISTING file, you can only write on new files
+-   Just read the existing file for information, DO NOT write in the EXISTING file, you can only write on new files
 
 Use the repository's actual paths and naming conventions; the paths
 above are examples of likely Spec Kit locations, not assumptions that

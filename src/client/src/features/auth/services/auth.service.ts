@@ -31,7 +31,7 @@ class AuthService {
   }
 
   async changePassword(data: ChangePasswordRequest): Promise<MessageResponse> {
-    return api.post<MessageResponse>(`${BASE}/change-password`, data);
+    return api.patch<MessageResponse>("/api/v1/profile/password", data);
   }
 }
 

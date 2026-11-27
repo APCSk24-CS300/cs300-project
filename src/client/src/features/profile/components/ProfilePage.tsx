@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { SurfaceCard } from "@/components/ui/SurfaceCard";
+import { PasswordChangeForm } from "@/features/profile/components/PasswordChangeForm";
 import type { Profile } from "@/features/profile/types";
 import { profileService } from "@/features/profile/services/profile.service";
 import { getPhoneNumberError } from "@/features/profile/validation/profile.validation";
@@ -316,6 +317,8 @@ export function ProfilePage() {
                   </p>
                 ) : null}
               </section>
+
+              <PasswordChangeForm />
 
               <section
                 aria-labelledby="academic-heading"

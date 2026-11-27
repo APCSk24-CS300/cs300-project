@@ -1,6 +1,6 @@
 # Handoff: 003-auth-dashboard-admin-users
 
-**Paused**: 2026-11-27, during `/speckit-implement`, Phase 10 (Polish).
+**Updated**: 2026-11-27, after resuming: T104 done, M13 fixed. Still in `/speckit-implement`, Phase 10 (Polish).
 **Branch**: `003-auth-dashboard-admin-users`. The spec commit is `0c4c391`. All implementation work is **uncommitted** in the working tree.
 
 ## 1. Current step
@@ -8,9 +8,9 @@
 - **Phases 1–9 are complete** (Setup, Foundational, US1, US2, US3, US6, US7, US4, US5).
 - **Phase 10 (Polish)**:
   - T100–T103 are done.
-  - **T104 is in progress**: lint and build were verified after the last code change, but the final full test run was stopped (details below).
+  - **T104 is done**: on the latest code, tests pass (48 files, 296 tests), lint reports 0 problems, and the build exits 0. The build needed one retry because of the Next.js security advisory (§3).
   - **T105 is not done**: only a server smoke test was run.
-- **tasks.md**: 103 of 105 tasks are checked `[X]`. T104 and T105 are unchecked with "(in progress: …)" notes.
+- **tasks.md**: 104 of 105 tasks are checked `[X]`. T105 is unchecked with an "(in progress: …)" note.
 
 ## 2. Verification state
 
@@ -30,7 +30,7 @@ Edits made after the last full test run:
 
 - **No failing tests are known.** The re-run of the suite is the open item.
 - **Next.js security advisory (not handled)**: `next build` stopped once with a `SecurityFatalError` saying Next.js 16.4.3 is affected by a known vulnerability. It recommends `next upgrade --agent=security --internal-nudge-id=9517a202-b931-4321-ae1d-4df23f81dbe2`. A retry built fine. I did **not** upgrade, because it's a dependency change outside this feature: **this needs a decision from the user**, including whether to run it in a separate worktree.
-- **Analysis M13 is still open in `spec.md`**: the "Proposed handling" of GAP-N says `ACCOUNT_DISABLED` applies to "any authenticated request". DOC-01, `contracts/mock-api.md` and the code exempt `GET /auth/me` (it returns `status: 'inactive'`) and `POST /auth/logout`. This is a one-line spec wording fix; nothing in the code changes.
+- **Analysis M13 is fixed**: GAP-N in `spec.md` now exempts `GET /auth/me` (returns `status: 'inactive'`) and `POST /auth/logout` from `ACCOUNT_DISABLED`, matching DOC-01, `contracts/mock-api.md` and the code.
 - **Analysis M11 and M12 are implemented in code but not written back into the artifacts** (see §4).
 - **`.next/` cache**: I deleted it once, because a stale `.next/dev/types/validator.ts` still referenced the removed `/forbidden` page and `api/auth/login` route and broke type-checking. If `npx tsc --noEmit` shows `.next/...` errors again, delete `.next/` and rebuild.
 - **Pre-existing, not from this feature**: the `metadataBase` warning during the build (landing metadata), the modified repo-root `.gitignore`, and the untracked `.claude/` and root `.specify/` tooling.
@@ -60,8 +60,7 @@ These are FE-internal. None of them changes `docs/`, so `docs-changes.md` needs 
 
 | File | What remains |
 |---|---|
-| `specs/003-…/tasks.md` | Check T104 and T105 once they're done. Optionally describe M12 (redirect ownership) in T042/T055. |
-| `specs/003-…/spec.md` | Apply M13: add the `/auth/me` and `/auth/logout` exceptions to GAP-N's "Proposed handling", matching DOC-01. |
+| `specs/003-…/tasks.md` | Check T105 once it's done. Optionally describe M12 (redirect ownership) in T042/T055. |
 | `specs/003-…/quickstart.md` | Fill in the "Manual timing (SC-007)" table during T105. |
 | `specs/003-…/contracts/ui-routes-and-components.md` | Optionally add the M12 redirect-ownership rule to §2. |
 | All implementation files under `src/client/` | Code is done; just **uncommitted** (see §6). |
@@ -72,16 +71,13 @@ These are FE-internal. None of them changes `docs/`, so `docs-changes.md` needs 
 
 ## 6. Exact next action when resuming
 
-1. In `src/client/`, run `npm run test`. Expect 48 files and 296 tests, all passing. If the wizard tests fail, look at the `digitsByRole` state change in `CreateAccountWizard.tsx`.
-2. Re-run `npx eslint .` and `npm run build`. Both should still pass. If `.next/` type errors appear, delete `.next/` first.
-3. If all three are green, mark **T104** `[X]`.
-4. Do **T105**:
+1. Do **T105**:
    - run `npm run dev` with `NEXT_PUBLIC_API_MODE=mock`;
    - walk through every row of `quickstart.md` in the browser, running `__myhcmusMock.reset()` first;
    - fill in the SC-007 timing table;
    - do the SC-011 consistency review;
    - then set `NEXT_PUBLIC_API_MODE=real`, rebuild, and confirm `git status` shows no changes under `src/client/src/{app,components,features}`;
    - record any failure as a new task.
-5. Apply the M13 one-line spec fix and, optionally, document M12 in the tasks and the UI contract.
-6. Ask the user about the Next.js security upgrade (§3).
-7. Ask the user how to commit the implementation. A suggested split is one commit per phase or user story on `003-auth-dashboard-admin-users`. Nothing is pushed.
+2. Optionally, document M12 in the tasks and the UI contract.
+3. Ask the user about the Next.js security upgrade (§3).
+4. Ask the user how to commit the implementation. A suggested split is one commit per phase or user story on `003-auth-dashboard-admin-users`. Nothing is pushed.

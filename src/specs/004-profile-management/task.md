@@ -18,7 +18,7 @@
 - [ ] T004 Confirm the approved avatar storage mechanism and verify it supports JPG/PNG validation, the 10 MB limit, replacement, and removal. Do not add a storage provider or dependency without approval. **Blocked:** no avatar storage provider or implementation was found. The database stores only `avatar_url`; the API contract says 5 MB while UC-03 and the current vision requirement say 10 MB. Approve storage and align the contract before implementation.
 - [ ] T005 Resolve the frontend platform mismatch between the constitution and the current Next.js client with the team before frontend implementation. **Blocked:** the constitution specifies Flutter, while the team contract and current client use Next.js/React. Team resolution is required before frontend implementation.
 
-## Phase 2: Uer Story 1 - View and update my profile (Priority: P1)
+## Phase 2: User Story 1 - View and update my profile (Priority: P1)
 
 **Goal**: Authenticated users view only their own profile, update their phone number, and cannot edit protected identity fields.
 

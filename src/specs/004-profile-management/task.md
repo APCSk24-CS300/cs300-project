@@ -73,18 +73,18 @@
 
 ## Phase 5: Verification
 
-- [ ] T021 Run targeted server and client tests for all three user stories and fix regressions caused by the feature.
-- [ ] T022 Verify the acceptance scenarios in `spec.md`, including unauthorized access, protected fields, invalid inputs, image boundaries, and failure preservation.
-- [ ] T023 Update directly related API or user documentation if implementation changes or adds profile behavior not already documented.
+- [x] T021 Run the full client and server test suites for the currently implemented US1/US2 work and fix regressions caused by the feature. **Verified:** client 127/127 tests passed; server 87/87 tests passed. US3 was not implemented or verified by these runs.
+- [ ] T022 Verify the acceptance scenarios in `spec.md`, including authorization, protected fields, invalid inputs, image boundaries, and failure preservation. **Pending:** US1 authentication is blocked by the shared token bypass (T006), the phone format needs approval (T009), and avatar boundaries/removal are unimplemented and unverified (T004, T016-T020). US2 scenarios are covered by passing tests.
+- [ ] T023 Update directly related API or user documentation if implementation changes or adds profile behavior not already documented. **Pending:** the password contract is consistent, but the implemented phone-number format is not in the API contract and requires approval before it can be documented as authoritative.
 
 ## Dependencies
 
 - T006-T010 depend on T001-T003.
 - T007, T010, T012, T015, T017, and T020 depend on T005.
-- T011-T015 depend on T001 and use the resolved password-change contract: `PATCH /profile/password`, an eight-character minimum, frontend-only confirmation, and a message-only success response. T001 verified that the server endpoint still needs implementation.
+- T011-T015 depend on T001 and use the resolved password-change contract: `PATCH /profile/password`, an eight-character minimum, frontend-only confirmation, and a message-only success response. The endpoint and client form are implemented; T013/T015 remain pending due authentication and platform blockers.
 - T016-T020 depend on T004.
 - T021-T023 depend on completion of the user-story implementation tasks.
 
 ## Completion
 
-The feature is complete when the reviewed acceptance criteria pass, profile ownership and protected fields are enforced server-side, password values remain protected, avatar failure paths preserve existing data, and relevant automated tests pass.
+**Overall status: incomplete.** US2 business logic and client/server tests are verified. US1 has implemented code and passing tests, but final acceptance is blocked by the shared hard-coded bearer-token bypass and the unapproved phone-number rule; the student-number source is also unresolved. US3 remains deferred until storage is approved, and none of its upload, removal, format, size-boundary, or failure-preservation criteria have been implemented or verified.

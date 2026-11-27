@@ -67,7 +67,7 @@ export function UserListView() {
         onClear={list.clearFilters}
       />
       {page && list.status === "success" && page.totalItems > 0 ? (
-        <p className="text-xs font-medium text-text-muted">
+        <p className="text-sm font-medium text-text-muted">
           Showing {page.items.length} of {page.totalItems} {page.totalItems === 1 ? "account" : "accounts"}
         </p>
       ) : null}

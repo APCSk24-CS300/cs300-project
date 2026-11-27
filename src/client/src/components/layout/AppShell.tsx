@@ -64,7 +64,7 @@ export function AppShell({
         demoMode={demoMode}
         nav={hasNav ? { open: drawerOpen, controlsId: navId, onToggle: () => setDrawerOpen((v) => !v) } : undefined}
       />
-      <div className="mx-auto flex w-full max-w-[var(--container-landing)] gap-6 px-4 py-6 pb-12 sm:px-6">
+      <div className="mx-auto flex w-full max-w-[1440px] gap-6 px-4 py-6 pb-14 sm:px-6 lg:gap-8 lg:px-8">
         {hasNav ? (
           <>
             {drawerOpen ? (
@@ -80,17 +80,17 @@ export function AppShell({
               id={navId}
               aria-label="Main"
               className={cn(
-                "w-68 shrink-0 rounded-2xl border border-divider bg-surface p-3 shadow-xs",
+                "w-72 shrink-0 rounded-2xl border border-divider bg-surface p-3.5 shadow-xs",
                 "lg:sticky lg:top-22 lg:block lg:self-start",
                 drawerOpen
-                  ? "fixed inset-y-0 left-0 z-40 flex w-72 flex-col overflow-y-auto rounded-none border-y-0 border-l-0 p-4 shadow-card lg:w-68 lg:rounded-2xl lg:border lg:p-3 lg:shadow-xs"
+                  ? "fixed inset-y-0 left-0 z-40 flex w-76 flex-col overflow-y-auto rounded-none border-y-0 border-l-0 p-4 shadow-card lg:w-72 lg:rounded-2xl lg:border lg:p-3.5 lg:shadow-xs"
                   : "hidden",
               )}
             >
               <div className="mb-3 flex items-center justify-between border-b border-divider pb-3 lg:hidden">
                 <div className="flex items-center gap-2">
                   <Logo href={homeHref} onClick={() => setDrawerOpen(false)} />
-                  <span className="rounded-pill bg-surface-muted px-2 py-0.5 text-[11px] font-medium text-text-muted">
+                  <span className="rounded-pill bg-surface-muted px-2.5 py-0.5 text-xs font-medium text-text-muted">
                     {ROLE_LABEL[user.role]}
                   </span>
                 </div>
@@ -103,7 +103,7 @@ export function AppShell({
                   <CloseIcon className="size-5" />
                 </button>
               </div>
-              <p className="mb-2 hidden px-3 text-[11px] font-semibold uppercase tracking-wider text-text-muted lg:block">
+              <p className="mb-2 hidden px-3 text-xs font-semibold uppercase tracking-wider text-text-muted lg:block">
                 Navigation
               </p>
               <SideNav items={navItems} currentPath={currentPath} onNavigate={() => setDrawerOpen(false)} />

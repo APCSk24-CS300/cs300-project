@@ -21,7 +21,7 @@ export function UserFilters({ search, role, onSearchChange, onRoleChange, onClea
       className="flex flex-col gap-4 rounded-2xl border border-divider bg-surface p-4 shadow-xs sm:flex-row sm:items-end"
     >
       <div className="grid flex-1 gap-4 sm:grid-cols-[2fr_1fr]">
-        <FormField label="Search" hideRequirementBadge hint="Name, email or student number">
+        <FormField label="Search" size="comfortable" hideRequirementBadge hint="Name, email or student number">
           <TextInput
             type="search"
             placeholder="Search accounts…"
@@ -29,7 +29,7 @@ export function UserFilters({ search, role, onSearchChange, onRoleChange, onClea
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </FormField>
-        <FormField label="Role" hideRequirementBadge>
+        <FormField label="Role" size="comfortable" hideRequirementBadge>
           <Select
             value={role}
             onChange={(e) => onRoleChange((e.target.value as RoleCode) || "")}

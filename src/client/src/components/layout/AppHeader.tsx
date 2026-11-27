@@ -19,8 +19,8 @@ type AppHeaderProps = {
 export function AppHeader({ user, homeHref, onLogout, logoutPending, demoMode = false, nav }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-divider bg-surface/95 backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-[var(--container-landing)] items-center justify-between gap-3 px-4 sm:px-6">
-        <div className="flex items-center gap-2.5">
+      <div className="mx-auto flex h-17 w-full max-w-[1440px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-3">
           {nav ? (
             <button
               type="button"
@@ -34,7 +34,7 @@ export function AppHeader({ user, homeHref, onLogout, logoutPending, demoMode = 
             </button>
           ) : null}
           <Logo href={homeHref} />
-          <span className="hidden rounded-pill bg-surface-muted px-2.5 py-0.5 text-xs font-medium text-text-muted md:inline-flex">
+          <span className="hidden rounded-pill bg-surface-muted px-3 py-1 text-[13px] font-medium text-text-muted md:inline-flex">
             {ROLE_LABEL[user.role]} Portal
           </span>
           {demoMode ? (

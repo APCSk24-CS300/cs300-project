@@ -14,6 +14,8 @@ type FormFieldProps = {
   required?: boolean;
   /** Hide the Required/Optional label suffix (e.g. for search/filter controls). */
   hideRequirementBadge?: boolean;
+  /** Typography scale: "default" preserves login form; "comfortable" uses 15px labels & 14px hints for app pages. */
+  size?: "default" | "comfortable";
   hint?: string;
   error?: string;
   /** The single input/select/textarea element. Receives id + aria wiring. */
@@ -28,6 +30,7 @@ export function FormField({
   label,
   required = false,
   hideRequirementBadge = false,
+  size = "default",
   hint,
   error,
   children,
@@ -40,6 +43,7 @@ export function FormField({
   const hintId = hint ? `${controlId}-hint` : undefined;
   const errorId = error ? `${controlId}-error` : undefined;
   const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+  const comfortable = size === "comfortable";
 
   const control = isValidElement(children)
     ? cloneElement(children, {
@@ -52,15 +56,23 @@ export function FormField({
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <label htmlFor={controlId} className="flex items-baseline justify-between gap-3 text-sm font-semibold text-heading">
+      <label
+        htmlFor={controlId}
+        className={cn(
+          "flex items-baseline justify-between gap-3 font-semibold text-heading",
+          comfortable ? "text-[15px]" : "text-sm",
+        )}
+      >
         <span>{label}</span>
         {hideRequirementBadge ? null : (
-          <span className="text-xs font-normal text-text-muted">{required ? "Required" : "Optional"}</span>
+          <span className={cn("font-normal text-text-muted", comfortable ? "text-[13px]" : "text-xs")}>
+            {required ? "Required" : "Optional"}
+          </span>
         )}
       </label>
       {control}
       {hint ? (
-        <p id={hintId} className="text-xs text-text-muted">
+        <p id={hintId} className={cn("text-text-muted", comfortable ? "text-sm" : "text-xs")}>
           {hint}
         </p>
       ) : null}

@@ -27,8 +27,8 @@ export function PageHeader({ title, description, actions, backHref, backLabel = 
       ) : null}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-heading sm:text-3xl">{title}</h1>
-          {description ? <p className="mt-1 text-sm text-text-muted">{description}</p> : null}
+          <h1 className="text-[28px] font-bold leading-tight tracking-tight text-heading sm:text-[32px]">{title}</h1>
+          {description ? <p className="mt-1.5 text-[15px] leading-relaxed text-text-muted">{description}</p> : null}
         </div>
         {actions ? <div className="flex flex-wrap items-center gap-3">{actions}</div> : null}
       </div>

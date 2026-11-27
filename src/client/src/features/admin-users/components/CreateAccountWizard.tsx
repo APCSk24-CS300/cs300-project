@@ -149,8 +149,8 @@ export function CreateAccountWizard() {
   const activeIndex = steps.findIndex((s) => s.id === step);
 
   return (
-    <div className="max-w-3xl rounded-2xl border border-divider bg-surface p-5 shadow-xs sm:p-7">
-      <ol className="mb-6 flex items-center gap-2 border-b border-divider pb-5 text-xs font-semibold" aria-label="Steps">
+    <div className="max-w-4xl rounded-2xl border border-divider bg-surface p-6 shadow-xs sm:p-8">
+      <ol className="mb-6 flex items-center gap-2 border-b border-divider pb-5 text-sm font-semibold" aria-label="Steps">
         {steps.map((s, i) => {
           const isCurrent = step === s.id;
           const isCompleted = i < activeIndex;

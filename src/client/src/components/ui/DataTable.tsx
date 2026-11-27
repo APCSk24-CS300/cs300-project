@@ -49,7 +49,7 @@ export function DataTable<T>({ caption, columns, rows, rowKey, loading = false, 
     rows.map((row) => (
       <tr key={rowKey(row)} className="border-t border-divider transition-colors hover:bg-surface-muted/40">
         {columns.map((column) => (
-          <td key={column.key} className={cn("px-4 py-3.5 align-middle text-sm text-heading", column.className)}>
+          <td key={column.key} className={cn("px-5 py-4 align-middle text-[15px] text-heading", column.className)}>
             {column.cell(row)}
           </td>
         ))}
@@ -64,7 +64,7 @@ export function DataTable<T>({ caption, columns, rows, rowKey, loading = false, 
         <thead className="bg-surface-muted/60">
           <tr>
             {columns.map((column) => (
-              <th key={column.key} scope="col" className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-text-muted">
+              <th key={column.key} scope="col" className="px-5 py-3.5 text-[13px] font-semibold uppercase tracking-wider text-text-muted">
                 {column.header}
               </th>
             ))}

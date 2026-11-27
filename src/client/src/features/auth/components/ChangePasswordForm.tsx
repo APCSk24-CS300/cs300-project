@@ -64,14 +64,16 @@ export function ChangePasswordForm({ redirectTo }: { redirectTo?: string }) {
           })(event);
         }}
       >
-        <Alert variant="info">For your security, set a new password before continuing.</Alert>
-        <FormField label="Current (temporary) password" required error={errors.currentPassword?.message}>
+        <Alert variant="info" className="text-[15px]">
+          For your security, set a new password before continuing.
+        </Alert>
+        <FormField label="Current (temporary) password" size="comfortable" required error={errors.currentPassword?.message}>
           <PasswordInput autoComplete="current-password" {...form.register("currentPassword")} />
         </FormField>
-        <FormField label="New password" required hint="At least 8 characters." error={errors.newPassword?.message}>
+        <FormField label="New password" size="comfortable" required hint="At least 8 characters." error={errors.newPassword?.message}>
           <PasswordInput autoComplete="new-password" {...form.register("newPassword")} />
         </FormField>
-        <FormField label="Confirm new password" required error={errors.confirmPassword?.message}>
+        <FormField label="Confirm new password" size="comfortable" required error={errors.confirmPassword?.message}>
           <PasswordInput autoComplete="new-password" {...form.register("confirmPassword")} />
         </FormField>
         {error ? (

@@ -49,10 +49,10 @@ export function AccountForm({ form, faculties, onReview, onCancel }: AccountForm
       className="flex flex-col gap-5"
     >
       <div className="grid gap-5 sm:grid-cols-2">
-        <FormField label="Email" required error={errors.email?.message}>
+        <FormField label="Email" size="comfortable" required error={errors.email?.message}>
           <TextInput type="email" autoComplete="off" {...register("email")} />
         </FormField>
-        <FormField label="Full name" required error={errors.fullName?.message}>
+        <FormField label="Full name" size="comfortable" required error={errors.fullName?.message}>
           <TextInput autoComplete="off" {...register("fullName")} />
         </FormField>
       </div>
@@ -77,23 +77,23 @@ export function AccountForm({ form, faculties, onReview, onCancel }: AccountForm
         )}
       />
 
-      <FormField label="Phone number" error={errors.phoneNumber?.message}>
+      <FormField label="Phone number" size="comfortable" error={errors.phoneNumber?.message}>
         <TextInput type="tel" autoComplete="off" {...register("phoneNumber")} />
       </FormField>
 
       {isStudent ? (
         <div className="grid gap-5 sm:grid-cols-2">
-          <FormField label="Student number" required error={errors.studentNumber?.message}>
+          <FormField label="Student number" size="comfortable" required error={errors.studentNumber?.message}>
             <TextInput autoComplete="off" {...register("studentNumber")} />
           </FormField>
           {faculties.status === "loading" ? (
             <div className="flex flex-col gap-1.5" role="status" aria-busy="true">
-              <span className="text-sm font-semibold text-heading">Faculty</span>
+              <span className="text-[15px] font-semibold text-heading">Faculty</span>
               <Skeleton className="h-12 w-full rounded-2xl" />
               <span className="sr-only">Loading faculties…</span>
             </div>
           ) : faculties.status === "success" ? (
-            <FormField label="Faculty" required error={errors.facultyId?.message}>
+            <FormField label="Faculty" size="comfortable" required error={errors.facultyId?.message}>
               <Select
                 placeholder="Choose a faculty"
                 options={(faculties.data ?? []).map((f) => ({ value: f.id, label: f.name }))}
@@ -102,7 +102,7 @@ export function AccountForm({ form, faculties, onReview, onCancel }: AccountForm
             </FormField>
           ) : (
             <div className="flex flex-col gap-1.5">
-              <span className="text-sm font-semibold text-heading">Faculty</span>
+              <span className="text-[15px] font-semibold text-heading">Faculty</span>
               <p role="alert" className="text-sm text-danger">
                 The faculty list could not be loaded.
               </p>

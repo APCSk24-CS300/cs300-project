@@ -13,7 +13,7 @@ export function AccountResult({ created, onCreateAnother }: { created: CreatedAc
         {account.fullName} ({account.email}) can sign in now as {account.role ? ROLE_LABEL[account.role] : "—"}.
       </Alert>
       <CopyField label="Temporary password" value={temporaryPassword} />
-      <p className="text-sm text-text-muted">
+      <p className="text-[15px] leading-relaxed text-text-muted">
         This password is shown only once. Share it with the user; they must set a new password at first sign-in.
       </p>
       <div className="flex flex-wrap justify-end gap-3 border-t border-divider pt-5">

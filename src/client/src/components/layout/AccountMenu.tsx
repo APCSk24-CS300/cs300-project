@@ -71,8 +71,8 @@ export function AccountMenu({ user, onLogout, pending = false }: AccountMenuProp
           {initials}
         </span>
         <span className="hidden flex-col sm:flex">
-          <span className="text-sm font-semibold leading-tight text-heading">{user.fullName}</span>
-          <span className="text-xs text-text-muted">{ROLE_LABEL[user.role]}</span>
+          <span className="text-[15px] font-semibold leading-tight text-heading">{user.fullName}</span>
+          <span className="text-[13px] text-text-muted">{ROLE_LABEL[user.role]}</span>
         </span>
         <ChevronDownIcon className={cn("hidden size-4 text-text-muted transition-transform sm:block", open && "rotate-180")} />
         <span className="sr-only">Account menu</span>
@@ -84,21 +84,21 @@ export function AccountMenu({ user, onLogout, pending = false }: AccountMenuProp
           id={menuId}
           role="menu"
           aria-label="Account"
-          className="absolute right-0 z-40 mt-2 w-68 rounded-2xl border border-divider bg-surface p-2 shadow-card"
+          className="absolute right-0 z-40 mt-2 w-72 rounded-2xl border border-divider bg-surface p-2.5 shadow-card"
         >
           <div className="flex items-start gap-3 px-3 py-2.5">
-            <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+            <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
               {initials}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-heading">{user.fullName}</p>
-              <p className="truncate text-xs text-text-muted">{user.email}</p>
-              <span className="mt-1.5 inline-flex rounded-pill bg-info-surface px-2 py-0.5 text-[11px] font-semibold text-primary">
+              <p className="truncate text-[15px] font-semibold text-heading">{user.fullName}</p>
+              <p className="truncate text-[13px] text-text-muted">{user.email}</p>
+              <span className="mt-1.5 inline-flex rounded-pill bg-info-surface px-2.5 py-0.5 text-xs font-semibold text-primary">
                 {ROLE_LABEL[user.role]}
               </span>
             </div>
           </div>
-          <div className="mt-1 border-t border-divider pt-1">
+          <div className="mt-1 border-t border-divider pt-1.5">
             <button
               ref={itemRef}
               type="button"
@@ -108,7 +108,7 @@ export function AccountMenu({ user, onLogout, pending = false }: AccountMenuProp
                 setOpen(false);
                 onLogout();
               }}
-              className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold text-danger transition-colors hover:bg-danger-surface disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-[15px] font-semibold text-danger transition-colors hover:bg-danger-surface disabled:cursor-not-allowed disabled:opacity-60"
             >
               <LogoutIcon className="size-4 shrink-0" />
               <span>{pending ? "Logging out…" : "Log out"}</span>

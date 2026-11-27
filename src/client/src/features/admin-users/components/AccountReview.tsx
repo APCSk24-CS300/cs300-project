@@ -59,28 +59,28 @@ export function AccountReview({
 
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-sm text-text-muted">Review the new account details below. Nothing is saved until you confirm.</p>
-      <dl className="grid gap-4 rounded-2xl border border-divider bg-surface-muted/40 p-4 sm:grid-cols-2 sm:p-5">
+      <p className="text-[15px] text-text-muted">Review the new account details below. Nothing is saved until you confirm.</p>
+      <dl className="grid gap-4 rounded-2xl border border-divider bg-surface-muted/40 p-5 sm:grid-cols-2">
         {rows.map(([term, value]) => (
           <div key={term}>
-            <dt className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">{term}</dt>
-            <dd className="mt-0.5 break-words text-sm font-medium text-heading">{value}</dd>
+            <dt className="text-xs font-semibold uppercase tracking-wider text-text-muted">{term}</dt>
+            <dd className="mt-1 break-words text-[15px] font-medium text-heading">{value}</dd>
           </div>
         ))}
       </dl>
 
       <RolePermissionsPanel role={fields.role} />
 
-      <section aria-labelledby="temp-password-heading" className="rounded-2xl border border-divider bg-surface-muted/40 p-4 sm:p-5">
-        <h3 id="temp-password-heading" className="text-sm font-semibold text-heading">
+      <section aria-labelledby="temp-password-heading" className="rounded-2xl border border-divider bg-surface-muted/40 p-5">
+        <h3 id="temp-password-heading" className="text-base font-semibold text-heading">
           Temporary password
         </h3>
-        <p className="mt-1 text-xs text-text-muted">
+        <p className="mt-1 text-sm text-text-muted">
           The user must set a new password at first sign-in.
         </p>
         {editing ? (
           <div className="mt-3 flex flex-col gap-2">
-            <FormField label="Temporary password" required error={overrideError} hint="At least 8 characters.">
+            <FormField label="Temporary password" size="comfortable" required error={overrideError} hint="At least 8 characters.">
               <TextInput
                 autoComplete="off"
                 value={override ?? ""}

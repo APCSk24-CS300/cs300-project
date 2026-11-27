@@ -40,11 +40,11 @@ export function RoleDashboard({ user }: { user: DashboardUser }) {
       {user.role === "administrator" ? <AdminInsightsSection /> : null}
 
       <section aria-labelledby="overview-heading">
-        <div className="mb-3 flex items-baseline justify-between gap-2">
-          <h2 id="overview-heading" className="text-base font-semibold text-heading">
+        <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 id="overview-heading" className="text-xl font-semibold text-heading">
             Overview
           </h2>
-          <span className="text-xs text-text-muted">{overviewSubtitle}</span>
+          <span className="text-sm text-text-muted">{overviewSubtitle}</span>
         </div>
         <div className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
           {sections.map((section) => (

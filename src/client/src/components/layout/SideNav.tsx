@@ -27,13 +27,13 @@ export function SideNav({ items, currentPath, onNavigate }: SideNavProps) {
             <li key={item.id}>
               <span
                 aria-disabled="true"
-                className="flex min-h-10 cursor-not-allowed items-center justify-between gap-2 rounded-xl px-3 py-1.5 text-sm text-text-muted/80"
+                className="flex min-h-10.5 cursor-not-allowed items-center justify-between gap-2 rounded-xl px-3 py-2 text-[15px] text-text-muted/85"
               >
                 <span className="flex min-w-0 items-center gap-2.5">
-                  <NavItemIcon id={item.id} className="size-4 shrink-0 text-text-muted/60" />
+                  <NavItemIcon id={item.id} className="size-4.5 shrink-0 text-text-muted/65" />
                   <span>{item.label}</span>
                 </span>
-                <ComingSoonBadge className="shrink-0 bg-transparent px-0 text-[10px] font-medium tracking-normal text-text-muted/70" />
+                <ComingSoonBadge className="shrink-0 bg-transparent px-0 text-xs font-medium normal-case tracking-normal text-text-muted/75" />
                 <span className="sr-only">(unavailable)</span>
               </span>
             </li>
@@ -47,13 +47,13 @@ export function SideNav({ items, currentPath, onNavigate }: SideNavProps) {
               onClick={onNavigate}
               aria-current={current ? "page" : undefined}
               className={cn(
-                "flex min-h-11 items-center gap-2.5 rounded-xl px-3 text-sm font-semibold transition-colors",
+                "flex min-h-11 items-center gap-2.5 rounded-xl px-3 py-2 text-[15px] font-semibold transition-colors",
                 current
                   ? "bg-primary text-on-primary shadow-xs"
                   : "text-heading hover:bg-surface-muted hover:text-primary",
               )}
             >
-              <NavItemIcon id={item.id} className={cn("size-4 shrink-0", current ? "text-on-primary" : "text-text-muted")} />
+              <NavItemIcon id={item.id} className={cn("size-4.5 shrink-0", current ? "text-on-primary" : "text-text-muted")} />
               <span>{item.label}</span>
             </Link>
           </li>

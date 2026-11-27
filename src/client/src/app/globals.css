@@ -20,6 +20,15 @@
   --color-guide-gradient-from: #ffffff;
   --color-guide-gradient-to: #e3eefb;
   --color-focus-ring: #f2b31b;
+  --color-danger: #b91c1c;
+  --color-danger-surface: #fef2f2;
+  --color-info: #1f4fa3;
+  --color-info-surface: #eef4fc;
+  --color-border: #b5b5b5;
+  --color-border-strong: #8a8f98;
+  --color-page: #f8f8f8;
+  --color-heading: #10132f;
+  --color-placeholder: #8a8a8a;
   --radius-card: 24px;
   --radius-pill: 9999px;
   --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.1);

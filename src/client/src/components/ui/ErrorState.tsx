@@ -19,13 +19,13 @@ export function ErrorState({
   return (
     <div
       className={cn(
-        "flex min-h-[360px] flex-col items-center justify-center rounded-card border border-slate-200 bg-surface px-6 py-12 text-center",
+        "flex min-h-[360px] flex-col items-center justify-center rounded-card border border-border bg-surface px-6 py-12 text-center",
         className,
       )}
     >
       <span
         aria-hidden="true"
-        className="mb-4 flex size-12 items-center justify-center rounded-full bg-red-50 text-2xl text-red-600"
+        className="mb-4 flex size-12 items-center justify-center rounded-full bg-danger-surface text-2xl text-danger"
       >
         !
       </span>

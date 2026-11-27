@@ -1,11 +1,11 @@
 'use client';
 
-import LoginForm from '@/components/forms/LoginForm';
+import LoginForm from '@/features/auth/components/LoginForm';
 import { useRouter } from 'next/navigation';
 
  function TestPage() {
     const router = useRouter();
-    const role = 'admin';
+    const role = 'admin'; // URL segment, not a role code
     return (
         <div className='login-page'>
             <h1>Login</h1>

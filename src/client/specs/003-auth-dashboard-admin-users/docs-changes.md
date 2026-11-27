@@ -210,4 +210,5 @@ These are mismatches between `src/server` or `src/db` and the documented contrac
 | Date | Change |
 |---|---|
 | 2026-11-27 | Created during the `/speckit-analyze` remediation (DOC-01 to DOC-15). |
+| 2026-11-27 | `/speckit-implement`: no new deviation from `docs/` came up. The implementation follows DOC-01 to DOC-15 as written. FE-internal changes need no `docs/` change: unsigned mock tokens, a `setRole` dev helper, and the token provider registered at module load. |
 | 2026-11-27 | Second analysis pass. **DOC-01**: the proposal now exempts `GET /auth/me` (returns `status: 'inactive'`) and `POST /auth/logout` from `ACCOUNT_DISABLED`, needed for the reload case (H6). **DOC-02**: FE impact now covers reload (`reason=role-missing`). The other fixes in this pass are FE-internal and need no `docs/` change: stale-hint clearing (H5), `useForbidden` wiring (M7), wording fixes (M8–M10, L7, L8). |

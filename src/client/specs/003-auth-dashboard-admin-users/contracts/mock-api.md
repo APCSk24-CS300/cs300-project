@@ -15,7 +15,7 @@ The handlers match `${NEXT_PUBLIC_API_BASE_URL}/…`, so the mock and real modes
 
 Each handler reads from and writes to the store (`mocks/db/store.ts`); see [data-model.md §4](../data-model.md#4-mock-store-srcmocksdb).
 - The simulated latency is 300 ms for login and 150–250 ms for other calls (enough to make loading states visible).
-- Token checks decode and verify the mock JWT. A missing, invalid, expired or revoked token returns `401 UNAUTHENTICATED`.
+- Token checks decode the mock JWT, which is unsigned, and accept it only if its `jti` was issued by the store and not revoked. A missing, forged, expired or revoked token returns `401 UNAUTHENTICATED`.
 After the token check, the account checks run in this order:
 1. **Inactive** user → `403 ACCOUNT_DISABLED` (spec GAP-N). This covers the "disabled while signed in" edge case; the client clears the session and shows the disabled message on `/login`.
 2. **`role: null`** → `403 FORBIDDEN`.
@@ -48,4 +48,6 @@ The `window.__myhcmusMock` helper exists only in mock mode.
 
 ## Reset
 
-`window.__myhcmusMock.reset()` re-seeds the store; clearing site data does the same. The helper `window.__myhcmusMock.disable(email)` sets a stored user to `inactive`, which is used to demo the GAP-N case mid-session. In tests, `resetMockDb()` runs in `beforeEach`.
+`window.__myhcmusMock.reset()` re-seeds the store; clearing site data does the same. Two more helpers set up specific cases:
+- `window.__myhcmusMock.disable(email)` sets a stored user to `inactive`, to demo the GAP-N case mid-session.
+- `window.__myhcmusMock.setRole(email, role | null)` changes a user's role. With `null` it demos the role-missing case on reload (FR-007; quickstart "Role missing on reload", which this makes manually runnable, analysis L10). In tests, `resetMockDb()` runs in `beforeEach`.

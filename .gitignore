@@ -11,3 +11,6 @@ src/.claude/*
 src/.specify/*
 !src/.specify/memory/constitution.md
 docs/pa
+CLAUDE.md
+.specify/
+.claude/

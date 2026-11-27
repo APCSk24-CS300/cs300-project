@@ -1,30 +1,11 @@
-import { RoleCode } from "@/libs/roles";
-import type { SessionUser } from "@/features/auth/types/auth";
+import type { components } from "@/types/openapi.gen";
 
-export interface LoginRequest {
-  role: RoleCode;
-  email: string;
-  password: string;
-}
+export type {
+  CurrentUserContextWithGaps,
+  LoginRequest,
+  LoginResponse,
+  ProfileWithGaps,
+} from "@/types/openapi-gaps";
 
-export interface AuthResponse {
-  user: SessionUser;
-}
-
-export interface ForgotPasswordRequest {
-  email: string;
-}
-
-export interface ResetPasswordRequest {
-  token: string;
-  newPassword: string;
-}
-
-export interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-}
-
-export interface MessageResponse {
-  message: string;
-}
+export type ChangePasswordRequestDTO = components["schemas"]["ChangePasswordRequest"];
+export type ApiMessageDTO = components["schemas"]["ApiMessage"];

@@ -63,7 +63,7 @@ Each item resolves an unknown in the plan's Technical Context. Format: Decision 
 
 **Alternatives**: IndexedDB (async and heavier, no benefit at this size); `sessionStorage` (lost when the tab closes, which breaks "log out → log in as new account" across tabs).
 
-**Mock token signing**: `jose` `SignJWT` (already a dependency), using HS256 with a constant mock-only key in `src/mocks`. The claims mirror the server (`sub`, `name`, `exp` = 1h) plus `jti` for revocation. The key is public by design: mock tokens confer nothing in real mode.
+**Mock token** (changed during implementation): the mock issues an **unsigned** JWT (`jose` `UnsecuredJWT`). The claims mirror the server (`sub`, `name`, `exp` = 1h) plus `jti`. Authenticity comes from the store: a token is accepted only if its `jti` was issued by this mock store and has not been revoked, so a forged token is still rejected. HS256 signing was dropped because WebCrypto signing is not portable across the jsdom test realm, and a public mock key adds no security anyway. Mock tokens confer nothing in real mode.
 
 ---
 

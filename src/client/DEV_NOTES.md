@@ -73,30 +73,32 @@
 | Authentication | Session-based authentication design |
 | Route protection | Next.js Proxy |
 | Authorization | RBAC |
-| API communication | TBD |
-| Navigation | Role-based navigation configuration |
+| API communication | Single client `src/libs/api-client.ts`, types generated from `docs/api/openapi.yaml` (`npm run gen:api`) |
+| Mock | MSW handlers in `src/mocks/` (browser in mock mode, `msw/node` in tests); constitution C-IV v1.1.0 |
+| Navigation | Role-based navigation configuration (`src/libs/navigation.ts`, "Coming soon" items) |
 
-### 3.1. Authentication API Contract
-**Current working assumption:**  
+### 3.1. Authentication & session (feature 003)
 
-The login request includes:
-```json
-{
-  "role": "student",
-  "email": "student@hcmus.edu.vn",
-  "password": "password123"
-}
-```
+- **Sign-in**: `POST /auth/login { email, password }` (no role; the role comes from `GET /auth/me`). Response `{ success, data: { token, expiresAt } }`, which mirrors `src/server` (bearer token in the body, 1 h).
+- **Token**: kept in `localStorage` (`myhcmus:token`) and sent only as `Authorization: Bearer` to `NEXT_PUBLIC_API_BASE_URL`. It is never put in a cookie.
+- **Route guard**: `src/proxy.ts` reads only the non-sensitive hint cookie `myhcmus_session` (role, password-change mark, expiry), and `RequireSession` re-checks on the client. Both guards are cosmetic: the API enforces access.
+- **`proxy.ts` location**: it lives in `src/` because Next 16 loads Proxy only beside `app/`. The old `client/proxy.ts` was never executed.
+- **Session end**: there is no refresh. A 401 sends the user to `/login?reason=expired`, 403 `ACCOUNT_DISABLED` to `/login?reason=disabled`, and a missing role to `/login?reason=role-missing`. Logout always clears local state; `reason=logout-unconfirmed` means the server call failed.
+- **First sign-in**: accounts created by an admin must use "Set a new password" (`/change-password`) first.
+- **Open contract proposals**: everything not yet in `openapi.yaml` (login/logout, error codes, `initialPassword`, `mustChangePassword`, nullable role, `ACCOUNT_DISABLED`) is tracked in `specs/003-auth-dashboard-admin-users/docs-changes.md` (DOC-01…DOC-15), and typed in `src/types/openapi-gaps.ts`.
 
-**Pending confirmation from BE:**  
-- Login endpoint and HTTP method.  
-- Request and response schemas.  
-- Session or JWT authentication mechanism.  
-- Cookie configuration.  
-- Logout and session expiration behavior.
-- Current user endpoint.  
+### 3.2. Mock mode
 
-> The authentication contract has not been finalized. The current FE implementation should be treated as provisional until both teams agree on the contract.
+- **Switch**: `NEXT_PUBLIC_API_MODE=mock|real` and `NEXT_PUBLIC_API_BASE_URL` (see `.env.example`). Switching needs no code change.
+- **Store**: the mock store lives in `localStorage` (`myhcmus:mock-db:v1`), so admin-created accounts survive reloads.
+- **Seed accounts** (password `demo2026`):
+  - `student1@`, `manager1@` and `admin@example.invalid`;
+  - `disabled@` (inactive);
+  - `norole@` (no role);
+  - `newuser@` (must set a new password).
+
+  `outage@example.invalid` always answers 503.
+- **Browser console helpers**: `__myhcmusMock.reset()`, `.fail('createUser' | 'login:network' | …)`, `.clearFailures()`, `.expireSessions()`, `.disable(email)`, `.setRole(email, role|null)`.
 
 ---
 
@@ -111,5 +113,6 @@ The login request includes:
 | 2026-10-31 | Reviewed project requirements and development workflow. |
 | 2026-11-01 | Worked on authentication foundation, roles, session, Proxy, and navigation. |
 | 2026-11-02 | Continued Login form development, role selection, Zod validation, and API integration design. |
+| 2026-11-27 | Feature 003: UC-01/02 end to end, role shell + draft dashboards, admin account list/creation (UC-29 subset), "Set a new password", MSW mock, `proxy.ts` moved to `src/`. |
 
 ---

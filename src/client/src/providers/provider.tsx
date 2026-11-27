@@ -1,9 +1,14 @@
 import { AuthProvider } from "@/features/auth/provider/AuthProvider";
+import { MockProvider } from "@/mocks/MockProvider";
 
 interface ProviderProps {
   children: React.ReactNode;
 }
 
 export function Provider({ children }: ProviderProps) {
-  return <AuthProvider>{children}</AuthProvider>;
+  return (
+    <MockProvider>
+      <AuthProvider>{children}</AuthProvider>
+    </MockProvider>
+  );
 }

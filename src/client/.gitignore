@@ -42,3 +42,5 @@ next-env.d.ts
 
 # 
 .env.local
+# example env is committed
+!.env.example

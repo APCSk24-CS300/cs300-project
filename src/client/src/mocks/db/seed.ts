@@ -1,0 +1,131 @@
+import type { MockDb, MockUser } from "@/mocks/db/types";
+
+/** Password of every seeded account (use-case-specifications §5.1 demo accounts). */
+export const SEED_PASSWORD = "demo2026";
+
+/**
+ * Not a stored user: the login handler always answers 503 for this email (UC-01 A5).
+ * Checked before any user lookup.
+ */
+export const OUTAGE_EMAIL = "outage@example.invalid";
+
+function user(partial: Omit<MockUser, "passwordPlain" | "version" | "phoneNumber"> & Partial<MockUser>): MockUser {
+  return {
+    phoneNumber: null,
+    passwordPlain: SEED_PASSWORD,
+    version: 1,
+    ...partial,
+  };
+}
+
+export function createSeed(): MockDb {
+  return {
+    version: 1,
+    // Six stored users (data-model §4).
+    users: [
+      user({
+        id: "user-001",
+        email: "student1@example.invalid",
+        fullName: "Nguyễn Văn An",
+        role: "student",
+        status: "active",
+        studentNumber: "23127001",
+        facultyId: "120",
+        mustChangePassword: false,
+        createdAt: "2026-09-01T08:00:00.000Z",
+      }),
+      user({
+        id: "user-002",
+        email: "manager1@example.invalid",
+        fullName: "Trần Thị Bích",
+        role: "manager",
+        status: "active",
+        studentNumber: null,
+        facultyId: null,
+        mustChangePassword: false,
+        createdAt: "2026-09-01T08:05:00.000Z",
+      }),
+      user({
+        id: "user-003",
+        email: "admin@example.invalid",
+        fullName: "Lê Quốc Huy",
+        role: "administrator",
+        status: "active",
+        studentNumber: null,
+        facultyId: null,
+        mustChangePassword: false,
+        createdAt: "2026-09-01T08:10:00.000Z",
+      }),
+      user({
+        id: "user-004",
+        email: "disabled@example.invalid",
+        fullName: "Phạm Minh Khoa",
+        role: "student",
+        status: "inactive",
+        studentNumber: "23127002",
+        facultyId: "120",
+        mustChangePassword: false,
+        createdAt: "2026-09-02T08:00:00.000Z",
+      }),
+      user({
+        id: "user-005",
+        email: "norole@example.invalid",
+        fullName: "Võ Thanh Long",
+        role: null,
+        status: "active",
+        studentNumber: null,
+        facultyId: null,
+        mustChangePassword: false,
+        createdAt: "2026-09-02T08:05:00.000Z",
+      }),
+      user({
+        id: "user-006",
+        email: "newuser@example.invalid",
+        fullName: "Đặng Thu Mai",
+        role: "student",
+        status: "active",
+        studentNumber: "23127003",
+        facultyId: "110",
+        mustChangePassword: true,
+        createdAt: "2026-09-03T08:00:00.000Z",
+      }),
+    ],
+    // Subset of src/server/src/enums/Faculty.ts (ids as strings).
+    faculties: [
+      { id: "120", code: "CIT", name: "Computer and Information Technology field" },
+      { id: "110", code: "MATH", name: "Mathematics field (Mathematics, Applied Mathematics, Computational Mathematics)" },
+      { id: "140", code: "CHEM", name: "Chemistry" },
+      { id: "150", code: "BIO", name: "Biology" },
+      { id: "180", code: "BIOTECH", name: "Biotechnology" },
+      { id: "280", code: "DSS", name: "Data Science and Statistics Field" },
+    ],
+    roles: [
+      { id: "role-student", code: "student", name: "Student", description: "Registers for activities and tracks training scores." },
+      { id: "role-manager", code: "manager", name: "Manager", description: "Manages assigned activities, registrations and participation." },
+      { id: "role-administrator", code: "administrator", name: "Administrator", description: "Manages accounts, roles and system configuration." },
+    ],
+    permissions: [
+      { id: "perm-registration-create", code: "registration.create", description: "Register for activities" },
+      { id: "perm-appeal-submit", code: "appeal.submit", description: "Submit recognition requests and appeals" },
+      { id: "perm-activity-manage", code: "activity.manage", description: "Create and manage activities" },
+      { id: "perm-registration-review", code: "registration.review", description: "Review activity registrations" },
+      { id: "perm-attendance-record", code: "attendance.record", description: "Record attendance" },
+      { id: "perm-score-submit", code: "score.submit", description: "Submit training-score results" },
+      { id: "perm-appeal-review", code: "appeal.review", description: "Review requests and appeals" },
+      { id: "perm-score-adjust", code: "score.adjust", description: "Adjust training scores" },
+      { id: "perm-criteria-manage", code: "criteria.manage", description: "Configure criteria and categories" },
+      { id: "perm-reports-view", code: "reports.view", description: "View system reports" },
+      { id: "perm-role-manage", code: "role.manage", description: "Manage user accounts and roles" },
+    ],
+    rolePermissions: {
+      "role-student": ["registration.create", "appeal.submit"],
+      "role-manager": ["activity.manage", "registration.review", "attendance.record", "score.submit", "appeal.review"],
+      "role-administrator": ["role.manage", "criteria.manage", "reports.view", "score.adjust"],
+    },
+    issuedTokens: {},
+    revokedTokenIds: [],
+    loginAttempts: {},
+    failures: [],
+    nextUserSeq: 7,
+  };
+}

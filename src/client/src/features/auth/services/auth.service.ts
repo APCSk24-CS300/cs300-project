@@ -1,39 +1,42 @@
-// Login, Logout, Forgot Password, Reset Password, Change Password, Get current user
-import { api } from "@/libs/api-client";
+import { api, unwrap } from "@/libs/api-client";
 import type {
-  AuthResponse, ChangePasswordRequest, ForgotPasswordRequest,
-  LoginRequest, MessageResponse, ResetPasswordRequest,
+  ApiMessageDTO,
+  ChangePasswordRequestDTO,
+  CurrentUserContextWithGaps,
+  LoginRequest,
+  LoginResponse,
 } from "@/features/auth/types/auth.dto";
 
-import type { SessionUser } from "@/features/auth/types";
+/**
+ * Auth service contract (constitution C-IV v1.1.0). One HTTP implementation; in mock mode
+ * the MSW handlers in src/mocks/handlers/auth.ts answer the same requests.
+ * Session callbacks are skipped: AuthProvider handles these errors itself.
+ */
+export interface AuthService {
+  login(request: LoginRequest): Promise<LoginResponse["data"]>;
+  logout(): Promise<void>;
+  getCurrentUserContext(): Promise<CurrentUserContextWithGaps["data"]>;
+  changePassword(request: ChangePasswordRequestDTO): Promise<void>;
+}
 
-const BASE = "/auth";
+const OWN_ERRORS = { skipSessionHandlers: true } as const;
 
-class AuthService {
-  async login(data: LoginRequest): Promise<AuthResponse> {
-    return api.post<AuthResponse>(`${BASE}/login`, data);
+class HttpAuthService implements AuthService {
+  async login(request: LoginRequest) {
+    return unwrap(await api.post<LoginResponse>("/auth/login", request, OWN_ERRORS));
   }
 
-  async logout(): Promise<void> {
-    return api.post<void>(`${BASE}/logout`);
+  async logout() {
+    await api.post<ApiMessageDTO>("/auth/logout", undefined, OWN_ERRORS);
   }
 
-  async getMe(): Promise<SessionUser> {
-    return api.get<SessionUser>(`${BASE}/me`);
+  async getCurrentUserContext() {
+    return unwrap(await api.get<CurrentUserContextWithGaps>("/auth/me", OWN_ERRORS));
   }
 
-  async forgotPassword(data: ForgotPasswordRequest): Promise<MessageResponse> {
-    return api.post<MessageResponse>(`${BASE}/forgot-password`, data);
-  }
-
-  async resetPassword(data: ResetPasswordRequest): Promise<MessageResponse> {
-    return api.post<MessageResponse>(`${BASE}/reset-password`, data);
-  }
-
-  async changePassword(data: ChangePasswordRequest): Promise<MessageResponse> {
-    return api.post<MessageResponse>(`${BASE}/change-password`, data);
+  async changePassword(request: ChangePasswordRequestDTO) {
+    await api.patch<ApiMessageDTO>("/profile/password", request, OWN_ERRORS);
   }
 }
 
-export const authService = new AuthService();
-
+export const authService: AuthService = new HttpAuthService();

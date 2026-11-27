@@ -1,10 +1,42 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { afterEach, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
+import { server } from "@/mocks/node";
+import { resetMockDb } from "@/mocks/db/store";
+import { TOKEN_STORAGE_KEY } from "@/libs/token-store";
+import { SESSION_HINT_COOKIE } from "@/libs/session-hint";
+import {
+  getMockPathname,
+  getMockSearchParams,
+  mockRouter,
+  resetMockNavigation,
+} from "./navigation-mock";
+
+process.env.NEXT_PUBLIC_API_BASE_URL = "http://localhost:8080/api/v1";
+process.env.NEXT_PUBLIC_API_MODE = "mock";
+
+// One MSW handler set for app and tests (research R1).
+beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+
+beforeEach(() => {
+  resetMockDb();
+  window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+  document.cookie = `${SESSION_HINT_COOKIE}=; Path=/; Max-Age=0`;
+  resetMockNavigation();
+});
 
 afterEach(() => {
   cleanup();
 });
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => mockRouter,
+  usePathname: () => getMockPathname(),
+  useSearchParams: () => getMockSearchParams(),
+  redirect: vi.fn(),
+}));
 
 vi.mock("next/image", async () => {
   const React = await import("react");

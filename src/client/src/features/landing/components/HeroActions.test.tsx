@@ -62,7 +62,7 @@ describe("HeroActions", () => {
   it.each([
     ["student", "/student/dashboard"],
     ["manager", "/manager/dashboard"],
-    ["admin", "/admin/dashboard"],
+    ["administrator", "/admin/dashboard"],
   ] satisfies [RoleCode, string][])(
     "sends authenticated %s users to %s",
     (role, dashboardPath) => {

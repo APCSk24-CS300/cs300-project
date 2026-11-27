@@ -2012,33 +2012,48 @@ components:
     UpdateProfileRequest:
       type: object
       minProperties: 1
+      additionalProperties: false
       properties:
         phoneNumber:
           type: string
           nullable: true
           example: '0901234567'
-      description: The account owner can edit phone number only. Full name, student number, and faculty are staff-controlled.
+      description: The account owner can edit phone number only. Full name and academic identity information are read-only.
     AcademicInfo:
       type: object
+      required:
+      - studentNumber
+      - faculty
+      - major
+      - enrollmentYear
       properties:
         studentNumber:
           type: string
           nullable: true
+          readOnly: true
         faculty:
           type: object
           allOf:
           - $ref: '#/components/schemas/FacultySummary'
           nullable: true
+          readOnly: true
         major:
           type: string
           nullable: true
+          readOnly: true
         enrollmentYear:
           type: integer
           nullable: true
-      readOnly: true
+          readOnly: true
       description: Staff-controlled; read-only to the account owner.
     Profile:
       type: object
+      required:
+      - id
+      - email
+      - fullName
+      - phoneNumber
+      - academicInfo
       properties:
         id:
           type: string
@@ -2064,6 +2079,7 @@ components:
           - $ref: '#/components/schemas/AcademicInfo'
           nullable: true
           type: object
+          readOnly: true
         role:
           $ref: '#/components/schemas/UserRole'
         interests:

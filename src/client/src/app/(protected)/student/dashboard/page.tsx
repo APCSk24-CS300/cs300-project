@@ -5,6 +5,7 @@ import { AuthContext } from "@/features/auth/context/AuthContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { RoleNav } from "@/components/layout/RoleNav";
 
 export default function DashboardPage() {
   const authContext = useAuth();
@@ -27,6 +28,8 @@ export default function DashboardPage() {
   }
 
   return (
+    <>
+    <RoleNav />
     <div className="flex flex-col items-center justify-center gap-4">
       <h1 className="text-2xl font-bold">Student Dashboard</h1>
       <p>Welcome to the student dashboard!</p>
@@ -37,5 +40,6 @@ export default function DashboardPage() {
         onClick={handlogout}>Log Out</button>
 
     </div>
+    </>
   );
 }

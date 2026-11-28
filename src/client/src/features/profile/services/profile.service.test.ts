@@ -1,133 +1,63 @@
-import { describe, expect, it, vi } from "vitest";
-import { api } from "@/libs/api-client";
-import { RealProfileService } from "@/features/profile/services/profile.service";
+import { describe, expect, it } from "vitest";
+import { profileService } from "@/features/profile/services/profile.service";
+import { readDb, setMockFailures, updateDb } from "@/mocks/db/store";
+import { signInAs } from "../../../../tests/test-utils";
 
-vi.mock("@/libs/api-client", () => ({
-  api: {
-    get: vi.fn(),
-    patch: vi.fn(),
-    post: vi.fn(),
-    delete: vi.fn(),
-  },
-}));
+// Against the MSW profile handlers through the single API client; titles are dev's (coverage.md, PS).
+// The two envelope cases ("supports the documented success/data response", "rejects an invalid
+// profile response") are mapper tests: mappers/profile.mapper.test.ts.
+const STUDENT = "student1@example.invalid";
+const stored = () => readDb().users.find((u) => u.email === STUDENT)!;
+const png = () => new File([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 9])], "me.png", { type: "image/png" });
 
-const getMock = vi.mocked(api.get);
-const patchMock = vi.mocked(api.patch);
-
-describe("RealProfileService", () => {
+describe("profile service", () => {
   it("requests and maps the server profile response", async () => {
-    const signal = new AbortController().signal;
-    getMock.mockResolvedValueOnce({
-      success: true,
-      payload: {
-        message: "OK",
-        data: {
-          email: "student@example.edu",
-          fullName: "Student Example",
-          phoneNumber: "0901234567",
-          avatarUrl: "https://example.edu/avatar.png",
-          academicInfo: {
-            studentNumber: "22120001",
-            faculty: { name: "Faculty of Science" },
-          },
-        },
-      },
-    });
-
-    await expect(new RealProfileService().getProfile(signal)).resolves.toEqual({
-      email: "student@example.edu",
-      fullName: "Student Example",
-      phoneNumber: "0901234567",
-      avatarUrl: "https://example.edu/avatar.png",
-      academicInfo: {
-        studentNumber: "22120001",
-        faculty: { name: "Faculty of Science" },
-      },
-    });
-    expect(getMock).toHaveBeenCalledWith("/api/v1/profile", { signal });
-  });
-
-  it("supports the documented success/data response", async () => {
-    getMock.mockResolvedValueOnce({
-      success: true,
-      data: {
-        email: "student@example.edu",
-        fullName: "Student Example",
-        phoneNumber: null,
-        academicInfo: null,
-      },
-    });
-
-    await expect(new RealProfileService().getProfile()).resolves.toMatchObject({
+    signInAs(STUDENT);
+    await expect(profileService.getProfile()).resolves.toEqual({
+      email: STUDENT,
+      fullName: "Nguyễn Văn An",
       phoneNumber: null,
       avatarUrl: null,
-      academicInfo: null,
+      academicInfo: { studentNumber: "23127001", faculty: { name: "Computer and Information Technology field" } },
     });
-  });
-
-  it("rejects an invalid profile response", async () => {
-    getMock.mockResolvedValueOnce({ success: true, payload: { data: {} } });
-
-    await expect(new RealProfileService().getProfile()).rejects.toThrow(
-      "The profile response is invalid",
-    );
   });
 
   it("updates only the phone number and maps the returned profile", async () => {
-    patchMock.mockResolvedValueOnce({
-      success: true,
-      payload: {
-        message: "OK",
-        data: {
-          email: "student@example.edu",
-          fullName: "Student Example",
-          phoneNumber: "+84901234567",
-          avatarUrl: null,
-          academicInfo: null,
-        },
-      },
-    });
-
-    await expect(
-      new RealProfileService().updatePhoneNumber("+84901234567"),
-    ).resolves.toMatchObject({ phoneNumber: "+84901234567" });
-    expect(patchMock).toHaveBeenCalledWith("/api/v1/profile", {
-      phoneNumber: "+84901234567",
-    });
+    signInAs(STUDENT);
+    const profile = await profileService.updatePhoneNumber("+84901234567");
+    expect(profile).toMatchObject({ phoneNumber: "+84901234567", fullName: "Nguyễn Văn An" });
+    expect(stored()).toMatchObject({ phoneNumber: "+84901234567", fullName: "Nguyễn Văn An", email: STUDENT });
   });
 
   it("sends null when clearing the phone number", async () => {
-    patchMock.mockResolvedValueOnce({
-      success: true,
-      payload: {
-        data: {
-          email: "student@example.edu",
-          fullName: "Student Example",
-          phoneNumber: null,
-          academicInfo: null,
-        },
-      },
+    updateDb((db) => {
+      db.users.find((u) => u.email === STUDENT)!.phoneNumber = "0901234567";
     });
-
-    await expect(
-      new RealProfileService().updatePhoneNumber(null),
-    ).resolves.toMatchObject({ phoneNumber: null });
-    expect(patchMock).toHaveBeenCalledWith("/api/v1/profile", {
-      phoneNumber: null,
-    });
+    signInAs(STUDENT);
+    await expect(profileService.updatePhoneNumber(null)).resolves.toMatchObject({ phoneNumber: null });
+    expect(stored().phoneNumber).toBeNull();
   });
-});
 
-it("uploads multipart avatar content and validates the active URL", async () => {
-  vi.mocked(api.post).mockResolvedValueOnce({success:true,data:{avatarUrl:"/api/v1/profile/avatar/files/test.png"}});
-  const file=new File(["image"],"test.png",{type:"image/png"});
-  await expect(new RealProfileService().uploadAvatar(file)).resolves.toBe("/api/v1/profile/avatar/files/test.png");
-  const form=vi.mocked(api.post).mock.calls[0][1] as FormData;
-  expect(form.get("avatar")).toBeInstanceOf(File);
-});
-it("removes the avatar only when the API confirms success", async () => {
-  vi.mocked(api.delete).mockResolvedValueOnce({success:true});
-  await expect(new RealProfileService().removeAvatar()).resolves.toBeUndefined();
-  vi.mocked(api.delete).mockResolvedValueOnce({success:false});
-  await expect(new RealProfileService().removeAvatar()).rejects.toThrow();
+  it("uploads multipart avatar content and validates the active URL", async () => {
+    signInAs(STUDENT);
+    const url = await profileService.uploadAvatar(png());
+    expect(url).toMatch(/^\/api\/v1\/profile\/avatar\/files\/[0-9a-f-]{36}\.png$/);
+    expect(stored().avatarUrl).toBe(url);
+    await expect(profileService.uploadAvatar(new File(["text"], "x.png", { type: "image/png" }))).rejects.toMatchObject({
+      status: 400,
+      code: "UNSUPPORTED_FILE",
+    });
+    expect(stored().avatarUrl).toBe(url);
+  });
+
+  it("removes the avatar only when the API confirms success", async () => {
+    signInAs(STUDENT);
+    const url = await profileService.uploadAvatar(png());
+    setMockFailures(["removeAvatar"]);
+    await expect(profileService.removeAvatar()).rejects.toMatchObject({ status: 500 });
+    expect(stored().avatarUrl).toBe(url);
+    setMockFailures([]);
+    await expect(profileService.removeAvatar()).resolves.toBeUndefined();
+    expect(stored().avatarUrl).toBeNull();
+  });
 });

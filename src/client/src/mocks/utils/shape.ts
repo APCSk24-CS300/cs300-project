@@ -27,7 +27,7 @@ export function toProfile(db: MockDb, user: MockUser) {
     email: user.email,
     fullName: user.fullName,
     phoneNumber: user.phoneNumber,
-    avatarUrl: null,
+    avatarUrl: user.avatarUrl ?? null,
     academicInfo:
       user.role === "student"
         ? {

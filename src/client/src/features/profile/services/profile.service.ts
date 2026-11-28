@@ -1,102 +1,42 @@
-import { api } from "@/libs/api-client";
-import type { Profile, ProfileResponseDTO } from "@/features/profile/types/profile";
+import { ApiError, api, unwrap } from "@/libs/api-client";
+import { profileFromEnvelope } from "@/features/profile/mappers/profile.mapper";
+import type { Profile } from "@/features/profile/types/profile";
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function isNullableString(value: unknown): value is string | null {
-  return value === null || typeof value === "string";
-}
-
-function mapProfile(value: unknown): Profile {
-  if (
-    !isRecord(value) ||
-    typeof value.email !== "string" ||
-    typeof value.fullName !== "string" ||
-    !isNullableString(value.phoneNumber) ||
-    (value.avatarUrl !== undefined && !isNullableString(value.avatarUrl))
-  ) {
-    throw new Error("The profile response is invalid");
-  }
-
-  let academicInfo: Profile["academicInfo"] = null;
-  if (value.academicInfo !== null && value.academicInfo !== undefined) {
-    if (!isRecord(value.academicInfo)) {
-      throw new Error("The profile response is invalid");
-    }
-
-    const studentNumber = value.academicInfo.studentNumber;
-    const faculty = value.academicInfo.faculty;
-    if (!isNullableString(studentNumber)) {
-      throw new Error("The profile response is invalid");
-    }
-
-    let facultyInfo: NonNullable<Profile["academicInfo"]>["faculty"] = null;
-    if (faculty !== null && faculty !== undefined) {
-      if (!isRecord(faculty) || typeof faculty.name !== "string") {
-        throw new Error("The profile response is invalid");
-      }
-      facultyInfo = { name: faculty.name };
-    }
-
-    academicInfo = { studentNumber, faculty: facultyInfo };
-  }
-
-  return {
-    email: value.email,
-    fullName: value.fullName,
-    phoneNumber: value.phoneNumber,
-    avatarUrl: typeof value.avatarUrl === "string" ? value.avatarUrl : null,
-    academicInfo,
-  };
-}
-
-function getProfileData(response: ProfileResponseDTO): unknown {
-  if (!response.success) {
-    throw new Error("The profile request was unsuccessful");
-  }
-
-  if ("payload" in response) {
-    return response.payload.data;
-  }
-
-  return response.data;
-}
-
+/**
+ * UC-03 profile operations through the single API client (plan 006 §6): paths are relative to the base
+ * URL, so mock mode (MSW) and real mode (the /api/backend forwarder) are the same code.
+ * Password changes live in the auth service (`authService.changePassword`, one service for the 003
+ * first-sign-in flow and the profile; plan 006 O3).
+ */
 export interface ProfileService {
-  getProfile(signal?: AbortSignal): Promise<Profile>;
+  getProfile(): Promise<Profile>;
+  updatePhoneNumber(phoneNumber: string | null): Promise<Profile>;
+  /** Returns the saved avatar URL (BE-relative, `/api/v1/profile/avatar/files/{name}`). */
   uploadAvatar(file: File): Promise<string>;
   removeAvatar(): Promise<void>;
-  updatePhoneNumber(phoneNumber: string | null): Promise<Profile>;
 }
 
 export class RealProfileService implements ProfileService {
-  async uploadAvatar(file: File): Promise<string> {
-    const form = new FormData(); form.append("avatar", file);
-    const result = await api.post<{ success: boolean; data: { avatarUrl: string } }>("/api/v1/profile/avatar", form);
-    if (!result.success || typeof result.data?.avatarUrl !== "string") throw new Error("Invalid avatar response");
-    return result.data.avatarUrl;
-  }
-  async removeAvatar(): Promise<void> {
-    const result = await api.delete<{ success: boolean }>("/api/v1/profile/avatar");
-    if (!result.success) throw new Error("Avatar removal failed");
-  }
-
-  async getProfile(signal?: AbortSignal): Promise<Profile> {
-    const response = await api.get<ProfileResponseDTO>("/api/v1/profile", {
-      signal,
-    });
-
-    return mapProfile(getProfileData(response));
+  async getProfile(): Promise<Profile> {
+    return profileFromEnvelope(await api.get<unknown>("/profile"));
   }
 
   async updatePhoneNumber(phoneNumber: string | null): Promise<Profile> {
-    const response = await api.patch<ProfileResponseDTO>("/api/v1/profile", {
-      phoneNumber,
-    });
+    return profileFromEnvelope(await api.patch<unknown>("/profile", { phoneNumber }));
+  }
 
-    return mapProfile(getProfileData(response));
+  async uploadAvatar(file: File): Promise<string> {
+    const form = new FormData();
+    form.append("avatar", file);
+    const data = unwrap(await api.post<{ success: boolean; data?: { avatarUrl?: unknown } }>("/profile/avatar", form));
+    if (typeof data?.avatarUrl !== "string") {
+      throw new ApiError({ status: 200, code: "UNKNOWN", message: "Invalid avatar response" });
+    }
+    return data.avatarUrl;
+  }
+
+  async removeAvatar(): Promise<void> {
+    await api.delete<{ success: boolean; message?: string }>("/profile/avatar");
   }
 }
 

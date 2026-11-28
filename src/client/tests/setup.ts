@@ -12,6 +12,21 @@ import {
   resetMockNavigation,
 } from "./navigation-mock";
 
+// jsdom replaces FormData/File/Blob with its own classes, which Node's fetch (used by MSW in tests)
+// cannot serialize: a multipart body arrives as "[object FormData]". Use the Node realm's classes so
+// avatar uploads reach the MSW handlers as real multipart, as in the browser (plan 006 step 4).
+// The Node FormData constructor is taken from a parsed form body (no extra dependency).
+if (typeof window !== "undefined") {
+  const { File: NodeFile, Blob: NodeBlob } = await import("node:buffer");
+  const parsed = await new Request("http://setup.local", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: "a=1",
+  }).formData();
+  const NodeFormData = parsed.constructor as typeof FormData;
+  Object.assign(globalThis, { FormData: NodeFormData, File: NodeFile, Blob: NodeBlob });
+}
+
 process.env.NEXT_PUBLIC_API_BASE_URL = "http://localhost:8080/api/v1";
 process.env.NEXT_PUBLIC_API_MODE = "mock";
 

@@ -14,6 +14,8 @@ export interface MockUser {
   facultyId: string | null;
   passwordPlain: string;
   mustChangePassword: boolean;
+  /** Same-origin avatar URL as the BE stores it (`/api/v1/profile/avatar/files/{name}`), or null (plan 006). */
+  avatarUrl: string | null;
   version: number;
   createdAt: string;
 }
@@ -62,8 +64,13 @@ export type OperationName =
   | "listFaculties"
   | "listRoles"
   | "listServices"
-  | "manageServiceLinks";
-export type OperationId = OperationName | `${OperationName}:network`;
+  | "manageServiceLinks"
+  | "getProfile"
+  | "updateProfile"
+  | "uploadAvatar"
+  | "removeAvatar";
+/** `:conflict` = the BE's 409 when another avatar update won the compare-and-set (UC-03 A9). */
+export type OperationId = OperationName | `${OperationName}:network` | "uploadAvatar:conflict" | "removeAvatar:conflict";
 
 export interface MockDb {
   version: 1;

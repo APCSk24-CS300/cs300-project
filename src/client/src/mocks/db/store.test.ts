@@ -76,4 +76,24 @@ describe("mock store", () => {
     });
     expect(readDb().rolePermissions["role-student"]).not.toContain("hub.services.read");
   });
+  it("adds avatarUrl to an older store's users and keeps sessions", () => {
+    // A store written before plan 006: users without avatarUrl, one signed-in session.
+    const old = readDb() as unknown as { users: Record<string, unknown>[]; issuedTokens: Record<string, string> };
+    for (const u of old.users) delete u.avatarUrl;
+    old.users[0].fullName = "Kept";
+    old.issuedTokens["jti-kept"] = "user-001";
+    window.localStorage.setItem(MOCK_DB_KEY, JSON.stringify(old));
+
+    const db = readDb();
+    expect(db.users.every((u) => u.avatarUrl === null)).toBe(true);
+    expect(db.users[0].fullName).toBe("Kept");
+    expect(db.issuedTokens["jti-kept"]).toBe("user-001");
+    expect(JSON.parse(window.localStorage.getItem(MOCK_DB_KEY) ?? "{}").users[0]).toHaveProperty("avatarUrl", null);
+
+    // Runs once: a later avatar value is not reset by the next read.
+    updateDb((d) => {
+      d.users[0].avatarUrl = "/api/v1/profile/avatar/files/x.png";
+    });
+    expect(readDb().users[0].avatarUrl).toBe("/api/v1/profile/avatar/files/x.png");
+  });
 });

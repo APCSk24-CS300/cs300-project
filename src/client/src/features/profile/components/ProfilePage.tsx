@@ -73,7 +73,7 @@ export function ProfilePage() {
     let active = true;
 
     profileService
-      .getProfile(controller.signal)
+      .getProfile()
       .then((profile) => {
         if (active) {
           setState({ status: "success", profile });

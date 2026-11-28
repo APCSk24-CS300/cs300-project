@@ -66,9 +66,27 @@ export function migrateHub(db: MockDb): boolean {
   return true;
 }
 
-function user(partial: Omit<MockUser, "passwordPlain" | "version" | "phoneNumber"> & Partial<MockUser>): MockUser {
+/**
+ * Adds what plan 006 introduced to a store written before it: `avatarUrl` on every user (null).
+ * Users, sessions and tokens are kept; runs once (a store whose users all have the field is left alone).
+ */
+export function migrateProfile(db: MockDb): boolean {
+  let changed = false;
+  for (const u of db.users) {
+    if (!Object.prototype.hasOwnProperty.call(u, "avatarUrl")) {
+      (u as MockUser).avatarUrl = null;
+      changed = true;
+    }
+  }
+  return changed;
+}
+
+function user(
+  partial: Omit<MockUser, "passwordPlain" | "version" | "phoneNumber" | "avatarUrl"> & Partial<MockUser>,
+): MockUser {
   return {
     phoneNumber: null,
+    avatarUrl: null,
     passwordPlain: SEED_PASSWORD,
     version: 1,
     ...partial,

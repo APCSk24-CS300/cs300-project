@@ -1,4 +1,5 @@
-import { createSeed, migrateHub } from "@/mocks/db/seed";
+import { createSeed, migrateHub, migrateProfile } from "@/mocks/db/seed";
+import { clearAvatarFiles } from "@/mocks/db/avatar-files";
 import type { MockDb, OperationId } from "@/mocks/db/types";
 
 /** Persistent mock store (research R3): survives reloads so admin-created accounts can sign in. */
@@ -25,8 +26,10 @@ export function readDb(): MockDb {
     if (raw) {
       const parsed = JSON.parse(raw) as MockDb;
       if (parsed && parsed.version === 1) {
-        // Stores written before plan 005 lack the hub data: add it, keep everything else.
-        if (migrateHub(parsed)) {
+        // Stores written before plans 005/006 lack the hub data / avatarUrl: add it, keep everything else.
+        const hub = migrateHub(parsed);
+        const profile = migrateProfile(parsed);
+        if (hub || profile) {
           writeDb(parsed);
         }
         return parsed;
@@ -63,6 +66,7 @@ export function updateDb<T>(mutate: (db: MockDb) => T): T {
 
 export function resetMockDb(): void {
   memoryFallback = null;
+  clearAvatarFiles();
   writeDb(createSeed());
 }
 

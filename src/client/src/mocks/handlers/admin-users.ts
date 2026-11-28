@@ -125,6 +125,7 @@ export const adminUserHandlers = [
               facultyId: role === "student" ? facultyId : null,
               passwordPlain: initialPassword,
               mustChangePassword: true,
+              avatarUrl: null,
               version: 1,
               createdAt: new Date().toISOString(),
             };

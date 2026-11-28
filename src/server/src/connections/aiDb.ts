@@ -16,11 +16,15 @@ let pool: Pool | undefined;
 export function getAiPool(): Pool {
 	if (!pool) {
 		pool = new Pool({
-			host: config.ai.db.dbHost,
-			user: config.ai.db.dbUser,
-			password: config.ai.db.dbPassword,
-			port: Number(config.ai.db.dbPort ?? 5432),
-			database: config.ai.db.dbName,
+			...(config.ai.db.connectionString
+				? { connectionString: config.ai.db.connectionString }
+				: {
+					host: config.ai.db.dbHost,
+					user: config.ai.db.dbUser,
+					password: config.ai.db.dbPassword,
+					port: Number(config.ai.db.dbPort ?? 5432),
+					database: config.ai.db.dbName,
+				}),
 			max: 5
 		});
 		// keep filtered vector searches returning enough rows (pgvector 0.8+, research R2)

@@ -5,13 +5,15 @@ class DbConnection {
     pool: Pool;
 
     constructor() {
-        this.pool = new Pool({
-            host: config.db.dbHost,
-            user: config.db.dbUser,
-            password: config.db.dbPassword,
-            port: Number(config.db.dbPort ?? 5432),
-            database: config.db.dbName,
-        });
+        this.pool = new Pool(config.db.connectionString
+            ? { connectionString: config.db.connectionString }
+            : {
+                host: config.db.dbHost,
+                user: config.db.dbUser,
+                password: config.db.dbPassword,
+                port: Number(config.db.dbPort ?? 5432),
+                database: config.db.dbName,
+            });
     }
 }
 

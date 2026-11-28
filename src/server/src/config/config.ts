@@ -19,22 +19,24 @@ const config: any = {
 	// 	dbPort: process.env.LOCAL_DB_PORT
 	// },
 	db: {
-		dbHost: 'db',
+		connectionString: process.env.DATABASE_URL,
+		dbHost: process.env.POSTGRES_HOST || 'db',
 		dbUser: process.env.POSTGRES_USER,
 		dbPassword: process.env.POSTGRES_PASSWORD,
 		dbName: process.env.POSTGRES_DB,
-		dbPort: 5432
+		dbPort: process.env.POSTGRES_PORT || 5432
 	},
 	// AI module (specs/003-ai-assistant-safety). Runtime limits and switches live in
 	// SystemSetting (ai.*), not here; these are secrets and connection details only.
 	ai: {
 		historySecret: process.env.AI_HISTORY_SECRET,
 		db: {
-			dbHost: 'db',
+			connectionString: process.env.AI_DATABASE_URL,
+			dbHost: process.env.POSTGRES_HOST || 'db',
 			dbUser: process.env.AI_DB_USER || 'ai_gateway',
 			dbPassword: process.env.AI_DB_PASSWORD,
 			dbName: process.env.POSTGRES_DB,
-			dbPort: 5432
+			dbPort: process.env.POSTGRES_PORT || 5432
 		},
 		classifierModel: process.env.GEMINI_CLASSIFIER_MODEL || 'gemini-2.5-flash-lite',
 		embeddingModel: process.env.GEMINI_EMBEDDING_MODEL || 'gemini-embedding-001'

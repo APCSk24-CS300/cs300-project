@@ -60,3 +60,20 @@ Since `5302b6d` (the dev commit 006 merged), dev changed **only** `docs/`: the s
 2. **BE branch off origin/dev:** #1 (the five getters and repository tests), #3, #4. Owner to be decided: this is outside `src/client`, so CLAUDE.md scope needs your OK or another teammate.
 3. **Infra:** #11 (Compose client service), after #4.
 4. **Later features:** #5 is the next phase (E2E authentication); #6 is UC-06, which needs the AI path decision first.
+
+## E2E slice (2026-11-28, branch `feat/e2e-auth`)
+
+Real browser → Next FE → `/api/backend` → server → PostgreSQL. Gaps and shortcuts are recorded here.
+
+### M1: backend up
+- **DB init.** `src/db/docker-init/00-myhcmus.sh` runs on the first start of an empty `db` volume and applies the README order: `schema.sql` → `ai_schema.sql` → `seed.sql` → `hub_schema.sql`. Test scripts are never run. `src/db` is mounted read-only. The script is forced to LF by `.gitattributes`. To re-initialise, recreate the volume.
+- **#4, partially fixed.**
+  - Compose: the server also reads `db/.env` (`POSTGRES_USER` / `POSTGRES_PASSWORD`), and gets `POSTGRES_DB=myHCMUS` (the database `schema.sql` creates; `db/.env`'s `POSTGRES_DB` only names the bootstrap DB) and `AVATAR_STORAGE_DIRECTORY=/app/data/avatars` on an `avatars` volume.
+  - The server waits for a healthy `db`.
+  - `server/.env.example`: `POSTGRES_*` added, the unused `DATABASE_URL` removed, and `JWT_SECRET` marked as required.
+  - The DB host is still hard-coded to `db` (`config.ts:22`), so it works in Compose only. Gap.
+- **Local blockers found (not code):**
+  - `JWT_SECRET` was empty in the local `server/.env`, which made login 500 ("secretOrPrivateKey must have a value"). It was set to a random value locally (the file is git-ignored).
+  - The `node_modules` volume predated `sharp`. `npm install` in the container failed because **Avast Web/Mail Shield intercepts HTTPS**; it was installed with `NODE_EXTRA_CA_CERTS` pointing at Avast's exported public root, for that one run only, and nothing was committed.
+- **#1 confirmed live.** `POST /api/auth/login` returns 200 + token for `admin@example.com`, `manager@example.com` and `student1@example.com` (`DemoPassword123!`); a wrong password gets 401. The token `sub` = the DB `user_id` (`SEED-ADMIN`), and `GET /api/v1/hub/services` with it returns 200.
+- **#3 still present:** `/health` reports the database as up without querying it.

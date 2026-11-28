@@ -11,7 +11,7 @@ src/.claude/*
 src/.specify/*
 # !src/.specify/memory/constitution.md
 docs/pa
-CLAUDE.md
+!CLAUDE.md
 .specify/
 .claude/
 # Added by code-review-graph

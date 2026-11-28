@@ -21,6 +21,8 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 beforeEach(() => {
+  // Node-environment tests (e.g. the /api/backend route handler) have no window or document.
+  if (typeof window === "undefined") return;
   resetMockDb();
   window.localStorage.removeItem(TOKEN_STORAGE_KEY);
   document.cookie = `${SESSION_HINT_COOKIE}=; Path=/; Max-Age=0`;
@@ -112,7 +114,8 @@ vi.mock("next/link", async () => {
   };
 });
 
-Object.defineProperty(window, "matchMedia", {
+// Node-environment tests (e.g. route handlers) have no window.
+if (typeof window !== "undefined") Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: (query: string) => ({
     matches: false,

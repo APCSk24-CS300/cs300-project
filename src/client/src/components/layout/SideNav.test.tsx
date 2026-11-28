@@ -8,7 +8,7 @@ import { render, screen, within } from "../../../tests/test-utils";
 describe("SideNav (FR-024)", () => {
   it.each(ROLE_CODES)("renders exactly the %s items and no other role's items", (role) => {
     render(<SideNav items={NAVIGATION[role]} currentPath={NAVIGATION[role][0].href} />);
-    const labels = screen.getAllByRole("listitem").map((li) => within(li).getByText(/./, { selector: "a, span > span:first-child" }).textContent);
+    const labels = screen.getAllByRole("listitem").map((li) => within(li).getByText(/./, { selector: "a > span, span > span > span:last-child" }).textContent);
     expect(labels).toEqual(NAVIGATION[role].map((i) => i.label));
     for (const other of ROLE_CODES.filter((r) => r !== role)) {
       for (const item of NAVIGATION[other].filter((i) => !NAVIGATION[role].some((m) => m.label === i.label))) {

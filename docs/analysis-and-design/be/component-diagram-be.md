@@ -28,6 +28,7 @@ The currently implemented backend components are:
 - **Authentication Repository:** Reads and writes user, role, and role-specific records in PostgreSQL.
 - **AI API:** Exposes the authenticated student-assistant prompt endpoint.
 - **AI Controller:** Validates prompt payloads and maps AI service results to HTTP responses.
+- **Hub Routes / Controller / Service / Repository:** University Services Hub (UC-07). Routes check the token and the `hub.services.read` or `hub.services.manage` permission; the controller maps HTTP (ETag, If-Match); the service applies the hub rules; the repository writes each link change and its AuditLog row in one transaction.
 - **AI Service:** Applies assistant business rules, conversation shaping, safety responses, and failure handling.
 - **LLM Client:** Hides the provider-specific Gemini HTTP protocol behind the `LLMClient` interface.
 - **Database Connection:** Owns the PostgreSQL connection pool used by repositories.
@@ -72,6 +73,14 @@ flowchart LR
             GeminiClient["Gemini Client Adapter<br/>GeminiClient"]
         end
 
+        subgraph Hub["University Services Hub Components"]
+            HubRoutes["Hub Routes<br/>/api/v1/hub/services<br/>/api/v1/admin/services"]
+            HubController["Hub Controller<br/>HubController"]
+            HubService["Hub Service<br/>HubService"]
+            ServiceLinkRepository["Service Link Repository<br/>ServiceLinkRepository (+ AuditLog)"]
+            RequirePermission["Permission Check<br/>createRequirePermission"]
+        end
+
         subgraph Shared["Shared Support"]
             Types["Domain and Request Types<br/>PromptRequest / UserRegistrationData"]
             Responses["Service Responses and HTTP Factories<br/>ServiceResponse / generate*Response"]
@@ -87,6 +96,7 @@ flowchart LR
         App --> Parser
         App --> AuthRoutes
         App --> AIRoutes
+        App --> HubRoutes
         App --> ErrorHandling
 
         AuthRoutes --> Validator
@@ -94,6 +104,13 @@ flowchart LR
         AIRoutes --> Validator
         AIRoutes --> RateLimit
         AIRoutes --> AIController
+        HubRoutes --> Validator
+        HubRoutes --> RequirePermission
+        HubRoutes --> HubController
+        HubController --> HubService
+        HubController --> Responses
+        HubService --> ServiceLinkRepository
+        ServiceLinkRepository --> DbConnection
 
         AuthController --> AuthService
         AuthController --> AuthRepository
@@ -135,7 +152,7 @@ flowchart LR
     classDef external fill:#EDF0F2,stroke:#64748B,color:#263445,stroke-width:1.5px;
 
     class Server,App entry;
-    class Parser,Validator,RateLimit,ErrorHandling,AuthRoutes,AuthController,AuthService,AuthRepository,AIRoutes,AIController,AIService,LLMPort,GeminiClient component;
+    class Parser,Validator,RateLimit,ErrorHandling,AuthRoutes,AuthController,AuthService,AuthRepository,AIRoutes,AIController,AIService,LLMPort,GeminiClient,HubRoutes,HubController,HubService,ServiceLinkRepository,RequirePermission component;
     class Config,Types,Responses,Helpers,DbConnection support;
     class Database datastore;
     class Frontend,Gemini external;

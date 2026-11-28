@@ -21,9 +21,9 @@ export const LANDING_SERVICE_LIMIT = 6;
 
 export const SERVICES: ServicePreview[] = [
   { id: "moodle", name: "Moodle", icon: { src: "/images/services/moodle.png", alt: "" } },
-  { id: "tuition-payment", name: "Tuition Payment", icon: { src: "/images/services/tuition.png", alt: "" } },
   { id: "student-portal", name: "Student Portal", icon: { src: "/images/services/portal.png", alt: "" } },
-  { id: "hcmus-website", name: "HCMUS Website", icon: { src: "/images/services/website.png", alt: "" } },
-  { id: "hcmus-library", name: "HCMUS Library", icon: { src: "/images/services/library.svg", alt: "" } },
-  { id: "it-support", name: "IT Support", icon: { src: "/images/services/support.svg", alt: "" } },
+  { id: "course-registration-portal", name: "Course Registration Portal", icon: { src: "/images/services/portal.png", alt: "" } },
+  { id: "special-programs-portal", name: "Special Programs Portal", icon: { src: "/images/services/portal.png", alt: "" } },
+  { id: "tuition-payment", name: "Tuition Payment", icon: { src: "/images/services/tuition.png", alt: "" } },
+  { id: "student-handbook-2025", name: "Student Handbook 2025", icon: { src: "/images/services/library.svg", alt: "" } },
 ];

@@ -8,6 +8,9 @@ const SERVICE_ICONS: Record<string, string> = {
   "hcmus-library": "/images/services/library.svg",
   library: "/images/services/library.svg",
   "it-support": "/images/services/support.svg",
+  "course-registration-portal": "/images/services/portal.png",
+  "special-programs-portal": "/images/services/portal.png",
+  "student-handbook-2025": "/images/services/library.svg",
 };
 
 export const DEFAULT_SERVICE_ICON = "/images/services/default.svg";

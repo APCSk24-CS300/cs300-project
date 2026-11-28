@@ -10,12 +10,12 @@ describe("mock hub services", () => {
   it("hub shows active links only; admin changes show in the hub", async () => {
     const hub = new MockHubService(0);
     const admin = new MockAdminHubService(0);
-    expect((await hub.listServices()).map((s) => s.name)).toEqual(["Moodle", "Student Portal", "Tuition Payment", "HCMUS"]);
+    expect((await hub.listServices()).map((s) => s.name)).toEqual(["Moodle", "Student Portal", "Course Registration Portal", "Special Programs Portal", "Tuition Payment", "Student Handbook 2025"]);
 
     const created = await admin.create({ name: "E-learning", url: "https://e.hcmus.edu.vn" });
-    expect(created.displayOrder).toBe(7);
+    expect(created.displayOrder).toBe(8);
     await admin.deactivate("1", 1);
-    expect((await hub.listServices()).map((s) => s.name)).toEqual(["Student Portal", "Tuition Payment", "HCMUS", "E-learning"]);
+    expect((await hub.listServices()).map((s) => s.name)).toEqual(["Student Portal", "Course Registration Portal", "Special Programs Portal", "Tuition Payment", "Student Handbook 2025", "E-learning"]);
   });
 
   it("enforces unique names and versions", async () => {

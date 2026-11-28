@@ -23,7 +23,7 @@ describe("ServiceCard", () => {
   it("renders a preview without href as a picture only", () => {
     const { container } = renderWithProviders(<ServiceCard service={preview} />);
     expect(container.querySelector("a")).toBeNull();
-    expect(screen.getByText("Tuition Payment")).toBeInTheDocument();
+    expect(screen.getByText(preview.name)).toBeInTheDocument();
   });
 
   it("renders an unlocked service as an external whole-card link", () => {

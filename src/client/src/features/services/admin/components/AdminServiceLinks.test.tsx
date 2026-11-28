@@ -22,7 +22,7 @@ describe("AdminServiceLinks", () => {
     const { container } = setup();
     await screen.findByText("Moodle", { selector: "p" });
     expect(within(row("Moodle")).getByText("Active")).toBeInTheDocument();
-    expect(within(row("HCMUS Library")).getByText("Inactive")).toBeInTheDocument();
+    expect(within(row("HCMUS")).getByText("Inactive")).toBeInTheDocument();
     await expectNoA11yViolations(container);
   });
 

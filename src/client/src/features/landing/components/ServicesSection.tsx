@@ -48,10 +48,10 @@ export function ServicesSection({ service }: ServicesSectionProps) {
               <ServiceGrid services={(state.services ?? []).slice(0, LANDING_SERVICE_LIMIT)} />
             ) : null}
             {state.status === "empty" ? (
-              <p className="text-white/80">{SERVICES_CONTENT.emptyLabel}</p>
+              <p className="text-on-primary/80">{SERVICES_CONTENT.emptyLabel}</p>
             ) : null}
             {state.status === "error" || state.status === "forbidden" ? (
-              <div role="alert" className="flex flex-wrap items-center gap-4 text-white">
+              <div role="alert" className="flex flex-wrap items-center gap-4 text-on-primary">
                 <p>{SERVICES_CONTENT.errorLabel}</p>
                 <Button variant="white" size="sm" onClick={state.refetch}>
                   {SERVICES_CONTENT.retryLabel}

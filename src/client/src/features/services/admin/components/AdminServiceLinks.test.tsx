@@ -36,28 +36,31 @@ describe("AdminServiceLinks", () => {
   it("adds a link after client-side validation", async () => {
     const { user } = setup();
     await user.click(await screen.findByRole("button", { name: ADMIN_CONTENT.add }));
-    const form = screen.getByRole("form", { name: "Add service" });
+    const dialog = screen.getByRole("dialog", { name: ADMIN_CONTENT.add });
+    expect(within(dialog).getByLabelText(/^name/i)).toHaveFocus();
+    const form = within(dialog).getByRole("form", { name: "Add service" });
 
-    await user.type(within(form).getByLabelText("Name"), "E-learning");
-    await user.type(within(form).getByLabelText("Address (URL)"), "javascript:alert(1)");
+    await user.type(within(form).getByLabelText(/^name/i), "E-learning");
+    await user.type(within(form).getByLabelText(/^address/i), "javascript:alert(1)");
     await user.click(within(form).getByRole("button", { name: "Add service" }));
     expect(await within(form).findByText("Use a full http:// or https:// address")).toBeInTheDocument();
 
-    await user.clear(within(form).getByLabelText("Address (URL)"));
-    await user.type(within(form).getByLabelText("Address (URL)"), "https://elearning.hcmus.edu.vn");
+    await user.clear(within(form).getByLabelText(/^address/i));
+    await user.type(within(form).getByLabelText(/^address/i), "https://elearning.hcmus.edu.vn");
     await user.click(within(form).getByRole("button", { name: "Add service" }));
 
     expect(await screen.findByText("Saved “E-learning”.")).toBeInTheDocument();
     expect(within(row("E-learning")).getByText("Active")).toBeInTheDocument();
     expect(screen.queryByRole("form")).not.toBeInTheDocument();
+    expect(stored("E-learning")).toMatchObject({ isActive: true, displayOrder: 8, version: 1 });
   });
 
   it("shows the backend's duplicate-name error on the name field", async () => {
     const { user } = setup();
     await user.click(await screen.findByRole("button", { name: ADMIN_CONTENT.add }));
     const form = screen.getByRole("form", { name: "Add service" });
-    await user.type(within(form).getByLabelText("Name"), " MOODLE ");
-    await user.type(within(form).getByLabelText("Address (URL)"), "https://m.edu");
+    await user.type(within(form).getByLabelText(/^name/i), " MOODLE ");
+    await user.type(within(form).getByLabelText(/^address/i), "https://m.edu");
     await user.click(within(form).getByRole("button", { name: "Add service" }));
     expect(await within(form).findByText("A service with this name already exists")).toBeInTheDocument();
     expect(readDb().serviceLinks).toHaveLength(7);
@@ -66,10 +69,11 @@ describe("AdminServiceLinks", () => {
   it("edits a link", async () => {
     const { user } = setup();
     await user.click(await screen.findByRole("button", { name: "Edit Moodle" }));
-    const form = screen.getByRole("form", { name: "Save changes" });
-    expect(within(form).getByLabelText("Name")).toHaveValue("Moodle");
-    await user.clear(within(form).getByLabelText("Name"));
-    await user.type(within(form).getByLabelText("Name"), "Moodle LMS");
+    const dialog = screen.getByRole("dialog", { name: "Edit Moodle" });
+    const form = within(dialog).getByRole("form", { name: "Save changes" });
+    expect(within(form).getByLabelText(/^name/i)).toHaveValue("Moodle");
+    await user.clear(within(form).getByLabelText(/^name/i));
+    await user.type(within(form).getByLabelText(/^name/i), "Moodle LMS");
     await user.click(within(form).getByRole("button", { name: "Save changes" }));
     expect(await screen.findByText("Moodle LMS", { selector: "p" })).toBeInTheDocument();
     expect(stored("Moodle LMS")).toMatchObject({ id: "1", version: 2 });
@@ -78,7 +82,7 @@ describe("AdminServiceLinks", () => {
   it("asks before deactivating, then allows reactivating", async () => {
     const { user } = setup();
     await user.click(await screen.findByRole("button", { name: "Deactivate Moodle" }));
-    const confirm = screen.getByRole("group", { name: "Confirm deactivating Moodle" });
+    const confirm = screen.getByRole("dialog", { name: "Deactivate Moodle?" });
     await user.click(within(confirm).getByRole("button", { name: "Deactivate" }));
     await waitFor(() => expect(within(row("Moodle")).getByText("Inactive")).toBeInTheDocument());
     expect(stored("Moodle")).toMatchObject({ isActive: false, version: 2 });
@@ -91,7 +95,8 @@ describe("AdminServiceLinks", () => {
   it("cancelling the confirmation changes nothing", async () => {
     const { user } = setup();
     await user.click(await screen.findByRole("button", { name: "Deactivate Moodle" }));
-    await user.click(within(screen.getByRole("group")).getByRole("button", { name: "Cancel" }));
+    await user.click(within(screen.getByRole("dialog", { name: "Deactivate Moodle?" })).getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(within(row("Moodle")).getByText("Active")).toBeInTheDocument();
     expect(stored("Moodle")).toMatchObject({ isActive: true, version: 1 });
   });
@@ -105,7 +110,7 @@ describe("AdminServiceLinks", () => {
       moodle.description = "Changed elsewhere";
       moodle.version = 2;
     });
-    await user.click(within(screen.getByRole("group")).getByRole("button", { name: "Deactivate" }));
+    await user.click(within(screen.getByRole("dialog", { name: "Deactivate Moodle?" })).getByRole("button", { name: "Deactivate" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(ADMIN_CONTENT.stale);
     expect(screen.getByRole("button", { name: ADMIN_CONTENT.reload })).toBeInTheDocument();
     expect(stored("Moodle")).toMatchObject({ isActive: true, version: 2 }); // not applied
@@ -138,7 +143,7 @@ describe("AdminServiceLinks", () => {
     updateDb((db) => {
       db.rolePermissions["role-administrator"] = db.rolePermissions["role-administrator"].filter((c) => c !== "hub.services.manage");
     });
-    await user.click(within(screen.getByRole("group")).getByRole("button", { name: "Deactivate" }));
+    await user.click(within(screen.getByRole("dialog", { name: "Deactivate Moodle?" })).getByRole("button", { name: "Deactivate" }));
     expect(await screen.findByText("You don't have permission to view this page")).toBeInTheDocument();
     expect(stored("Moodle")).toMatchObject({ isActive: true });
   });

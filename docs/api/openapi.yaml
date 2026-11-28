@@ -126,7 +126,7 @@ paths:
       summary: Upload or update profile avatar
       description: Upload a JPG or PNG image up to 10 MB inclusive. File content is validated, not only its filename
         or client-provided media type. A successful upload replaces the authenticated user's current avatar. The
-        storage provider is implementation-defined and is not specified by this contract.
+        approved implementation stores validated image files in a configured persistent directory and stores only the authenticated same-origin image URL in PostgreSQL User.avatar_url.
       operationId: uploadMyAvatar
       requestBody:
         required: true
@@ -153,6 +153,12 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Another avatar update completed first; retry with the current profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Avatar storage or profile update failed; the existing avatar is kept.
           content:
@@ -178,12 +184,47 @@ paths:
                 message: Avatar removed successfully
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Another avatar update completed first; retry with the current profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Avatar removal failed; the existing avatar is kept.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /profile/avatar/files/{fileName}:
+    get:
+      tags:
+      - Profile
+      summary: Read the authenticated user's current avatar file
+      description: Reads the file only when it matches the authenticated user's current avatar URL.
+      operationId: readMyAvatarFile
+      parameters:
+      - name: fileName
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Avatar image bytes.
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: The file is not the authenticated user's current avatar.
   /profile/interests:
     get:
       tags:
@@ -2047,6 +2088,8 @@ components:
         phoneNumber:
           type: string
           nullable: true
+          pattern: '^(?:0\d{9}|\+84\d{9})$'
+          description: Approved domestic or international phone format; null clears the saved number.
           example: '0901234567'
       description: The account owner can edit phone number only. Full name and academic identity information are read-only.
     AcademicInfo:
@@ -2060,6 +2103,7 @@ components:
         studentNumber:
           type: string
           nullable: true
+          description: Student.user_id (also User.user_id) when a Student row exists; null for accounts without a Student record. Read-only to the account owner.
           readOnly: true
         faculty:
           type: object
@@ -2102,7 +2146,7 @@ components:
           example: '0901234567'
         avatarUrl:
           type: string
-          format: uri
+          format: uri-reference
           nullable: true
         academicInfo:
           allOf:
@@ -2138,7 +2182,7 @@ components:
         avatar:
           type: string
           format: binary
-          description: JPG or PNG image. Maximum file size is 10 MB inclusive; files larger than 10 MB are rejected.
+          description: JPG or PNG image. Maximum file size is 10485760 bytes (10 MiB) inclusive; larger files are rejected.
     AvatarResponse:
       type: object
       required:
@@ -2158,8 +2202,8 @@ components:
           properties:
             avatarUrl:
               type: string
-              format: uri
-              description: URI for the newly active avatar; storage provider is implementation-defined.
+              format: uri-reference
+              description: Legal same-origin URL for the separately stored, fully decoded JPG/PNG image; null after removal.
     ChangePasswordRequest:
       type: object
       additionalProperties: false
@@ -2173,9 +2217,9 @@ components:
         newPassword:
           type: string
           format: password
-          minLength: 8
+          minLength: 6
       description: The request contains only currentPassword and newPassword. New-password confirmation is checked
-        by the FE before sending. The new password must be at least 8 characters.
+        by the FE before sending. The new password must be at least 6 characters.
     UniversityService:
       type: object
       required:

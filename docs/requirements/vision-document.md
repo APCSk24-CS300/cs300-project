@@ -359,7 +359,7 @@ flowchart TD
 | NFR ID | Requirement |
 | :---: | :--- |
 | NFR-SEC-01 | All communication between the user and the system shall be encrypted with HTTPS | 
-| NFR-SEC-02 | Every user shall log in with an account. Passwords shall be at least 6 characters and stored only as salted hashes, never as plain text | 
+| NFR-SEC-02 | Every user shall log in with an account. Passwords shall be at least 8 characters and stored only as salted hashes, never as plain text | 
 | NFR-SEC-03 | Access shall be controlled by role (student, manager, administrator). A user shall only see and do what their role allows, and this shall be checked on the server, not only on the screen | 
 | NFR-SEC-04 | A student shall only view and change their own personal data, registrations, scores and appeals | 
 | NFR-SEC-05 | (OPTIONAL) A session shall end after 30 minutes without activity, and an account shall be temporarily locked for 15 minutes after 5 failed login attempts | 

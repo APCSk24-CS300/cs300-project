@@ -67,7 +67,9 @@ async function apiRequestWithMeta<T>(
   }
 
   const headers = new Headers(options.headers);
-  const url = `${API_BASE_URL}${endpoint}`;
+  const url = endpoint.startsWith("/api/v1/profile") || endpoint.startsWith("/api/auth/")
+    ? endpoint
+    : `${API_BASE_URL}${endpoint}`;
   let body: BodyInit | undefined;
 
   if (options.body != undefined) {

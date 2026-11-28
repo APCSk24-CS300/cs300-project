@@ -28,6 +28,23 @@ describe("api client", () => {
     );
   });
 
+  it.each([
+    ["/api/v1/profile", { phoneNumber: "0912345678" }],
+    ["/api/v1/profile/password", { currentPassword: "old-password", newPassword: "new-password" }],
+  ])("sends PATCH and JSON for %s", async (endpoint, body) => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('{"success":true}'));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await api.patch(endpoint, body);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining(endpoint),
+      expect.objectContaining({ method: "PATCH", body: JSON.stringify(body) }),
+    );
+    const headers = fetchMock.mock.calls[0][1].headers as Headers;
+    expect(headers.get("Content-Type")).toBe("application/json");
+  });
+
   it("normalizes non-ok responses into an Error", async () => {
     vi.stubGlobal(
       "fetch",
@@ -43,4 +60,16 @@ describe("api client", () => {
       "API request failed: 500 Internal Server Error - server exploded",
     );
   });
+});
+
+it("lets the browser encode multipart boundaries and sends DELETE explicitly", async () => {
+ const fetchMock=vi.fn().mockImplementation(async()=>Response.json({success:true}));
+ vi.stubGlobal("fetch",fetchMock);
+ const form=new FormData();form.append("avatar",new File(["image"],"a.png",{type:"image/png"}));
+ await api.post("/api/v1/profile/avatar",form);
+ expect(fetchMock.mock.calls[0][1]).toMatchObject({method:"POST",body:form});
+ expect(fetchMock.mock.calls[0][1].headers.has("Content-Type")).toBe(false);
+ await api.delete("/api/v1/profile/avatar");
+ expect(fetchMock.mock.calls[1][1].method).toBe("DELETE");
+ vi.unstubAllGlobals();
 });

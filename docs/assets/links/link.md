@@ -4,6 +4,11 @@ This document provides quick access to useful university-related resources and s
 
 ## Academic Resources
 
+- **Moodle (Course Management System)** – Access course materials, assignments, announcements, and learning activities.
+  - https://courses.ctda.hcmus.edu.vn/
+
+
+
 
 
 https://courses.ctda.hcmus.edu.vn/

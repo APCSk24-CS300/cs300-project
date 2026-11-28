@@ -93,3 +93,22 @@ Real browser → Next FE → `/api/backend` → server → PostgreSQL. Gaps and 
   - There is no login lock (DOC-14).
   - Node's strip-only TypeScript in the container rejects constructor parameter properties, so classes use explicit fields as the rest of the server does.
   - nodemon does not see file changes through the Windows bind mount: restart the `server` container after a BE edit.
+
+### M3: FE auth in real mode
+- `src/client/.env.local` (git-ignored): `NEXT_PUBLIC_API_MODE=real`, `NEXT_PUBLIC_API_BASE_URL=/api/backend`, `BACKEND_API_URL=http://localhost:8080/api/v1`, `ALLOW_DEV_BACKEND_TOKEN=false`, and no `DEV_BACKEND_TOKEN`. **No FE code change was needed:** the 003 auth service and mapper match the M2 shapes.
+- **Verified through the forwarder on `next dev` :3000, for admin, manager and student:**
+  - `/api/backend/auth/login` → token;
+  - `/auth/me` → `administrator` / `manager` / `student`;
+  - `/hub/services` 200 and `/profile` 200 with the user's own bearer;
+  - `/auth/logout` 200;
+  - `/student/dashboard` without a session → 307 to `/login?redirectTo=…`.
+- **Not done by me:** a click-through in a real browser (dashboard per role, reload keeps the session, log out, then protected pages redirect). No browser tool was available in this session, so it is listed as a manual check in the final report.
+
+### M4: hub end to end (the user's own token, through the forwarder)
+- **Reads:** a student gets the 6 active DB links. A student and a manager get **403** on `GET /admin/services` (permission 911) and on POST.
+- **Admin changes:**
+  - create → 201, `ETag: "1"`;
+  - edit with `If-Match: "1"` → 200;
+  - the same stale `If-Match: "1"` again → **412** (this is the two-tab ETag case);
+  - the new link shows for the student; after `DELETE` (`If-Match: "2"`) → 200 it no longer shows.
+- **Gap:** the hub `/admin/services` page in the browser was not clicked through by me (same reason as M3).

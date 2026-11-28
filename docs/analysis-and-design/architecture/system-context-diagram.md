@@ -22,13 +22,13 @@ flowchart LR
 
     email["External Email Service<br/>(External Software System)"]
     ai["External AI API<br/>(External Software System)<br/>AI Student Assistant support"]
-    university["University Services<br/>(External Linked Websites)<br/>Moodle / Student Portal / Library"]
+    university["University Services<br/>(External Linked Websites)<br/>Moodle / Student Portal / Tuition Payment"]
 
     student -->|"Discovers and registers for activities;<br/>checks scores, calendar and notifications;<br/>submits requests; uses AI assistant"| system
     manager -->|"Manages activities and registrations;<br/>verifies participation and scores;<br/>reviews requests and reports"| system
     admin -->|"Manages users and permissions;<br/>configures criteria and categories;<br/>views system reports"| system
 
-    system -->|"Sends email notifications"| email
+    system -.->|"Sends email notifications"| email
     system -->|"Sends AI requests and receives responses<br/>via external API"| ai
     system -.->|"Provides hyperlinks only;<br/>no API or database integration"| university
 
@@ -41,7 +41,7 @@ flowchart LR
     class email,ai,university external;
 ```
 
-**Diagram legend:** Solid arrows show direct user interactions or external service dependencies. The dashed arrow to University Services represents navigation-only hyperlinks, not an API integration. The blue system box represents the entire myHCMUS application.
+**Diagram legend:** Solid arrows show direct user interactions or external service dependencies. Dashed arrows represent navigation-only hyperlinks or relationships that are planned but not yet implemented. The blue system box represents the entire myHCMUS application.
 
 ## 3. Explanation of the Diagram
 

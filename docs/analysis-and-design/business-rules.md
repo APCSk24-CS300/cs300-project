@@ -12,7 +12,7 @@
 | BR-ACC-06 | A change to a user's permissions must be enforced on subsequent protected requests, including when that user has an existing session. | N | UC-29 A10 |
 | BR-ACC-07 | Users may change their own phone number, password, and avatar within the supported validation rules. | N | UC-03; V Feature 2 |
 | BR-ACC-08 | Full name, ID, and faculty are read-only in the user's self-service profile; users must not update another person's profile. | N | UC-03 A6 |
-| BR-ACC-09 | Passwords must be stored as salted hashes; password changes require valid current-password verification and a new password of at least six characters. | R | BR `User.password_hash`; V NFR-SEC-02; UC-03 A2/A7 |
+| BR-ACC-09 | Passwords must be stored as salted hashes; password changes require valid current-password verification and a new password of at least eight characters. | R | BR `User.password_hash`; V NFR-SEC-02; UC-03 A2/A7 |
 | BR-ACC-10 | Profile avatar uploads must be JPG or PNG images not exceeding 10 MB; invalid uploads must not replace the current avatar. | N | UC-03 A3/A8/A9 |
 
 ### 2.2 Activity ownership, management, discovery, and following

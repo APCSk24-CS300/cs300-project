@@ -112,3 +112,21 @@ Real browser → Next FE → `/api/backend` → server → PostgreSQL. Gaps and 
   - the same stale `If-Match: "1"` again → **412** (this is the two-tab ETag case);
   - the new link shows for the student; after `DELETE` (`If-Match: "2"`) → 200 it no longer shows.
 - **Gap:** the hub `/admin/services` page in the browser was not clicked through by me (same reason as M3).
+
+### M5: profile end to end (the user's own token, through the forwarder)
+- **Profile data:** `GET /profile` returns the DB profile (student: `studentNumber` = `Student.user_id`, faculty).
+- **Phone:**
+  - an invalid phone → 400 with `{ field: phoneNumber }`;
+  - the manager's `0911111111` → 200, then the student's `+84911111111` → **409** (the other format of a taken number);
+  - `fullName` → 400 (read-only).
+- **Password:**
+  - a wrong current password → 400 `CURRENT_PASSWORD_INCORRECT` with a `currentPassword` field error;
+  - a correct change → 200: the old password then gets 401 and the new one 200. Changed back afterwards, so the seed credentials still work.
+- **Avatar:**
+  - a real 1×1 PNG uploaded with `curl -F` **through the forwarder** → 200 with `avatarUrl`;
+  - the file read with the bearer → 200 `image/png`, **byte-identical** (`cmp`); `/auth/me` shows the new `avatarUrl`;
+  - a text file named `.png` → 400 `UNSUPPORTED_FILE`;
+  - `DELETE` → 200, and the file is gone from the volume.
+  - `AVATAR_STORAGE_DIRECTORY=/app/data/avatars` is on the Compose volume `avatars`.
+- **Test data left in the DB:** `SEED-MANAGER.phone_number = 0911111111`, and a deactivated hub link "E2E Library" (id 8).
+- **Gap:** the `/profile` page in the browser (`ProfileAvatar` on the page and in the account menu) was not clicked through by me. The bytes and auth path it uses are the ones verified above.

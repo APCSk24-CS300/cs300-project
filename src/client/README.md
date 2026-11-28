@@ -1,6 +1,20 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+## myHCMUS frontend setup
+
+```bash
+npm install
+cp .env.example .env.local      # NEXT_PUBLIC_API_MODE=mock, NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api/v1
+npx msw init public             # only if public/mockServiceWorker.js is missing
+npm run dev
+```
+
+- **Mock mode (default)**: all API calls are answered by the MSW handlers in `src/mocks/`, with data kept in the browser's local storage. Sign in with `student1@example.invalid`, `manager1@example.invalid` or `admin@example.invalid` and the password `demo2026`. Use `__myhcmusMock.reset()` in the console to reset the data.
+- **Real backend**: set `NEXT_PUBLIC_API_MODE=real` and point `NEXT_PUBLIC_API_BASE_URL` at the backend. No code changes are needed. Some operations still wait for backend agreement: see `specs/003-auth-dashboard-admin-users/docs-changes.md`.
+- **API types**: run `npm run gen:api` after `docs/api/openapi.yaml` changes. It regenerates `src/types/openapi.gen.ts`.
+- **Quality gates**: `npm run lint`, `npm run test` and `npm run build`.
+
+## Getting Started (Next.js template)
 
 First, run the development server:
 

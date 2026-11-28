@@ -9,8 +9,11 @@ src/.claude
 src/.agents/*
 src/.claude/*
 src/.specify/*
-!src/.specify/memory/constitution.md
+# !src/.specify/memory/constitution.md
 docs/pa
+!CLAUDE.md
+.specify/
+.claude/
 # Added by code-review-graph
 .code-review-graph/
 # >>> code-review-graph install files >>>

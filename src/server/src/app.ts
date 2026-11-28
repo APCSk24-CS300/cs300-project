@@ -43,6 +43,10 @@ import { HubController } from './controllers/HubController.ts';
 import AuthRoute from './routes/AuthRoute.ts';
 import { createAIRoute } from './routes/AIRoute.ts';
 import { createProfileRoute } from './routes/ProfileRoute.ts';
+import { createSessionV1Route } from './routes/SessionV1Route.ts';
+import { SessionController } from './controllers/SessionController.ts';
+import { SessionService } from './services/SessionService.ts';
+import { SessionRepository } from './repositories/SessionRepository.ts';
 import { createHubRoute, createAdminServicesRoute } from './routes/HubRoute.ts';
 
 // callbacks
@@ -90,6 +94,11 @@ export function createApp(options: AppOptions = {}) {
 		new HubService(options.serviceLinkStore ?? new ServiceLinkRepository(DbConnection.pool))
 	);
 
+	// Versioned session API (openapi.yaml /auth/*); the legacy /api/auth routes below stay as they are.
+	app.use('/api/v1/auth', createSessionV1Route(new SessionController(new SessionService(
+		new SessionRepository(DbConnection.pool),
+		new ProfileRepository(DbConnection.pool)
+	))));
 	app.use('/api/auth', createSessionRoute(DbConnection.pool));
 	app.use('/api/auth', AuthRoute);
 	app.use('/api/ai', createAIRoute(aiController, {

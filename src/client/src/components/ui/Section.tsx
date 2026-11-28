@@ -22,7 +22,7 @@ export function Section({
       aria-labelledby={labelledBy}
       className={cn(
         "scroll-mt-[calc(var(--header-height)+2rem)] py-16",
-        background === "primary-dark" && "bg-primary-dark text-white",
+        background === "primary-dark" && "bg-primary-dark text-on-primary",
         className,
       )}
     >

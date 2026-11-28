@@ -31,11 +31,11 @@ export function HeroVisual({ src, alt }: HeroVisualProps) {
       )}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-white/10"
+        className="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-surface/10"
       />
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-white"
+        className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-surface"
       />
     </div>
   );

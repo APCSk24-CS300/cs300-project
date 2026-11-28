@@ -68,7 +68,7 @@ export function ActivityCard({ activity, variant }: ActivityCardProps) {
           />
         </div>
 
-        <div className="mt-auto flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
+        <div className="mt-auto flex items-center justify-between gap-3 border-t border-surface-muted pt-4">
           <ActivityStatusBadge status={activity.registrationStatus} />
           <span
             className={cn(

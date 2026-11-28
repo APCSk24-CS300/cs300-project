@@ -1,23 +1,3 @@
-<!--
-Sync Impact Report
-==================
-Version change: unratified template -> 1.0.0
-Ratification: initial adoption on 2026-11-13
-Modified principles:
-  - Principle 1 placeholder -> I. App Router and TypeScript First
-  - Principle 2 placeholder -> II. Feature-First Architecture
-  - Principle 3 placeholder -> III. Centralized HTTP Through the API Client
-  - Principle 4 placeholder -> IV. Service Contracts with Paired Mock Implementations
-  - Principle 5 placeholder -> V. DTO and Domain Separation via Explicit Mappers
-  - Added -> VI. Token-Based Design System and Component Layering
-  - Added -> VII. Explicit Data States in Every Data-Driven Section
-  - Added -> VIII. Accessibility and Separation of Concerns
-Added sections:
-  - Additional Constraints (technology and repository rules)
-  - Development Workflow and Quality Gates
-Removed sections: none
-Deferred TODOs: none
--->
 # myHCMUS Frontend Constitution
 
 ## Core Principles
@@ -56,19 +36,34 @@ shared API client rather than reimplemented per feature.
 Rationale: one transport boundary guarantees consistent authentication, error handling, and
 observability, and prevents divergent network behavior across features.
 
-### IV. Service Contracts with Paired Mock Implementations (NON-NEGOTIABLE)
+### IV. Service Contracts with Real and Mock Implementations (NON-NEGOTIABLE)
 
 Every feature MUST expose its data operations through a service contract: a TypeScript
-`interface` in `features/<name>/services/`. Each contract MUST have two implementations: a real
-implementation that calls the API client, and a mock implementation that returns deterministic
-fixtures with simulated latency. Both MUST implement the same interface, be interchangeable
-through a single selection point, and remain behaviorally compatible. The existing
-`features/auth/services` pair is the reference pattern; extend that pattern rather than invent
-a new one. Mock implementations MUST NOT be imported by production code paths except through
-the selection point.
+`interface` in `features/<name>/services/`. Each service contract MUST have a real implementation
+that calls the API client. Each contract MUST also be mockable in one of two forms:
+
+- **Network-level mock**: MSW handlers in `src/mocks/` that follow `docs/api/openapi.yaml`
+  (paths, envelope, status codes, error codes) and drive the real implementation over HTTP. This
+  is the preferred form for new features.
+- **Mock class**: a second class implementing the same interface, returning deterministic fixtures
+  with simulated latency.
+
+Either way, the mock MUST return deterministic data with simulated latency and stay behaviorally
+compatible with the real implementation. Switching between mock and real MUST require
+configuration only (`NEXT_PUBLIC_API_MODE`), with no change to pages, components, hooks or
+services. Mock code MUST be loaded only through that single selection point and MUST NOT be
+imported directly by production code paths. Any field or operation a mock serves that is not in
+the contract MUST be recorded as an API gap in the feature spec.
+
+The `features/auth/services` contract (one HTTP implementation driven by the MSW handlers in
+`src/mocks/handlers/`) is the reference pattern for network-level mocks. The
+`features/activities/services` pair is the reference for mock classes. Extend these patterns
+rather than inventing new ones.
 
 Rationale: interface-backed services enable parallel frontend/backend work, reliable UI state
-testing, and safe replacement of implementations without touching consumers.
+testing, and safe replacement of implementations without touching consumers. A network-level
+mock also exercises the real transport, envelope handling and error mapping, and avoids
+maintaining a second implementation of the same behavior.
 
 ### V. DTO and Domain Separation via Explicit Mappers
 
@@ -153,8 +148,8 @@ Technology and repository constraints are non-negotiable unless this constitutio
   and accessibility.
 - A principle violation MUST be fixed or documented as an explicit, time-bound exception approved
   by maintainers in the change description.
-- New features MUST ship with their mock service implementation so the feature is usable without a
-  live backend.
+- New features MUST ship with a mock (network-level MSW handlers or a mock class, per Principle IV)
+  so the feature is usable without a live backend.
 - Reviewers MUST block changes that introduce hardcoded colors, direct network calls, DTO leakage
   into components, or inaccessible interactive elements.
 - `AGENTS.md` provides agent-facing instructions and `DEV_NOTES.md` records working technical
@@ -179,4 +174,4 @@ Compliance review is mandatory for every change. Maintainers MUST verify the pri
 review and MAY request changes solely on constitutional grounds. Repeated non-compliance MUST be
 addressed through documentation, review guidance, or an explicit amendment rather than tolerated.
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-13 | **Last Amended**: 2026-11-13
+**Version**: 1.1.0 | **Ratified**: 2026-11-13 | **Last Amended**: 2026-11-27

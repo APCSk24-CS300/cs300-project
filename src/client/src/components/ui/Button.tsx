@@ -28,13 +28,13 @@ type ButtonProps = {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-white shadow-sm hover:bg-primary-dark disabled:hover:bg-primary",
+    "bg-primary text-on-primary shadow-sm hover:bg-primary-dark disabled:hover:bg-primary",
   secondary:
-    "bg-primary-dark text-white shadow-sm hover:bg-primary disabled:hover:bg-primary-dark",
+    "bg-primary-dark text-on-primary shadow-sm hover:bg-primary disabled:hover:bg-primary-dark",
   white:
     "bg-surface text-primary shadow-card hover:bg-guide-gradient-to disabled:hover:bg-surface",
   ghost:
-    "bg-transparent text-text hover:bg-black/5 disabled:hover:bg-transparent",
+    "bg-transparent text-text hover:bg-hover-tint disabled:hover:bg-transparent",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

@@ -77,3 +77,19 @@ Real browser → Next FE → `/api/backend` → server → PostgreSQL. Gaps and 
   - The `node_modules` volume predated `sharp`. `npm install` in the container failed because **Avast Web/Mail Shield intercepts HTTPS**; it was installed with `NODE_EXTRA_CA_CERTS` pointing at Avast's exported public root, for that one run only, and nothing was committed.
 - **#1 confirmed live.** `POST /api/auth/login` returns 200 + token for `admin@example.com`, `manager@example.com` and `student1@example.com` (`DemoPassword123!`); a wrong password gets 401. The token `sub` = the DB `user_id` (`SEED-ADMIN`), and `GET /api/v1/hub/services` with it returns 200.
 - **#3 still present:** `/health` reports the database as up without querying it.
+
+### M2: versioned auth (`/api/v1/auth`)
+- **New layering:** `routes/SessionV1Route.ts` → `controllers/SessionController.ts` → `services/SessionService.ts` → `repositories/SessionRepository.ts`, plus the existing `ProfileRepository` for the profile body. It is mounted at `/api/v1/auth` before the legacy routes, and legacy `/api/auth/*` is unchanged (still 200).
+- **Contract envelope:**
+  - `POST /login` → `{ success, data: { token, expiresAt } }`. `401 INVALID_CREDENTIALS` for an unknown email **and** a wrong password (no enumeration, DOC-04), `403 ACCOUNT_DISABLED`, `400 VALIDATION_FAILED`.
+  - `GET /me` → `{ success, data: { user: Profile + role (exactly one, else null), status, mustChangePassword, permissions, … } }`.
+  - `POST /logout` → `{ success, message }`.
+- **The same JWT as legacy:** `sub` = DB `user_id`, `name`, 1 h, `JWT_SECRET`, validated by the shared `validateAccessToken`.
+- **Verified with curl** for admin, manager and student: login → `/me` (role, status, permission count) → logout. A wrong password and an unknown email both get `INVALID_CREDENTIALS`, and `/me` without a token gets 401. Unit tests: `tests/unit/SessionService.test.ts`, 5 / 5.
+- **Gaps / shortcuts:**
+  - **Logout has no server-side revocation** (there is no token store); the token stays valid until it expires (1 h). The FE clears it locally.
+  - `mustChangePassword` is always `false` (no DB column; see M6).
+  - An inactive account gets `403 ACCOUNT_DISABLED` from `/me` rather than DOC-01's `200 { status: 'inactive' }`.
+  - There is no login lock (DOC-14).
+  - Node's strip-only TypeScript in the container rejects constructor parameter properties, so classes use explicit fields as the rest of the server does.
+  - nodemon does not see file changes through the Windows bind mount: restart the `server` container after a BE edit.

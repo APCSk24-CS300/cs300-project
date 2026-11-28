@@ -24,6 +24,9 @@ This document provides quick access to useful university-related resources and s
 - **Tuition Fee Management** – Access tuition fee information and payment-related services.
   - https://hocphi.hcmus.edu.vn/
 
+- **Student Handbook (Sổ tay Sinh viên 2025)** – Refer to the student handbook for university regulations, guidelines, and student-related information.
+  - https://hcmus.edu.vn/wp-content/uploads/2025/08/STSV2025_ONLINE.pdf
+
 
 
 

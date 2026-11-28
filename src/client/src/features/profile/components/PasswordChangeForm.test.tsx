@@ -38,7 +38,7 @@ function fillForm({
 describe("PasswordChangeForm", () => {
   it.each([
     ["a missing current password", "", "newpass8", "newpass8", "Enter your current password."],
-    ["a seven-character new password", "current-secret", "1234567", "1234567", "Your new password must be at least 8 characters."],
+    ["a five-character new password", "current-secret", "12345", "12345", "Your new password must be at least 6 characters."],
     ["mismatched confirmation", "current-secret", "new-secret-password", "different-secret", "The new password and confirmation do not match."],
   ])("rejects %s and clears all password fields", (_case, currentPassword, newPassword, confirmPassword, message) => {
     render(<PasswordChangeForm />);
@@ -61,7 +61,7 @@ describe("PasswordChangeForm", () => {
       }),
     );
     render(<PasswordChangeForm />);
-    fillForm({ newPassword: "newpass8" });
+    fillForm({ newPassword: "secret" });
 
     fireEvent.click(screen.getByRole("button", { name: "Change password" }));
 
@@ -69,7 +69,7 @@ describe("PasswordChangeForm", () => {
     expect(loadingButton).toBeDisabled();
     expect(changePasswordMock).toHaveBeenCalledWith({
       currentPassword: "current-secret",
-      newPassword: "newpass8",
+      newPassword: "secret",
     });
 
     await act(async () => {

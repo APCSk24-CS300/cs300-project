@@ -66,10 +66,23 @@ function getProfileData(response: ProfileResponseDTO): unknown {
 
 export interface ProfileService {
   getProfile(signal?: AbortSignal): Promise<Profile>;
+  uploadAvatar(file: File): Promise<string>;
+  removeAvatar(): Promise<void>;
   updatePhoneNumber(phoneNumber: string | null): Promise<Profile>;
 }
 
 export class RealProfileService implements ProfileService {
+  async uploadAvatar(file: File): Promise<string> {
+    const form = new FormData(); form.append("avatar", file);
+    const result = await api.post<{ success: boolean; data: { avatarUrl: string } }>("/api/v1/profile/avatar", form);
+    if (!result.success || typeof result.data?.avatarUrl !== "string") throw new Error("Invalid avatar response");
+    return result.data.avatarUrl;
+  }
+  async removeAvatar(): Promise<void> {
+    const result = await api.delete<{ success: boolean }>("/api/v1/profile/avatar");
+    if (!result.success) throw new Error("Avatar removal failed");
+  }
+
   async getProfile(signal?: AbortSignal): Promise<Profile> {
     const response = await api.get<ProfileResponseDTO>("/api/v1/profile", {
       signal,

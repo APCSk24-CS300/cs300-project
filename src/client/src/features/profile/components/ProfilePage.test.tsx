@@ -9,6 +9,8 @@ vi.mock("@/features/profile/services/profile.service", () => ({
   profileService: {
     getProfile: vi.fn(),
     updatePhoneNumber: vi.fn(),
+    uploadAvatar: vi.fn(),
+    removeAvatar: vi.fn(),
   },
 }));
 
@@ -114,6 +116,7 @@ describe("ProfilePage", () => {
       "Enter a 10-digit number",
     );
     expect(phoneInput).toHaveValue("12345");
+    expect(phoneInput).toHaveAttribute("aria-invalid", "true");
     expect(updatePhoneNumberMock).not.toHaveBeenCalled();
     expect(screen.queryByRole("textbox", { name: "Student number" })).not.toBeInTheDocument();
   });
@@ -172,4 +175,35 @@ describe("ProfilePage", () => {
     expect(screen.getByText("0901234567")).toBeInTheDocument();
     expect(screen.queryByText("Phone number updated successfully.")).not.toBeInTheDocument();
   });
+});
+
+it("offers retry when the saved picture fails to load", async () => {
+  getProfileMock.mockResolvedValueOnce(profile);
+  renderWithProviders(<ProfilePage />);
+  const image=await screen.findByAltText("Student Example's profile picture");
+  fireEvent.error(image);
+  expect(screen.getByRole("img",{name:"No profile picture"})).toBeInTheDocument();
+  fireEvent.click(screen.getByText("Retry picture"));
+  expect(screen.getByAltText("Student Example's profile picture")).toBeInTheDocument();
+});
+it("restores the default picture after confirmed removal", async () => {
+  getProfileMock.mockResolvedValueOnce(profile);
+  vi.mocked(profileService.removeAvatar).mockResolvedValueOnce();
+  renderWithProviders(<ProfilePage />);
+  fireEvent.click(await screen.findByText("Remove picture"));
+  fireEvent.click(screen.getByText("Confirm removal"));
+  await waitFor(()=>expect(screen.getByRole("img",{name:"No profile picture"})).toBeInTheDocument());
+});
+
+it("shows a server validation error on the phone field while preserving the draft", async () => {
+  getProfileMock.mockResolvedValueOnce(profile);
+  updatePhoneNumberMock.mockRejectedValueOnce(new Error("Phone number is already in use"));
+  renderWithProviders(<ProfilePage />);
+  fireEvent.click(await screen.findByRole("button", { name: "Edit phone number" }));
+  const input = screen.getByRole("textbox", { name: "Phone number" });
+  fireEvent.change(input, { target: { value: "0911111111" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save" }));
+  await waitFor(() => expect(input).toHaveAttribute("aria-invalid", "true"));
+  expect(input).toHaveValue("0911111111");
+  expect(screen.queryByText("Phone number updated successfully.")).not.toBeInTheDocument();
 });

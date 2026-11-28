@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { authService } from "@/features/auth/services/auth.service";
 
-const MIN_PASSWORD_LENGTH = 8;
+import { getPasswordChangeError } from "@/features/profile/validation/password.validation";
 
 export function PasswordChangeForm() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -24,20 +24,13 @@ export function PasswordChangeForm() {
     setError(null);
     setSuccess(null);
 
-    if (!currentPassword) {
-      setError("Enter your current password.");
-      clearPasswords();
-      return;
-    }
-
-    if (Array.from(newPassword).length < MIN_PASSWORD_LENGTH) {
-      setError("Your new password must be at least 8 characters.");
-      clearPasswords();
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setError("The new password and confirmation do not match.");
+    const validationError = getPasswordChangeError({
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    });
+    if (validationError) {
+      setError(validationError);
       clearPasswords();
       return;
     }
@@ -111,7 +104,7 @@ export function PasswordChangeForm() {
             className="mt-2 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-base text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:opacity-60"
           />
           <p id="new-password-hint" className="mt-2 text-sm text-text-muted">
-            Use at least 8 characters.
+            Use at least 6 characters.
           </p>
         </div>
         <div>

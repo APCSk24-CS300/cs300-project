@@ -7,7 +7,7 @@ import type {
 
 import type { SessionUser } from "@/features/auth/types";
 
-const BASE = "/auth";
+const BASE = "/api/auth";
 
 class AuthService {
   async login(data: LoginRequest): Promise<AuthResponse> {

@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { SurfaceCard } from "@/components/ui/SurfaceCard";
+import { AvatarEditor } from "@/features/profile/components/AvatarEditor";
 import { PasswordChangeForm } from "@/features/profile/components/PasswordChangeForm";
 import type { Profile } from "@/features/profile/types";
 import { profileService } from "@/features/profile/services/profile.service";
@@ -56,6 +57,8 @@ function ProfileField({
 }
 
 export function ProfilePage() {
+  const [imageError, setImageError] = useState(false);
+  const [imageRetry, setImageRetry] = useState(0);
   const [state, setState] = useState<LoadState>({ status: "loading" });
   const [requestNumber, setRequestNumber] = useState(0);
   const [isEditingPhone, setIsEditingPhone] = useState(false);
@@ -136,7 +139,9 @@ export function ProfilePage() {
       const updatedProfile = await profileService.updatePhoneNumber(
         phoneDraft === "" ? null : phoneDraft,
       );
-      setState({ status: "success", profile: updatedProfile });
+      setState((current) => current.status === "success"
+        ? { status: "success", profile: { ...current.profile, phoneNumber: updatedProfile.phoneNumber } }
+        : current);
       setIsEditingPhone(false);
       setPhoneDraft("");
       setSaveSuccess(true);
@@ -199,11 +204,13 @@ export function ProfilePage() {
                 aria-labelledby="profile-identity-heading"
                 className="flex flex-col gap-5 border-b border-slate-200 pb-8 sm:flex-row sm:items-center"
               >
-                {profile.avatarUrl ? (
+                {profile.avatarUrl && !imageError ? (
                   // The avatar URL is provided by the API and may use a host not configured in next/image.
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
+                    key={`${profile.avatarUrl}-${imageRetry}`}
                     src={profile.avatarUrl}
+                    onError={() => setImageError(true)}
                     alt={`${profile.fullName}'s profile picture`}
                     className="size-20 rounded-full border border-slate-200 object-cover"
                   />
@@ -226,6 +233,12 @@ export function ProfilePage() {
                   <p className="mt-1 text-text-muted">{profile.email}</p>
                 </div>
               </section>
+
+              {imageError && <div role="alert">Picture could not be loaded. <button type="button" onClick={() => { setImageError(false); setImageRetry((value) => value + 1); }}>Retry picture</button></div>}
+              <AvatarEditor avatarUrl={profile.avatarUrl} onSaved={(avatarUrl) => {
+                setImageError(false);
+                setState((current) => current.status === "success" ? { status: "success", profile: { ...current.profile, avatarUrl } } : current);
+              }} />
 
               <section aria-labelledby="contact-heading" className="pt-8">
                 <h2 id="contact-heading" className="text-lg font-semibold text-text">
@@ -253,9 +266,9 @@ export function ProfilePage() {
                             setPhoneError(null);
                             setSaveError(null);
                           }}
-                          aria-invalid={phoneError !== null}
+                          aria-invalid={phoneError !== null || saveError !== null}
                           aria-describedby={
-                            phoneError ? "profile-phone-error" : undefined
+                            phoneError ? "profile-phone-error" : saveError ? "profile-save-error" : undefined
                           }
                           className="min-h-11 w-full rounded-xl border border-slate-300 px-3 text-base text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
                           disabled={isSaving}
@@ -274,7 +287,7 @@ export function ProfilePage() {
                           Leave blank to remove your phone number.
                         </p>
                         {saveError ? (
-                          <p className="mt-2 text-sm text-red-700" role="alert">
+                          <p id="profile-save-error" className="mt-2 text-sm text-red-700" role="alert">
                             {saveError}
                           </p>
                         ) : null}

@@ -6,6 +6,8 @@ vi.mock("@/libs/api-client", () => ({
   api: {
     get: vi.fn(),
     patch: vi.fn(),
+    post: vi.fn(),
+    delete: vi.fn(),
   },
 }));
 
@@ -114,4 +116,18 @@ describe("RealProfileService", () => {
       phoneNumber: null,
     });
   });
+});
+
+it("uploads multipart avatar content and validates the active URL", async () => {
+  vi.mocked(api.post).mockResolvedValueOnce({success:true,data:{avatarUrl:"/api/v1/profile/avatar/files/test.png"}});
+  const file=new File(["image"],"test.png",{type:"image/png"});
+  await expect(new RealProfileService().uploadAvatar(file)).resolves.toBe("/api/v1/profile/avatar/files/test.png");
+  const form=vi.mocked(api.post).mock.calls[0][1] as FormData;
+  expect(form.get("avatar")).toBeInstanceOf(File);
+});
+it("removes the avatar only when the API confirms success", async () => {
+  vi.mocked(api.delete).mockResolvedValueOnce({success:true});
+  await expect(new RealProfileService().removeAvatar()).resolves.toBeUndefined();
+  vi.mocked(api.delete).mockResolvedValueOnce({success:false});
+  await expect(new RealProfileService().removeAvatar()).rejects.toThrow();
 });

@@ -10,7 +10,13 @@ export type ErrorContext =
   /** University Services Hub reads (UC-07). */
   | "hub"
   /** Service-link administration (BR-ADM-01): 409 / 412 / 404 copy. */
-  | "manageServiceLink";
+  | "manageServiceLink"
+  /** UC-03 phone number save (A5): 409 duplicate. */
+  | "profilePhone"
+  /** UC-03 avatar upload (A8 / A9): the saved picture is always kept. */
+  | "avatarUpload"
+  /** UC-03 avatar removal (A9). */
+  | "avatarRemove";
 
 const UNAVAILABLE = "The service is unavailable. Please try again.";
 
@@ -19,6 +25,23 @@ const SERVICE_LINK_MESSAGES: Partial<Record<ApiErrorCode, string>> = {
   DUPLICATE_VALUE: "A service with this name already exists.",
   PRECONDITION_FAILED: "This link was changed by someone else. Reload to see the latest version, then try again.",
   NOT_FOUND: "This link no longer exists. Reload to see the current list.",
+};
+
+/** UC-03 copy (plan 006 §5). The BE answers 409 for both a taken phone number and an avatar race. */
+const PROFILE_MESSAGES: Partial<Record<ErrorContext, Partial<Record<ApiErrorCode, string>> & { fallback: string }>> = {
+  profilePhone: {
+    DUPLICATE_VALUE: "This phone number is already used by another account.",
+    fallback: "Your phone number could not be saved. Please try again.",
+  },
+  avatarUpload: {
+    UNSUPPORTED_FILE: "Choose a JPG or PNG image up to 10 MB. Your saved picture is unchanged.",
+    DUPLICATE_VALUE: "Your picture changed while saving. Your saved picture is unchanged. Please retry.",
+    fallback: "Picture could not be saved. Your saved picture is unchanged. Please retry.",
+  },
+  avatarRemove: {
+    DUPLICATE_VALUE: "Your picture changed while removing. Please retry.",
+    fallback: "Picture could not be removed. Please retry.",
+  },
 };
 
 function formatRetryTime(retryAfterSeconds: number | undefined): string | null {
@@ -61,6 +84,11 @@ export function toUserMessage(error: unknown, context: ErrorContext): string {
     return time
       ? `Too many failed attempts. Try again after ${time}.`
       : "Too many failed attempts. Try again later.";
+  }
+
+  const profileCopy = PROFILE_MESSAGES[context];
+  if (profileCopy && error.code !== "UNAUTHENTICATED" && error.code !== "FORBIDDEN" && error.code !== "ACCOUNT_DISABLED") {
+    return profileCopy[error.code] ?? profileCopy.fallback;
   }
 
   if (error.code === "VALIDATION_FAILED") {

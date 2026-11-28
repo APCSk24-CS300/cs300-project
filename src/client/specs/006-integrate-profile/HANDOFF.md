@@ -20,7 +20,7 @@
 | 2 API client | done | `ea9a58c` | object-shaped `details { field }`; ServiceResponse " (STATUS)" suffix stripped; `INTERNAL_ERROR`; `api.blob()` | 425 |
 | 3 Shared rules + route | done | `0f654cd` | `libs/validation/password.ts` (8 code points), `libs/validation/phone.ts` (contract pattern, also admin create); `/profile` shared route; nav Profile → `/profile`; AccountMenu "My profile" | 430 |
 | 4 MSW profile handlers | done — gates green: tsc, 65 files / 450 tests, lint, build, server/db identical | step 4 commit | MSW profile/avatar handlers matching `src/server`; service on our paths and adapters; dev's 4 `vi.mock` test files rewritten on MSW (same titles); shared-rule and migration tests | 450 |
-| 5 Hooks / services | not started | — | — | — |
+| 5 Hooks / services | done — gates green: tsc, 66 files / 455 tests, lint, build, server/db identical | step 5 commit | `useMyProfile` (`useAsyncResource`, server-confirmed `apply`, retry drops it); ProfilePage on it; saves call `auth.refresh()` (AccountMenu follows `/auth/me`, no second store); `toUserMessage` contexts `profilePhone` / `avatarUpload` / `avatarRemove`; server field error → field; forbidden → `ForbiddenView` | 455 |
 | 6 UI | not started | — | — | — |
 | 7 Forwarder (binary / multipart) | not started | — | — | — |
 | 8 Docs (DOC-19 to DOC-23, …) | not started | — | — | — |

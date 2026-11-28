@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Container } from "@/components/ui/Container";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -8,14 +8,14 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { SurfaceCard } from "@/components/ui/SurfaceCard";
 import { AvatarEditor } from "@/features/profile/components/AvatarEditor";
 import { PasswordChangeForm } from "@/features/profile/components/PasswordChangeForm";
-import type { Profile } from "@/features/profile/types";
+import { ForbiddenView } from "@/components/layout/ForbiddenView";
+import { useMyProfile } from "@/features/profile/hooks/useMyProfile";
 import { profileService } from "@/features/profile/services/profile.service";
+import { useAuth } from "@/hooks/useAuth";
+import { isApiError } from "@/libs/api-client";
+import { toUserMessage } from "@/libs/error-messages";
+import { getDashboardPath } from "@/libs/navigation";
 import { getPhoneNumberError } from "@/features/profile/validation/profile.validation";
-
-type LoadState =
-  | { status: "loading" }
-  | { status: "success"; profile: Profile }
-  | { status: "error" };
 
 function ProfileLoading() {
   return (
@@ -59,8 +59,10 @@ function ProfileField({
 export function ProfilePage() {
   const [imageError, setImageError] = useState(false);
   const [imageRetry, setImageRetry] = useState(0);
-  const [state, setState] = useState<LoadState>({ status: "loading" });
-  const [requestNumber, setRequestNumber] = useState(0);
+  // UC-03 step 2 through the shared read core; saved changes also refresh the AuthProvider user, so
+  // AccountMenu (name, avatar) follows from the server, with no second store (plan 006 O4).
+  const state = useMyProfile();
+  const { user, refresh } = useAuth();
   const [isEditingPhone, setIsEditingPhone] = useState(false);
   const [phoneDraft, setPhoneDraft] = useState("");
   const [phoneError, setPhoneError] = useState<string | null>(null);
@@ -68,33 +70,7 @@ export function ProfilePage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    let active = true;
-
-    profileService
-      .getProfile()
-      .then((profile) => {
-        if (active) {
-          setState({ status: "success", profile });
-        }
-      })
-      .catch((error: unknown) => {
-        if (active && !(error instanceof Error && error.name === "AbortError")) {
-          setState({ status: "error" });
-        }
-      });
-
-    return () => {
-      active = false;
-      controller.abort();
-    };
-  }, [requestNumber]);
-
-  const handleRetry = () => {
-    setState({ status: "loading" });
-    setRequestNumber((current) => current + 1);
-  };
+  const handleRetry = state.retry;
 
   const handleStartEditingPhone = () => {
     if (!profile) {
@@ -139,25 +115,31 @@ export function ProfilePage() {
       const updatedProfile = await profileService.updatePhoneNumber(
         phoneDraft === "" ? null : phoneDraft,
       );
-      setState((current) => current.status === "success"
-        ? { status: "success", profile: { ...current.profile, phoneNumber: updatedProfile.phoneNumber } }
-        : current);
+      state.apply({ phoneNumber: updatedProfile.phoneNumber });
+      void refresh();
       setIsEditingPhone(false);
       setPhoneDraft("");
       setSaveSuccess(true);
     } catch (error) {
-      setSaveError(
-        error instanceof Error
-          ? error.message
-          : "Unable to save your phone number. Please try again.",
-      );
+      // A field error from the server (400 { field }) goes on the field; everything else is copy from
+      // toUserMessage (FR-011). The draft is kept for correction (A5).
+      const fieldMessage = isApiError(error) ? error.fieldErrors.phoneNumber : undefined;
+      if (fieldMessage && isApiError(error) && error.code === "VALIDATION_FAILED") {
+        setPhoneError(fieldMessage);
+      } else {
+        setSaveError(toUserMessage(error, "profilePhone"));
+      }
     } finally {
       setIsSaving(false);
     }
   };
 
-  const profile = state.status === "success" ? state.profile : null;
+  const profile = state.profile;
   const academicInfo = profile?.academicInfo ?? null;
+
+  if (state.status === "forbidden") {
+    return <ForbiddenView dashboardHref={getDashboardPath(user?.role)} />;
+  }
 
   return (
     <main className="min-h-screen bg-slate-50 py-12 sm:py-16">
@@ -237,7 +219,8 @@ export function ProfilePage() {
               {imageError && <div role="alert">Picture could not be loaded. <button type="button" onClick={() => { setImageError(false); setImageRetry((value) => value + 1); }}>Retry picture</button></div>}
               <AvatarEditor avatarUrl={profile.avatarUrl} onSaved={(avatarUrl) => {
                 setImageError(false);
-                setState((current) => current.status === "success" ? { status: "success", profile: { ...current.profile, avatarUrl } } : current);
+                state.apply({ avatarUrl });
+                void refresh();
               }} />
 
               <section aria-labelledby="contact-heading" className="pt-8">

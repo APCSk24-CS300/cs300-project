@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { profileService } from '../services/profile.service';
 import { getAvatarError } from '../validation/avatar.validation';
+import { toUserMessage } from '@/libs/error-messages';
 
 export function AvatarEditor({ avatarUrl, onSaved }: { avatarUrl: string | null; onSaved: (url: string | null) => void }) {
  const inputRef = useRef<HTMLInputElement>(null);
@@ -16,14 +17,14 @@ export function AvatarEditor({ avatarUrl, onSaved }: { avatarUrl: string | null;
   if (!file || busy) return;
   setBusy(true); setError(null); setMessage(null);
   try { onSaved(await profileService.uploadAvatar(file)); setFile(null); setPreview(null); if (inputRef.current) inputRef.current.value = ''; setMessage('Profile picture updated.'); }
-  catch { setError('Picture could not be saved. Your saved picture is unchanged. Please retry.'); }
+  catch (failure) { setError(toUserMessage(failure, 'avatarUpload')); }
   finally { setBusy(false); }
  }
  async function remove() {
   if (busy) return;
   setBusy(true); setError(null); setMessage(null);
   try { await profileService.removeAvatar(); onSaved(null); setFile(null); setPreview(null); setConfirmRemove(false); if (inputRef.current) inputRef.current.value = ''; setMessage('Profile picture removed.'); }
-  catch { setError('Picture could not be removed. Please retry.'); }
+  catch (failure) { setError(toUserMessage(failure, 'avatarRemove')); }
   finally { setBusy(false); }
  }
  return <section aria-label="Manage profile picture" className="mt-6 grid gap-3">

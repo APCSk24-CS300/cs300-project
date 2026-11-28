@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { ProfilePage } from "@/features/profile/components/ProfilePage";
 import { readDb, setMockFailures, updateDb } from "@/mocks/db/store";
+import { useAuth } from "@/hooks/useAuth";
 import { renderWithProviders, signInAs } from "../../../../tests/test-utils";
 
 // Against the MSW profile handlers (they answer like src/server); the mock DB is reset before each test.
@@ -127,7 +128,7 @@ describe("ProfilePage", () => {
     fireEvent.change(phoneInput, { target: { value: "0911111111" } });
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Phone number is already in use");
+    expect(await screen.findByRole("alert")).toHaveTextContent("This phone number is already used by another account."); // toUserMessage "profilePhone" (step 5)
     expect(phoneInput).toHaveValue("0911111111");
     expect(screen.queryByText("Phone number updated successfully.")).not.toBeInTheDocument();
 
@@ -168,3 +169,46 @@ it("shows a server validation error on the phone field while preserving the draf
   expect(input).toHaveValue("0911111111");
   expect(screen.queryByText("Phone number updated successfully.")).not.toBeInTheDocument();
 });
+
+// ---- step 5: one session store, forbidden ----
+
+function SessionProbe() {
+  const { user } = useAuth();
+  return <p data-testid="session-avatar">{user ? String(user.avatarUrl) : "no user"}</p>;
+}
+
+it("refreshes the signed-in user (AccountMenu) after a saved change", async () => {
+  updateDb((db) => {
+    db.users.find((u) => u.email === STUDENT)!.avatarUrl = AVATAR;
+  });
+  signInAs(STUDENT);
+  // One AuthProvider for the page and the probe, as in the app (AccountMenu reads the same provider).
+  renderWithProviders(
+    <>
+      <ProfilePage />
+      <SessionProbe />
+    </>,
+    { route: "/profile" },
+  );
+  await waitFor(() => expect(screen.getByTestId("session-avatar")).toHaveTextContent(AVATAR));
+  fireEvent.click(await screen.findByText("Remove picture"));
+  fireEvent.click(screen.getByText("Confirm removal"));
+  // The provider re-read /auth/me: AccountMenu's user follows the server, no second store (plan 006 O4).
+  await waitFor(() => expect(screen.getByTestId("session-avatar")).toHaveTextContent("null"));
+});
+
+it("shows the forbidden view when the API refuses the profile with 403", async () => {
+  const { server } = await import("@/mocks/node");
+  const { http, HttpResponse } = await import("msw");
+  server.use(
+    http.get("http://localhost:8080/api/v1/profile", () =>
+      HttpResponse.json({ success: false, code: "FORBIDDEN", message: "Forbidden" }, { status: 403 }),
+    ),
+  );
+  setup();
+  expect(await screen.findByText("You don't have permission to view this page")).toBeInTheDocument();
+  await waitFor(() =>
+    expect(screen.getByRole("link", { name: "Go to my dashboard" })).toHaveAttribute("href", "/student/dashboard"),
+  );
+});
+

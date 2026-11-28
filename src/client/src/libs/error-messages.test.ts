@@ -63,4 +63,17 @@ describe("toUserMessage", () => {
     expect(toUserMessage(e(503, "SERVICE_UNAVAILABLE"), "hub")).toBe("The service is unavailable. Please try again.");
     expect(toUserMessage(e(403, "FORBIDDEN"), "hub")).toBe("You don't have permission to do this.");
   });
+
+  it("UC-03 copy: phone, avatar upload and removal (plan 006 step 5)", () => {
+    const e = (status: number, code: ApiErrorCode) => new ApiError({ status, code });
+    expect(toUserMessage(e(409, "DUPLICATE_VALUE"), "profilePhone")).toBe("This phone number is already used by another account.");
+    expect(toUserMessage(e(503, "SERVICE_UNAVAILABLE"), "profilePhone")).toBe("Your phone number could not be saved. Please try again.");
+    expect(toUserMessage(e(400, "UNSUPPORTED_FILE"), "avatarUpload")).toBe("Choose a JPG or PNG image up to 10 MB. Your saved picture is unchanged.");
+    expect(toUserMessage(e(409, "DUPLICATE_VALUE"), "avatarUpload")).toContain("unchanged");
+    expect(toUserMessage(e(500, "UNKNOWN"), "avatarUpload")).toBe("Picture could not be saved. Your saved picture is unchanged. Please retry.");
+    expect(toUserMessage(e(500, "UNKNOWN"), "avatarRemove")).toBe("Picture could not be removed. Please retry.");
+    expect(toUserMessage(new Error("x"), "avatarRemove")).toBe("The service is unavailable. Please try again.");
+    // Session-level codes keep their own copy in every context.
+    expect(toUserMessage(e(401, "UNAUTHENTICATED"), "avatarUpload")).toBe("Your session has expired. Please sign in again.");
+  });
 });

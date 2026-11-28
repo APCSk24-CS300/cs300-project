@@ -10,6 +10,9 @@ This document provides quick access to useful university-related resources and s
 
 ## Student Portals
 
+- **CTDB Student Portal** – Access the CTDB student portal.
+  - https://portal.ctdb.hcmus.edu.vn/Login
+
 
 
 

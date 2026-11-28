@@ -43,18 +43,19 @@ One row per successful admin change:
 
 ### Seed
 
-`hub_schema.sql` seeds the links that `seed.sql` (PR #103) does not, so the two never collide in either order:
+The hub has six links, agreed with the team. `seed.sql` (now on `dev`, from PR #103) inserts "HCMUS" and "Student Portal" without `ON CONFLICT`, so `hub_schema.sql` never inserts those names. It updates those two rows in place, and only while they still hold `seed.sql`'s original values, so a re-run never overwrites an admin's edits. It inserts the other five with `ON CONFLICT DO NOTHING`.
 
-| display_order | name | url | is_active | from |
+| display_order | name | url | is_active | row from |
 | --- | --- | --- | --- | --- |
-| 1 | HCMUS | https://hcmus.edu.vn | true | seed.sql |
-| 2 | Student Portal | https://portal.hcmus.edu.vn | true | seed.sql |
-| 3 | Moodle | https://moodle.hcmus.edu.vn/ | true | hub_schema.sql |
-| 4 | Tuition Payment | https://hcmus.edu.vn/ | true | hub_schema.sql |
-| 5 | HCMUS Library | https://hcmus.edu.vn/ | false | hub_schema.sql |
-| 6 | IT Support | https://hcmus.edu.vn/ | false | hub_schema.sql |
+| 1 | Moodle | https://courses.ctda.hcmus.edu.vn/ | true | hub_schema.sql |
+| 2 | Student Portal | https://student.hcmus.edu.vn/login | true | seed.sql, URL updated by hub_schema.sql |
+| 3 | Course Registration Portal | https://new-portal4.hcmus.edu.vn/Login.aspx | true | hub_schema.sql |
+| 4 | Special Programs Portal | https://portal.ctdb.hcmus.edu.vn/Login | true | hub_schema.sql |
+| 5 | Tuition Payment | https://hocphi.hcmus.edu.vn/ | true | hub_schema.sql |
+| 6 | Student Handbook 2025 | https://hcmus.edu.vn/wp-content/uploads/2025/08/STSV2025_ONLINE.pdf | true | hub_schema.sql |
+| 7 | HCMUS | https://hcmus.edu.vn | false | seed.sql, deactivated by hub_schema.sql |
 
-The Tuition Payment, Library and IT Support URLs are placeholders from the landing config. Hub permissions are granted to existing roles only; if `hub_schema.sql` runs before `seed.sql`, run it again afterwards.
+Run `hub_schema.sql` after `seed.sql`. Hub permissions are granted to existing roles only, and the two `seed.sql` rows can only be updated once they exist; if `hub_schema.sql` ran first, run it again afterwards.
 
 ## Backend types (`src/server/src/types/ServiceLink.ts`)
 

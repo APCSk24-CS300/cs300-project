@@ -37,7 +37,7 @@ A signed-in student, activity manager or administrator opens **University Servic
 **Acceptance Scenarios**:
 
 1. **Given** a signed-in user of any role and three active links, **When** they open University Services, **Then** they see the three links with name and description, ordered by display order then name.
-2. **Given** the hub is shown, **When** the user selects "Moodle", **Then** `https://moodle.hcmus.edu.vn/` opens in a new tab with `noopener noreferrer`, and the hub stays open.
+2. **Given** the hub is shown, **When** the user selects "Moodle", **Then** `https://courses.ctda.hcmus.edu.vn/` opens in a new tab with `noopener noreferrer`, and the hub stays open.
 3. **Given** no active links exist, **When** the user opens the hub, **Then** an informative empty state is shown (UC-07 A1).
 4. **Given** the backend is unreachable or returns an error, **When** the hub loads, **Then** a retryable error is shown and the Retry button reloads the list (UC-07 A4).
 5. **Given** a link points to a site that is down, **When** the user opens it, **Then** the browser shows the external result; myHCMUS shows nothing extra (UC-07 A3).
@@ -128,7 +128,7 @@ A university administrator opens **Admin › University Services**, sees all lin
 
 - **FR-016**: The frontend MUST get hub data through a service interface with a mock implementation and a real implementation selected by `NEXT_PUBLIC_DATA_SOURCE`, as the activities feature does.
 - **FR-017**: In `api` mode the frontend MUST reach the backend through a server-side route on the Next.js app that attaches the backend access token from an httpOnly cookie, so the token never reaches browser JavaScript and the backend needs no CORS.
-- **FR-018**: Initial service links MUST be seeded from the current landing config (Moodle, Student Portal, Tuition Payment, HCMUS Website active; HCMUS Library and IT Support inactive, matching today's "Coming soon").
+- **FR-018**: Initial service links MUST be the six links agreed with the team (Moodle, Student Portal, Course Registration Portal, Special Programs Portal, Tuition Payment, Student Handbook 2025), all active; the HCMUS website row from `seed.sql` is kept but inactive. See data-model.md.
 
 ### Key Entities
 

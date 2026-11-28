@@ -12,7 +12,7 @@ docker exec -i myHCMUS-db psql -U "$POSTGRES_USER" -d myHCMUS < db/hub_schema.sq
 docker exec -i myHCMUS-db psql -U "$POSTGRES_USER" -d myHCMUS -c 'SELECT name, is_active, version FROM "ServiceLink" ORDER BY display_order;'
 ```
 
-Expect 6 rows, 4 active, when PR #103's `seed.sql` has run (it adds HCMUS and Student Portal; without it you get 4 rows). Order does not matter, but if `hub_schema.sql` ran before `seed.sql`, run it once more so the seeded roles get the hub permissions. Running `hub_schema.sql` a second time changes nothing. Constraint checks:
+Run it after `seed.sql`. Expect 7 rows, 6 active (the HCMUS website row from `seed.sql` is kept but inactive); see data-model.md. If `hub_schema.sql` ran before `seed.sql`, run it once more so the seeded roles get the hub permissions and the seeded rows are updated. Running `hub_schema.sql` a second time changes nothing. Constraint checks:
 
 ```bash
 docker exec -i myHCMUS-db psql -U "$POSTGRES_USER" -d myHCMUS -v ON_ERROR_STOP=1 < db/hub_schema_test.sql

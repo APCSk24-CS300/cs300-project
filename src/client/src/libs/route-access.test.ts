@@ -103,4 +103,14 @@ describe("resolveRouteAccess", () => {
       expect(resolveRouteAccess("/servicesX", null, NOW)).toEqual({ type: "allow", noStore: false });
     });
   });
+  describe("My profile (plan 006 step 3)", () => {
+    it("/profile needs a session, is open to every role and honors a pending password change", () => {
+      expect(resolveRouteAccess("/profile", null, NOW)).toEqual({ type: "redirect", to: "/login?redirectTo=%2Fprofile" });
+      for (const role of ["student", "manager", "administrator"] as const) {
+        expect(resolveRouteAccess("/profile", hint(role), NOW)).toEqual({ type: "allow", noStore: true });
+      }
+      expect(resolveRouteAccess("/profile", hint("manager", true), NOW)).toEqual({ type: "redirect", to: "/change-password" });
+      expect(resolveRouteAccess("/profileX", null, NOW)).toEqual({ type: "allow", noStore: false });
+    });
+  });
 });

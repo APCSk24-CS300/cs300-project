@@ -5,7 +5,7 @@ const valid = {
   email: "  An.Nguyen@Example.invalid ",
   fullName: " Nguyễn Văn An ",
   role: "student" as const,
-  phoneNumber: "abc 123 ",
+  phoneNumber: " 0901234567 ",
   studentNumber: "23127555",
   facultyId: "120",
 };
@@ -16,11 +16,11 @@ const issues = (input: unknown) => {
 };
 
 describe("account fields schema (data-model §2.6)", () => {
-  it("trims and lowercases the email, trims name and phone (no phone format: GAP-P)", () => {
+  it("trims and lowercases the email, trims name and phone", () => {
     const parsed = AccountFieldsSchema.parse(valid);
     expect(parsed.email).toBe("an.nguyen@example.invalid");
     expect(parsed.fullName).toBe("Nguyễn Văn An");
-    expect(parsed.phoneNumber).toBe("abc 123");
+    expect(parsed.phoneNumber).toBe("0901234567");
   });
 
   it("requires a valid email and a 1–100 character name", () => {
@@ -45,5 +45,15 @@ describe("account fields schema (data-model §2.6)", () => {
   it("requires a temporary password of at least 8 characters", () => {
     expect(NewAccountSchema.safeParse({ ...valid, temporaryPassword: "short", passwordOverridden: true }).success).toBe(false);
     expect(NewAccountSchema.safeParse({ ...valid, temporaryPassword: "KHTN@NVA7555", passwordOverridden: false }).success).toBe(true);
+  });
+  it("uses the shared phone rule: empty, 0 + 9 digits or +84 + 9 digits (plan 006 Q4, DOC-07)", () => {
+    for (const phoneNumber of ["", "  ", "0901234567", "+84901234567"]) {
+      expect(AccountFieldsSchema.safeParse({ ...valid, phoneNumber }).success, phoneNumber).toBe(true);
+    }
+    for (const phoneNumber of ["abc 123", "090123456", "84901234567", "+8490123456", "0901 234 567"]) {
+      expect(issues({ ...valid, phoneNumber }), phoneNumber).toEqual(
+        expect.objectContaining({ phoneNumber: expect.stringContaining("0 followed by 9 digits") }),
+      );
+    }
   });
 });

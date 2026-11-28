@@ -1,9 +1,11 @@
 import { z } from "zod";
 import { ROLE_CODES } from "@/libs/roles";
 import { TEMP_PASSWORD_MIN_LENGTH } from "@/features/admin-users/lib/temporary-password";
+import { PHONE_INVALID, isValidPhoneNumber } from "@/libs/validation/phone";
 
 /**
- * data-model §2.6. Phone is only trimmed: no format is defined anywhere (GAP-P / DOC-07).
+ * data-model §2.6. Phone: the shared rule (libs/validation/phone.ts, plan 006 Q4). The contract defines
+ * the pattern only for UpdateProfileRequest; for CreateUserRequest it is FE + mock only (DOC-07).
  * `AccountFieldsSchema` validates the form step; `NewAccountSchema` the full draft incl. the
  * temporary password (review step).
  */
@@ -11,7 +13,7 @@ const fields = {
   email: z.string().trim().toLowerCase().min(1, "Email is required").pipe(z.email("Enter a valid email address")),
   fullName: z.string().trim().min(1, "Full name is required").max(100, "Use at most 100 characters"),
   role: z.enum(ROLE_CODES, "Each account has exactly one role"),
-  phoneNumber: z.string().trim(),
+  phoneNumber: z.string().trim().refine(isValidPhoneNumber, PHONE_INVALID),
   studentNumber: z.string().trim(),
   facultyId: z.string(),
 };

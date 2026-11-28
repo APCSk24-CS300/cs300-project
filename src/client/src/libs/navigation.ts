@@ -14,7 +14,8 @@ export interface NavItem {
 /**
  * Role navigation (spec FR-024, user-flow.md §1.5; its second list is the manager's).
  * University Services (`/services`, UC-07) is shared by every role; Service Links is the
- * administrator's hub configuration (BR-ADM-01). docs-changes DOC-11.
+ * administrator's hub configuration (BR-ADM-01). Profile (`/profile`, UC-03) is shared by every
+ * role too (plan 006). docs-changes DOC-11.
  * Only destinations built in this phase are `available`; switching an item on later
  * is a one-line change here (FR-024, FR-024a).
  */
@@ -27,7 +28,7 @@ export const NAVIGATION: Record<RoleCode, NavItem[]> = {
     { id: "calendar", label: "Calendar", href: "/student/calendar", status: "coming-soon", ucId: "UC-15" },
     { id: "assistant", label: "AI Student Assistant", href: "/student/assistant", status: "coming-soon", ucId: "UC-06" },
     { id: "services", label: "University Services", href: "/services", status: "available", ucId: "UC-07" },
-    { id: "profile", label: "Profile", href: "/student/profile", status: "coming-soon", ucId: "UC-03" },
+    { id: "profile", label: "Profile", href: "/profile", status: "available", ucId: "UC-03" },
   ],
   manager: [
     { id: "dashboard", label: "Dashboard", href: "/manager/dashboard", status: "available", ucId: "UC-32" },
@@ -37,7 +38,7 @@ export const NAVIGATION: Record<RoleCode, NavItem[]> = {
     { id: "appeals", label: "Appeals", href: "/manager/appeals", status: "coming-soon", ucId: "UC-28" },
     { id: "reports", label: "Reports", href: "/manager/reports", status: "coming-soon", ucId: "UC-20" },
     { id: "services", label: "University Services", href: "/services", status: "available", ucId: "UC-07" },
-    { id: "profile", label: "Profile", href: "/manager/profile", status: "coming-soon", ucId: "UC-03" },
+    { id: "profile", label: "Profile", href: "/profile", status: "available", ucId: "UC-03" },
   ],
   administrator: [
     { id: "dashboard", label: "Dashboard", href: "/admin/dashboard", status: "available", ucId: "UC-32" },
@@ -48,7 +49,7 @@ export const NAVIGATION: Record<RoleCode, NavItem[]> = {
     { id: "reports", label: "Reports and Analytics", href: "/admin/reports", status: "coming-soon", ucId: "UC-31" },
     { id: "audit", label: "Audit Logs", href: "/admin/audit-logs", status: "coming-soon", ucId: "UC-29" },
     { id: "services", label: "University Services", href: "/services", status: "available", ucId: "UC-07" },
-    { id: "profile", label: "Profile", href: "/admin/profile", status: "coming-soon", ucId: "UC-03" },
+    { id: "profile", label: "Profile", href: "/profile", status: "available", ucId: "UC-03" },
   ],
 };
 

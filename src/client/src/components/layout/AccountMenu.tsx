@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import { ChevronDownIcon, LogoutIcon } from "@/components/icons/NavIcons";
+import { ChevronDownIcon, LogoutIcon, NavItemIcon } from "@/components/icons/NavIcons";
+import { PROFILE_PATH } from "@/libs/route-access";
 import { cn } from "@/libs/cn";
 import { ROLE_LABEL, type RoleCode } from "@/libs/roles";
 
@@ -17,12 +19,12 @@ type AccountMenuProps = {
   pending?: boolean;
 };
 
-/** Menu-button with the account name, role label and "Log out" (UC-02 step 1, A1). */
+/** Menu-button with the account name, role label, "My profile" (UC-03) and "Log out" (UC-02 step 1, A1). */
 export function AccountMenu({ user, onLogout, pending = false }: AccountMenuProps) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const itemRef = useRef<HTMLButtonElement>(null);
+  const itemRef = useRef<HTMLAnchorElement>(null);
   const menuId = useId();
 
   useEffect(() => {
@@ -98,9 +100,18 @@ export function AccountMenu({ user, onLogout, pending = false }: AccountMenuProp
               </span>
             </div>
           </div>
-          <div className="mt-1 border-t border-divider pt-1.5">
-            <button
+          <div className="mt-1 flex flex-col gap-0.5 border-t border-divider pt-1.5">
+            <Link
               ref={itemRef}
+              href={PROFILE_PATH}
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-[15px] font-semibold text-heading transition-colors hover:bg-surface-muted"
+            >
+              <NavItemIcon id="profile" className="size-4 shrink-0" />
+              <span>My profile</span>
+            </Link>
+            <button
               type="button"
               role="menuitem"
               disabled={pending}

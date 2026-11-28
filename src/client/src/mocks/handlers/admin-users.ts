@@ -6,6 +6,7 @@ import { fail, ok } from "@/mocks/utils/envelope";
 import { delay } from "@/mocks/utils/latency";
 import { apiUrl, toAdminUser } from "@/mocks/utils/shape";
 import { withAuth, withFailureSwitch } from "@/mocks/handlers/guards";
+import { PHONE_INVALID, isValidPhoneNumber } from "@/libs/validation/phone";
 
 const SORTABLE = new Set(["createdAt", "fullName", "email"]);
 
@@ -83,6 +84,8 @@ export const adminUserHandlers = [
           if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push({ field: "email", message: "Enter a valid email address" });
           if (!fullName) errors.push({ field: "fullName", message: "Full name is required" });
           if (initialPassword.length < 8) errors.push({ field: "initialPassword", message: "Use at least 8 characters" });
+          // Mock-only for now: CreateUserRequest has no phone pattern in the contract yet (DOC-07, plan 006 Q4).
+          if (!isValidPhoneNumber(phoneNumber)) errors.push({ field: "phoneNumber", message: PHONE_INVALID });
           if (role === "student") {
             if (!studentNumber) errors.push({ field: "studentNumber", message: "Student number is required" });
             if (!facultyId || !db.faculties.some((f) => f.id === facultyId)) {

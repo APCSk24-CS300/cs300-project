@@ -36,6 +36,7 @@ describe("navigation", () => {
       [
         "/admin/dashboard", "/admin/users", "/admin/services", "/manager/dashboard", "/student/dashboard",
         "/services", "/services", "/services",
+        "/profile", "/profile", "/profile",
       ].sort(),
     );
   });
@@ -65,5 +66,12 @@ describe("navigation", () => {
     }
     expect(getLoginHref("/services")).toBe("/login?redirectTo=%2Fservices");
     expect(isPathAllowedForRole("/admin/services", "student")).toBe(false);
+  });
+  it("Profile is one shared, available /profile item for every role", () => {
+    for (const role of ["student", "manager", "administrator"] as const) {
+      const profile = NAVIGATION[role].find((i) => i.id === "profile");
+      expect(profile).toMatchObject({ href: "/profile", status: "available", ucId: "UC-03" });
+      expect(isPathAllowedForRole("/profile", role)).toBe(true);
+    }
   });
 });

@@ -71,4 +71,14 @@ describe("proxy (route guard)", () => {
       expect(location(proxy(request("/admin/services", { role: "administrator" })))).toBeNull();
     });
   });
+  describe("My profile route (plan 006 step 3)", () => {
+    it("sends signed-out visitors from /profile to sign-in and lets every role in, marked no-store", () => {
+      expect(location(proxy(request("/profile")))).toBe("http://localhost:3000/login?redirectTo=%2Fprofile");
+      for (const role of ["student", "manager", "administrator"] as const) {
+        const res = proxy(request("/profile", { role }));
+        expect(location(res)).toBeNull();
+        expect(res.headers.get("cache-control")).toContain("no-store");
+      }
+    });
+  });
 });

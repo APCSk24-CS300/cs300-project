@@ -15,7 +15,9 @@ export const CHANGE_PASSWORD_PATH = "/change-password";
 
 /** Signed-in paths outside the role areas; any role may open them. `/services` = UC-07 hub. */
 export const UNIVERSITY_SERVICES_PATH = "/services";
-const PROTECTED_SHARED_PATHS = [CHANGE_PASSWORD_PATH, "/forbidden", UNIVERSITY_SERVICES_PATH];
+/** UC-03 "My profile", shared by every role (plan 006 O9). */
+export const PROFILE_PATH = "/profile";
+const PROTECTED_SHARED_PATHS = [CHANGE_PASSWORD_PATH, "/forbidden", UNIVERSITY_SERVICES_PATH, PROFILE_PATH];
 
 export function isProtectedPath(pathname: string): boolean {
   return (

@@ -13,6 +13,7 @@ import { isApiError } from "@/libs/api-client";
 import { toUserMessage } from "@/libs/error-messages";
 import { getDashboardPath, isPathAllowedForRole } from "@/libs/navigation";
 import { ChangePasswordSchema, type ChangePasswordValues } from "@/features/auth/schema/change-password.schema";
+import { PASSWORD_HINT } from "@/libs/validation/password";
 
 /** "Set a new password" at first sign-in (US7, FR-045–FR-048). react-hook-form + zodResolver. */
 export function ChangePasswordForm({ redirectTo }: { redirectTo?: string }) {
@@ -70,7 +71,7 @@ export function ChangePasswordForm({ redirectTo }: { redirectTo?: string }) {
         <FormField label="Current (temporary) password" size="comfortable" required error={errors.currentPassword?.message}>
           <PasswordInput autoComplete="current-password" {...form.register("currentPassword")} />
         </FormField>
-        <FormField label="New password" size="comfortable" required hint="At least 8 characters." error={errors.newPassword?.message}>
+        <FormField label="New password" size="comfortable" required hint={PASSWORD_HINT} error={errors.newPassword?.message}>
           <PasswordInput autoComplete="new-password" {...form.register("newPassword")} />
         </FormField>
         <FormField label="Confirm new password" size="comfortable" required error={errors.confirmPassword?.message}>

@@ -113,7 +113,7 @@ describe("ProfilePage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Enter a 10-digit number",
+      "Enter 0 followed by 9 digits, or +84 followed by 9 digits.", // shared rule (plan 006 Q4)
     );
     expect(phoneInput).toHaveValue("12345");
     expect(phoneInput).toHaveAttribute("aria-invalid", "true");

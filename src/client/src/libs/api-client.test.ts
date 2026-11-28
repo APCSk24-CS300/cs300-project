@@ -7,6 +7,8 @@ import {
   setTokenProvider,
   setUnauthorizedHandler,
   unwrap,
+  unwrapServiceResponse,
+  versionFromEtag,
 } from "./api-client";
 
 function json(body: unknown, status = 200, headers: Record<string, string> = {}) {
@@ -123,5 +125,96 @@ describe("api client", () => {
   it("unwraps the contract envelope", () => {
     expect(unwrap({ data: 5 })).toBe(5);
     expect(() => unwrap({})).toThrow(ApiError);
+  });
+  describe("hub ServiceResponse envelope (DOC-16)", () => {
+    function hubError(status: number, message: string, details?: unknown[]) {
+      return json(
+        { success: false, statusCode: status, payload: { message, ...(details ? { data: { details } } : {}) } },
+        status,
+      );
+    }
+
+    it("reads field errors and per-field codes from payload.data.details", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue(
+          hubError(400, "Validation failed (BAD_REQUEST)", [
+            { field: "url", code: "INVALID_URL", message: "Use a full http:// or https:// address" },
+            { field: "name", code: "REQUIRED", message: "Name is required" },
+          ]),
+        ),
+      );
+
+      const error = (await api.post("/admin/services", {}).catch((e: unknown) => e)) as ApiError;
+      expect(error).toBeInstanceOf(ApiError);
+      expect(error).toMatchObject({
+        status: 400,
+        code: "VALIDATION_FAILED",
+        message: "Validation failed (BAD_REQUEST)",
+        fieldErrors: { url: "Use a full http:// or https:// address", name: "Name is required" },
+      });
+      expect(error.details).toEqual([
+        { field: "url", code: "INVALID_URL", message: "Use a full http:// or https:// address" },
+        { field: "name", code: "REQUIRED", message: "Name is required" },
+      ]);
+    });
+
+    it("takes a known code from details (409 DUPLICATE_VALUE)", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue(
+          hubError(409, "Conflict (CONFLICT)", [
+            { field: "name", code: "DUPLICATE_VALUE", message: "A service with this name already exists" },
+          ]),
+        ),
+      );
+      await expect(api.post("/admin/services", {})).rejects.toMatchObject({
+        status: 409,
+        code: "DUPLICATE_VALUE",
+        fieldErrors: { name: "A service with this name already exists" },
+      });
+    });
+
+    it.each([
+      [401, "UNAUTHENTICATED"],
+      [403, "FORBIDDEN"],
+      [404, "NOT_FOUND"],
+      [412, "PRECONDITION_FAILED"],
+      [503, "SERVICE_UNAVAILABLE"],
+      [502, "UNKNOWN"],
+    ] as const)("maps a hub %i without details to %s", async (status, code) => {
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue(hubError(status, "x")));
+      await expect(api.get("/hub/services")).rejects.toMatchObject({ status, code, fieldErrors: {} });
+    });
+
+    it("unwraps payload.data and rejects a missing one", () => {
+      expect(unwrapServiceResponse({ success: true, statusCode: 200, payload: { message: "OK", data: [1] } })).toEqual([1]);
+      expect(() => unwrapServiceResponse({ success: true, statusCode: 200, payload: { message: "OK" } })).toThrow(ApiError);
+      expect(() => unwrapServiceResponse(undefined)).toThrow(ApiError);
+    });
+
+    it("reads the version from an ETag", () => {
+      expect(versionFromEtag(new Headers({ ETag: '"3"' }))).toBe(3);
+      expect(versionFromEtag(new Headers({ ETag: 'W/"12"' }))).toBe(12);
+      expect(versionFromEtag(new Headers({ ETag: "abc" }))).toBeNull();
+      expect(versionFromEtag(new Headers())).toBeNull();
+    });
+
+    it("returns the ETag header from api.request", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue(
+          json({ success: true, statusCode: 200, payload: { message: "OK", data: { id: "1" } } }, 200, { ETag: '"2"' }),
+        ),
+      );
+      const res = await api.request<{ payload: { data: { id: string } } }>("/admin/services/1", "PATCH", {
+        body: { name: "x" },
+        headers: { "If-Match": '"1"' },
+      });
+      expect(versionFromEtag(res.headers)).toBe(2);
+      const init = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0]![1] as RequestInit;
+      expect(init.method).toBe("PATCH");
+      expect(new Headers(init.headers).get("If-Match")).toBe('"1"');
+    });
   });
 });

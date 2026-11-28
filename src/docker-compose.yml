@@ -12,6 +12,34 @@ services:
     volumes:
       - ./server:/app
       - node_modules:/app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  client:
+    container_name: myHCMUS-client
+    image: node:22
+    working_dir: /app
+    # node_modules lives in a volume so Linux binaries never mix with the Windows ones in src/client.
+    command: sh -c "npm install && npm run dev -- --hostname 0.0.0.0"
+    ports:
+      - '3000:3000'
+    env_file:
+      - path: client/.env.local
+        required: false
+    environment:
+      # Inside Docker the backend is reached by its service name, not localhost.
+      API_BACKEND_URL: http://server:8080
+      BACKEND_API_URL: http://server:8080/api/v1
+      # File changes on a Windows bind mount are only seen by polling.
+      WATCHPACK_POLLING: 'true'
+    volumes:
+      - ./client:/app
+      - client_node_modules:/app/node_modules
+      - client_next:/app/.next
+    depends_on:
+      - server
     restart: unless-stopped
 
   db:
@@ -24,6 +52,9 @@ services:
           - "5432:5432"
     volumes:
             - myHCMUS-db:/var/lib/postgresql
+            # First start only (empty volume): schema.sql, seed.sql, hub_schema.sql. See db/docker-init.
+            - ./db:/db:ro
+            - ./db/docker-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
             test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
             interval: 5s
@@ -33,3 +64,5 @@ services:
 volumes:
   node_modules:
   myHCMUS-db:
+  client_node_modules:
+  client_next:

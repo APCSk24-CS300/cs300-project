@@ -49,4 +49,26 @@ describe("proxy (route guard)", () => {
     req.cookies.set("myhcmus_token", "anything");
     expect(location(proxy(req))).toMatch(/\/login/);
   });
+  describe("University Services Hub routes (plan 005 step 3)", () => {
+    it("sends signed-out visitors from /services and /admin/services to sign-in with a return path", () => {
+      expect(location(proxy(request("/services")))).toBe("http://localhost:3000/login?redirectTo=%2Fservices");
+      expect(location(proxy(request("/admin/services")))).toBe(
+        "http://localhost:3000/login?redirectTo=%2Fadmin%2Fservices",
+      );
+    });
+
+    it("lets every signed-in role open /services, marked no-store", () => {
+      for (const role of ["student", "manager", "administrator"] as const) {
+        const res = proxy(request("/services", { role }));
+        expect(location(res)).toBeNull();
+        expect(res.headers.get("cache-control")).toContain("no-store");
+      }
+    });
+
+    it("sends non-administrators on /admin/services to /forbidden and lets administrators in", () => {
+      expect(location(proxy(request("/admin/services", { role: "student" })))).toBe("http://localhost:3000/forbidden");
+      expect(location(proxy(request("/admin/services", { role: "manager" })))).toBe("http://localhost:3000/forbidden");
+      expect(location(proxy(request("/admin/services", { role: "administrator" })))).toBeNull();
+    });
+  });
 });

@@ -13,6 +13,8 @@ export interface NavItem {
 
 /**
  * Role navigation (spec FR-024, user-flow.md §1.5; its second list is the manager's).
+ * University Services (`/services`, UC-07) is shared by every role; Service Links is the
+ * administrator's hub configuration (BR-ADM-01). docs-changes DOC-11.
  * Only destinations built in this phase are `available`; switching an item on later
  * is a one-line change here (FR-024, FR-024a).
  */
@@ -24,7 +26,7 @@ export const NAVIGATION: Record<RoleCode, NavItem[]> = {
     { id: "registrations", label: "My Registrations", href: "/student/registrations", status: "coming-soon", ucId: "UC-12" },
     { id: "calendar", label: "Calendar", href: "/student/calendar", status: "coming-soon", ucId: "UC-15" },
     { id: "assistant", label: "AI Student Assistant", href: "/student/assistant", status: "coming-soon", ucId: "UC-06" },
-    { id: "services", label: "University Services", href: "/student/services", status: "coming-soon", ucId: "UC-07" },
+    { id: "services", label: "University Services", href: "/services", status: "available", ucId: "UC-07" },
     { id: "profile", label: "Profile", href: "/student/profile", status: "coming-soon", ucId: "UC-03" },
   ],
   manager: [
@@ -34,15 +36,18 @@ export const NAVIGATION: Record<RoleCode, NavItem[]> = {
     { id: "attendance", label: "Attendance and Results", href: "/manager/attendance", status: "coming-soon", ucId: "UC-21" },
     { id: "appeals", label: "Appeals", href: "/manager/appeals", status: "coming-soon", ucId: "UC-28" },
     { id: "reports", label: "Reports", href: "/manager/reports", status: "coming-soon", ucId: "UC-20" },
+    { id: "services", label: "University Services", href: "/services", status: "available", ucId: "UC-07" },
     { id: "profile", label: "Profile", href: "/manager/profile", status: "coming-soon", ucId: "UC-03" },
   ],
   administrator: [
     { id: "dashboard", label: "Dashboard", href: "/admin/dashboard", status: "available", ucId: "UC-32" },
     { id: "users", label: "User Management", href: "/admin/users", status: "available", ucId: "UC-29" },
+    { id: "service-links", label: "Service Links", href: "/admin/services", status: "available", ucId: "UC-30" },
     { id: "categories", label: "Activity Categories", href: "/admin/categories", status: "coming-soon", ucId: "UC-30" },
     { id: "configuration", label: "System Configuration", href: "/admin/configuration", status: "coming-soon", ucId: "UC-30" },
     { id: "reports", label: "Reports and Analytics", href: "/admin/reports", status: "coming-soon", ucId: "UC-31" },
     { id: "audit", label: "Audit Logs", href: "/admin/audit-logs", status: "coming-soon", ucId: "UC-29" },
+    { id: "services", label: "University Services", href: "/services", status: "available", ucId: "UC-07" },
     { id: "profile", label: "Profile", href: "/admin/profile", status: "coming-soon", ucId: "UC-03" },
   ],
 };

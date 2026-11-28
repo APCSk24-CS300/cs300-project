@@ -107,6 +107,7 @@ export function NavItemIcon({ id, className = "size-4 shrink-0" }: { id: string;
       );
     case "categories":
     case "configuration":
+    case "service-links":
       return (
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.75} aria-hidden="true" className={className}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 6.5h11m-11 7h11M7.5 4v5m5 2v5" />

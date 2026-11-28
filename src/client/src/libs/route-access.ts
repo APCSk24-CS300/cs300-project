@@ -13,7 +13,9 @@ export type RouteAccess =
 
 export const CHANGE_PASSWORD_PATH = "/change-password";
 
-const PROTECTED_SHARED_PATHS = [CHANGE_PASSWORD_PATH, "/forbidden"];
+/** Signed-in paths outside the role areas; any role may open them. `/services` = UC-07 hub. */
+export const UNIVERSITY_SERVICES_PATH = "/services";
+const PROTECTED_SHARED_PATHS = [CHANGE_PASSWORD_PATH, "/forbidden", UNIVERSITY_SERVICES_PATH];
 
 export function isProtectedPath(pathname: string): boolean {
   return (

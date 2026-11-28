@@ -71,4 +71,36 @@ describe("resolveRouteAccess", () => {
   ])("rule 6: %s may open %s and the response is not cached", (role, path) => {
     expect(resolveRouteAccess(path, hint(role), NOW)).toEqual({ type: "allow", noStore: true });
   });
+  describe("University Services Hub (plan 005)", () => {
+    it("/services needs a session but is open to every role, without a role area", () => {
+      expect(resolveRouteAccess("/services", null, NOW)).toEqual({
+        type: "redirect",
+        to: "/login?redirectTo=%2Fservices",
+      });
+      for (const role of ["student", "manager", "administrator"] as const) {
+        expect(resolveRouteAccess("/services", hint(role), NOW)).toEqual({ type: "allow", noStore: true });
+      }
+    });
+
+    it("/services still honors a pending password change", () => {
+      expect(resolveRouteAccess("/services", hint("student", true), NOW)).toEqual({
+        type: "redirect",
+        to: "/change-password",
+      });
+    });
+
+    it("/admin/services is the administrator's area", () => {
+      expect(resolveRouteAccess("/admin/services", null, NOW)).toEqual({
+        type: "redirect",
+        to: "/login?redirectTo=%2Fadmin%2Fservices",
+      });
+      expect(resolveRouteAccess("/admin/services", hint("administrator"), NOW)).toEqual({ type: "allow", noStore: true });
+      expect(resolveRouteAccess("/admin/services", hint("student"), NOW)).toEqual({ type: "redirect", to: "/forbidden" });
+      expect(resolveRouteAccess("/admin/services", hint("manager"), NOW)).toEqual({ type: "redirect", to: "/forbidden" });
+    });
+
+    it("does not treat look-alike paths as the hub", () => {
+      expect(resolveRouteAccess("/servicesX", null, NOW)).toEqual({ type: "allow", noStore: false });
+    });
+  });
 });

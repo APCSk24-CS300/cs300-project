@@ -21,7 +21,9 @@ describe("SideNav (FR-024)", () => {
     render(<SideNav items={NAVIGATION.administrator} currentPath="/admin/users/new" />);
     expect(screen.getByRole("link", { name: "User Management" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Dashboard" })).not.toHaveAttribute("aria-current");
-    expect(screen.getAllByRole("link")).toHaveLength(2);
+    expect(screen.getAllByRole("link")).toHaveLength(
+      NAVIGATION.administrator.filter((i) => i.status === "available").length,
+    );
   });
 
   it("coming-soon items have no href, are aria-disabled, skipped by Tab and labelled", async () => {
@@ -29,10 +31,14 @@ describe("SideNav (FR-024)", () => {
     const calendar = screen.getByText("Calendar").closest("[aria-disabled]");
     expect(calendar).toHaveAttribute("aria-disabled", "true");
     expect(calendar?.closest("a")).toBeNull();
-    expect(screen.getAllByText("Coming soon")).toHaveLength(NAVIGATION.student.length - 1);
+    const available = NAVIGATION.student.filter((i) => i.status === "available");
+    expect(screen.getAllByText("Coming soon")).toHaveLength(NAVIGATION.student.length - available.length);
 
-    await userEvent.tab();
-    expect(screen.getByRole("link", { name: "Dashboard" })).toHaveFocus();
+    // Tab visits only the available items, in order, then leaves the nav.
+    for (const item of available) {
+      await userEvent.tab();
+      expect(screen.getByRole("link", { name: item.label })).toHaveFocus();
+    }
     await userEvent.tab();
     expect(document.body).toHaveFocus();
   });

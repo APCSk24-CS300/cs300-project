@@ -22,18 +22,21 @@ describe("navigation", () => {
     ]);
     expect(NAVIGATION.manager.map((i) => i.label)).toEqual([
       "Dashboard", "Activity Management", "Registration Management",
-      "Attendance and Results", "Appeals", "Reports", "Profile",
+      "Attendance and Results", "Appeals", "Reports", "University Services", "Profile",
     ]);
     expect(NAVIGATION.administrator.map((i) => i.label)).toEqual([
-      "Dashboard", "User Management", "Activity Categories",
-      "System Configuration", "Reports and Analytics", "Audit Logs", "Profile",
+      "Dashboard", "User Management", "Service Links", "Activity Categories",
+      "System Configuration", "Reports and Analytics", "Audit Logs", "University Services", "Profile",
     ]);
     const available = Object.values(NAVIGATION)
       .flat()
       .filter((i) => i.status === "available")
       .map((i) => i.href);
     expect(available.sort()).toEqual(
-      ["/admin/dashboard", "/admin/users", "/manager/dashboard", "/student/dashboard"].sort(),
+      [
+        "/admin/dashboard", "/admin/users", "/admin/services", "/manager/dashboard", "/student/dashboard",
+        "/services", "/services", "/services",
+      ].sort(),
     );
   });
 

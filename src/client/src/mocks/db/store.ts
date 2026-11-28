@@ -1,4 +1,4 @@
-import { createSeed } from "@/mocks/db/seed";
+import { createSeed, migrateHub } from "@/mocks/db/seed";
 import type { MockDb, OperationId } from "@/mocks/db/types";
 
 /** Persistent mock store (research R3): survives reloads so admin-created accounts can sign in. */
@@ -25,6 +25,10 @@ export function readDb(): MockDb {
     if (raw) {
       const parsed = JSON.parse(raw) as MockDb;
       if (parsed && parsed.version === 1) {
+        // Stores written before plan 005 lack the hub data: add it, keep everything else.
+        if (migrateHub(parsed)) {
+          writeDb(parsed);
+        }
         return parsed;
       }
     }

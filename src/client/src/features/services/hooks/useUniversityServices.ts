@@ -1,9 +1,8 @@
 "use client";
 
-import { createHubService } from "@/features/services/services/hub.service.factory";
-import type { HubService } from "@/features/services/services/hub.service";
+import { hubService, type HubService } from "@/features/services/services/hub.service";
 import type { UniversityService } from "@/features/services/types/service";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export type UniversityServicesState =
   | { status: "loading"; services: null; error: null }
@@ -24,8 +23,7 @@ export function useUniversityServices(
   injectedService?: HubService,
   enabled = true,
 ): UseUniversityServicesResult {
-  const defaultService = useMemo(() => createHubService(), []);
-  const service = injectedService ?? defaultService;
+  const service = injectedService ?? hubService;
   const [state, setState] = useState<UniversityServicesState>(LOADING);
   const [attempt, setAttempt] = useState(0);
   const requestIdRef = useRef(0);
@@ -36,7 +34,7 @@ export function useUniversityServices(
     const requestId = ++requestIdRef.current;
 
     service
-      .listServices(controller.signal)
+      .listServices()
       .then((services) => {
         if (controller.signal.aborted || requestId !== requestIdRef.current) return;
         setState(

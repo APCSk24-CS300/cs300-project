@@ -1,19 +1,26 @@
-import { describe, expect, it, vi } from "vitest";
-import { screen, waitFor, within } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { ADMIN_CONTENT, AdminServiceLinks } from "@/features/services/admin/components/AdminServiceLinks";
-import type { AdminHubService } from "@/features/services/admin/services/admin-hub.service";
-import { MockAdminHubService } from "@/features/services/admin/services/mock.admin-hub.service";
-import { mockServiceLinkStore } from "@/features/services/services/mock.store";
-import { ApiError } from "@/libs/api-client";
-import { expectNoA11yViolations, renderWithProviders } from "../../../../../tests/test-utils";
+import { readDb, setMockFailures, updateDb } from "@/mocks/db/store";
+import {
+  expectNoA11yViolations,
+  renderWithProviders,
+  screen,
+  signInAs,
+  waitFor,
+  within,
+} from "../../../../../tests/test-utils";
 
-function setup(service: AdminHubService = new MockAdminHubService(0)) {
-  mockServiceLinkStore.reset();
+// Talks to the MSW hub handlers (they answer like the backend); the mock DB is reset before each test.
+// Scenario map: specs/005-integrate-hub/coverage.md (US3).
+function setup() {
+  signInAs("admin@example.invalid");
   const user = userEvent.setup();
-  const view = renderWithProviders(<AdminServiceLinks service={service} />);
+  const view = renderWithProviders(<AdminServiceLinks />, { route: "/admin/services" });
   return { user, ...view };
 }
+
+const stored = (name: string) => readDb().serviceLinks.find((l) => l.name === name);
 
 const row = (name: string) => screen.getByText(name, { selector: "p" }).closest("tr")!;
 
@@ -49,10 +56,11 @@ describe("AdminServiceLinks", () => {
     const { user } = setup();
     await user.click(await screen.findByRole("button", { name: ADMIN_CONTENT.add }));
     const form = screen.getByRole("form", { name: "Add service" });
-    await user.type(within(form).getByLabelText("Name"), "moodle");
+    await user.type(within(form).getByLabelText("Name"), " MOODLE ");
     await user.type(within(form).getByLabelText("Address (URL)"), "https://m.edu");
     await user.click(within(form).getByRole("button", { name: "Add service" }));
     expect(await within(form).findByText("A service with this name already exists")).toBeInTheDocument();
+    expect(readDb().serviceLinks).toHaveLength(7);
   });
 
   it("edits a link", async () => {
@@ -64,6 +72,7 @@ describe("AdminServiceLinks", () => {
     await user.type(within(form).getByLabelText("Name"), "Moodle LMS");
     await user.click(within(form).getByRole("button", { name: "Save changes" }));
     expect(await screen.findByText("Moodle LMS", { selector: "p" })).toBeInTheDocument();
+    expect(stored("Moodle LMS")).toMatchObject({ id: "1", version: 2 });
   });
 
   it("asks before deactivating, then allows reactivating", async () => {
@@ -72,7 +81,8 @@ describe("AdminServiceLinks", () => {
     const confirm = screen.getByRole("group", { name: "Confirm deactivating Moodle" });
     await user.click(within(confirm).getByRole("button", { name: "Deactivate" }));
     await waitFor(() => expect(within(row("Moodle")).getByText("Inactive")).toBeInTheDocument());
-    expect(mockServiceLinkStore.links.find((l) => l.name === "Moodle")?.isActive).toBe(false);
+    expect(stored("Moodle")).toMatchObject({ isActive: false, version: 2 });
+    expect(readDb().serviceLinks).toHaveLength(7); // never deleted
 
     await user.click(screen.getByRole("button", { name: "Reactivate Moodle" }));
     await waitFor(() => expect(within(row("Moodle")).getByText("Active")).toBeInTheDocument());
@@ -83,27 +93,33 @@ describe("AdminServiceLinks", () => {
     await user.click(await screen.findByRole("button", { name: "Deactivate Moodle" }));
     await user.click(within(screen.getByRole("group")).getByRole("button", { name: "Cancel" }));
     expect(within(row("Moodle")).getByText("Active")).toBeInTheDocument();
+    expect(stored("Moodle")).toMatchObject({ isActive: true, version: 1 });
   });
 
   it("tells the admin to reload when someone else saved first (412)", async () => {
-    const base = new MockAdminHubService(0);
-    const service: AdminHubService = {
-      listAll: (s) => base.listAll(s),
-      create: (b) => base.create(b),
-      update: vi.fn().mockRejectedValue(new ApiError({ status: 412, code: "PRECONDITION_FAILED", message: "stale" })),
-      deactivate: vi.fn().mockRejectedValue(new ApiError({ status: 412, code: "PRECONDITION_FAILED", message: "stale" })),
-    };
-    const { user } = setup(service);
+    const { user } = setup();
     await user.click(await screen.findByRole("button", { name: "Deactivate Moodle" }));
+    // Another administrator saves Moodle after this list was loaded.
+    updateDb((db) => {
+      const moodle = db.serviceLinks.find((l) => l.name === "Moodle")!;
+      moodle.description = "Changed elsewhere";
+      moodle.version = 2;
+    });
     await user.click(within(screen.getByRole("group")).getByRole("button", { name: "Deactivate" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(ADMIN_CONTENT.stale);
     expect(screen.getByRole("button", { name: ADMIN_CONTENT.reload })).toBeInTheDocument();
+    expect(stored("Moodle")).toMatchObject({ isActive: true, version: 2 }); // not applied
   });
 
   it("shows a retryable error when the list cannot load", async () => {
-    const listAll = vi.fn().mockRejectedValueOnce(new Error("down")).mockResolvedValueOnce([]);
-    const { user } = setup({ listAll, create: vi.fn(), update: vi.fn(), deactivate: vi.fn() });
-    await user.click(await screen.findByRole("button", { name: "Try again" }));
+    setMockFailures(["manageServiceLinks"]);
+    const { user } = setup();
+    const retry = await screen.findByRole("button", { name: "Try again" });
+    setMockFailures([]);
+    updateDb((db) => {
+      db.serviceLinks = [];
+    });
+    await user.click(retry);
     expect(await screen.findByText("No service links yet")).toBeInTheDocument();
   });
 });

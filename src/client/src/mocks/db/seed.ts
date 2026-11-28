@@ -1,4 +1,4 @@
-import type { MockDb, MockUser } from "@/mocks/db/types";
+import type { MockDb, MockPermission, MockServiceLink, MockUser } from "@/mocks/db/types";
 
 /** Password of every seeded account (use-case-specifications §5.1 demo accounts). */
 export const SEED_PASSWORD = "demo2026";
@@ -8,6 +8,67 @@ export const SEED_PASSWORD = "demo2026";
  * Checked before any user lookup.
  */
 export const OUTAGE_EMAIL = "outage@example.invalid";
+
+/** Hub permission codes (src/db/hub_schema.sql ids 910-911): read = every role, manage = administrator. */
+export const HUB_READ = "hub.services.read";
+export const HUB_MANAGE = "hub.services.manage";
+export const HUB_PERMISSIONS: MockPermission[] = [
+  { id: "perm-hub-read", code: HUB_READ, description: "View the University Services Hub" },
+  { id: "perm-hub-manage", code: HUB_MANAGE, description: "Add, edit, deactivate and reactivate university service links" },
+];
+
+/**
+ * The six agreed HCMUS links plus the inactive university website, as a fresh database has them
+ * (src/db/hub_schema.sql + seed.sql; spec 004 FR-018).
+ */
+const SERVICE_LINK_SEED: Omit<MockServiceLink, "version">[] = [
+  { id: "1", name: "Moodle", url: "https://courses.ctda.hcmus.edu.vn/", description: "Courses, assignments and lecture materials", displayOrder: 1, isActive: true },
+  { id: "2", name: "Student Portal", url: "https://student.hcmus.edu.vn/login", description: "Student information, timetable and grades", displayOrder: 2, isActive: true },
+  { id: "3", name: "Course Registration Portal", url: "https://new-portal4.hcmus.edu.vn/Login.aspx", description: "Course registration, timetable and results", displayOrder: 3, isActive: true },
+  { id: "4", name: "Special Programs Portal", url: "https://portal.ctdb.hcmus.edu.vn/Login", description: "Portal for special training programs", displayOrder: 4, isActive: true },
+  { id: "5", name: "Tuition Payment", url: "https://hocphi.hcmus.edu.vn/", description: "Pay tuition and check payment status", displayOrder: 5, isActive: true },
+  { id: "6", name: "Student Handbook 2025", url: "https://hcmus.edu.vn/wp-content/uploads/2025/08/STSV2025_ONLINE.pdf", description: "Rules, procedures and student support (PDF)", displayOrder: 6, isActive: true },
+  { id: "7", name: "HCMUS", url: "https://hcmus.edu.vn", description: "University website", displayOrder: 7, isActive: false },
+];
+
+export function createServiceLinkSeed(): MockServiceLink[] {
+  return SERVICE_LINK_SEED.map((link) => ({ ...link, version: 1 }));
+}
+
+/**
+ * Adds what plan 005 introduced to a store written before it: the hub links and the hub permissions.
+ * Users, sessions, tokens and lockouts are kept (approved plan change 1: migrate, never wipe).
+ * Returns true when something was added.
+ */
+export function migrateHub(db: MockDb): boolean {
+  let changed = false;
+  if (!Array.isArray(db.serviceLinks)) {
+    db.serviceLinks = createServiceLinkSeed();
+    db.nextServiceLinkId = SERVICE_LINK_SEED.length + 1;
+    changed = true;
+  }
+  for (const permission of HUB_PERMISSIONS) {
+    if (!db.permissions.some((p) => p.code === permission.code)) {
+      db.permissions.push({ ...permission });
+      changed = true;
+    }
+  }
+  const grants: Record<string, string[]> = {
+    "role-student": [HUB_READ],
+    "role-manager": [HUB_READ],
+    "role-administrator": [HUB_READ, HUB_MANAGE],
+  };
+  for (const [roleId, codes] of Object.entries(grants)) {
+    const current = (db.rolePermissions[roleId] ??= []);
+    for (const code of codes) {
+      if (!current.includes(code)) {
+        current.push(code);
+        changed = true;
+      }
+    }
+  }
+  return changed;
+}
 
 function user(partial: Omit<MockUser, "passwordPlain" | "version" | "phoneNumber"> & Partial<MockUser>): MockUser {
   return {
@@ -116,16 +177,19 @@ export function createSeed(): MockDb {
       { id: "perm-criteria-manage", code: "criteria.manage", description: "Configure criteria and categories" },
       { id: "perm-reports-view", code: "reports.view", description: "View system reports" },
       { id: "perm-role-manage", code: "role.manage", description: "Manage user accounts and roles" },
+      ...HUB_PERMISSIONS,
     ],
     rolePermissions: {
-      "role-student": ["registration.create", "appeal.submit"],
-      "role-manager": ["activity.manage", "registration.review", "attendance.record", "score.submit", "appeal.review"],
-      "role-administrator": ["role.manage", "criteria.manage", "reports.view", "score.adjust"],
+      "role-student": ["registration.create", "appeal.submit", HUB_READ],
+      "role-manager": ["activity.manage", "registration.review", "attendance.record", "score.submit", "appeal.review", HUB_READ],
+      "role-administrator": ["role.manage", "criteria.manage", "reports.view", "score.adjust", HUB_READ, HUB_MANAGE],
     },
     issuedTokens: {},
     revokedTokenIds: [],
     loginAttempts: {},
     failures: [],
     nextUserSeq: 7,
+    serviceLinks: createServiceLinkSeed(),
+    nextServiceLinkId: SERVICE_LINK_SEED.length + 1,
   };
 }

@@ -37,6 +37,20 @@ export interface MockPermission {
   description: string;
 }
 
+/**
+ * A University Services Hub link (BR `ServiceLink`, contract `UniversityService` incl. `version`).
+ * Same shape as the backend sends (src/server/src/types/ServiceLink.ts).
+ */
+export interface MockServiceLink {
+  id: string;
+  name: string;
+  url: string;
+  description: string | null;
+  displayOrder: number;
+  isActive: boolean;
+  version: number;
+}
+
 /** Failure-switch operation ids (contracts/mock-api.md). `:network` = network error instead of 500. */
 export type OperationName =
   | "login"
@@ -46,7 +60,9 @@ export type OperationName =
   | "listUsers"
   | "createUser"
   | "listFaculties"
-  | "listRoles";
+  | "listRoles"
+  | "listServices"
+  | "manageServiceLinks";
 export type OperationId = OperationName | `${OperationName}:network`;
 
 export interface MockDb {
@@ -62,4 +78,7 @@ export interface MockDb {
   loginAttempts: Record<string, { consecutiveFailures: number; lockedUntil?: string }>;
   failures: OperationId[];
   nextUserSeq: number;
+  /** Hub links (plan 005). Older stores lack them; `readDb` migrates (see store.ts). */
+  serviceLinks: MockServiceLink[];
+  nextServiceLinkId: number;
 }

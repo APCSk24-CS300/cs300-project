@@ -39,4 +39,34 @@ describe("mock store", () => {
     setMockFailures(["createUser", "login:network"]);
     expect(readDb().failures).toEqual(["createUser", "login:network"]);
   });
+  it("adds the hub links to an older store and keeps users and sessions", () => {
+    // A store written before plan 005: no service links, no hub permissions, one signed-in session.
+    const old = readDb() as unknown as Record<string, unknown> & {
+      users: { fullName: string }[];
+      issuedTokens: Record<string, string>;
+      permissions: { code: string }[];
+      rolePermissions: Record<string, string[]>;
+    };
+    delete old.serviceLinks;
+    delete old.nextServiceLinkId;
+    old.permissions = old.permissions.filter((p) => !p.code.startsWith("hub."));
+    for (const id of Object.keys(old.rolePermissions)) {
+      old.rolePermissions[id] = old.rolePermissions[id].filter((c) => !c.startsWith("hub."));
+    }
+    old.users[0].fullName = "Kept";
+    old.issuedTokens["jti-kept"] = "user-001";
+    window.localStorage.setItem(MOCK_DB_KEY, JSON.stringify(old));
+
+    const db = readDb();
+    expect(db.users[0].fullName).toBe("Kept");
+    expect(db.issuedTokens["jti-kept"]).toBe("user-001");
+    expect(db.serviceLinks.map((l) => l.name)).toContain("Moodle");
+    expect(db.nextServiceLinkId).toBe(8);
+    expect(db.rolePermissions["role-student"]).toContain("hub.services.read");
+    expect(db.rolePermissions["role-administrator"]).toEqual(expect.arrayContaining(["hub.services.read", "hub.services.manage"]));
+    expect(db.rolePermissions["role-manager"]).not.toContain("hub.services.manage");
+    // The migration is written back once and is idempotent.
+    expect(JSON.parse(window.localStorage.getItem(MOCK_DB_KEY) ?? "{}").serviceLinks).toHaveLength(7);
+    expect(readDb().permissions.filter((p) => p.code.startsWith("hub."))).toHaveLength(2);
+  });
 });

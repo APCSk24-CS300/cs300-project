@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createAdminHubService } from "@/features/services/admin/services/admin-hub.service.factory";
-import type { AdminHubService } from "@/features/services/admin/services/admin-hub.service";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { adminHubService, type AdminHubService } from "@/features/services/admin/services/admin-hub.service";
 import { compareServices } from "@/features/services/mappers/service.mapper";
 import type { UniversityService } from "@/features/services/types/service";
 import type { CreateServiceLinkDTO, UpdateServiceLinkDTO } from "@/features/services/types/service.dto";
@@ -18,8 +17,7 @@ export type AdminLinksState =
  * the form can show field errors (400/409) or the reload message (412).
  */
 export function useAdminServiceLinks(injected?: AdminHubService) {
-  const fallback = useMemo(() => createAdminHubService(), []);
-  const service = injected ?? fallback;
+  const service = injected ?? adminHubService;
   const [state, setState] = useState<AdminLinksState>({ status: "loading", links: null, error: null });
   const [attempt, setAttempt] = useState(0);
   const requestIdRef = useRef(0);
@@ -28,7 +26,7 @@ export function useAdminServiceLinks(injected?: AdminHubService) {
     const controller = new AbortController();
     const requestId = ++requestIdRef.current;
     service
-      .listAll(controller.signal)
+      .listAll()
       .then((links) => {
         if (!controller.signal.aborted && requestId === requestIdRef.current) setState({ status: "ready", links, error: null });
       })

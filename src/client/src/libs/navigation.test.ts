@@ -59,4 +59,11 @@ describe("navigation", () => {
     expect(isPathAllowedForRole("/#services", "manager")).toBe(true);
     expect(isPathAllowedForRole("https://evil.example", "manager")).toBe(false);
   });
+  it("/services is a safe return path for every role", () => {
+    for (const role of ["student", "manager", "administrator"] as const) {
+      expect(isPathAllowedForRole("/services", role)).toBe(true);
+    }
+    expect(getLoginHref("/services")).toBe("/login?redirectTo=%2Fservices");
+    expect(isPathAllowedForRole("/admin/services", "student")).toBe(false);
+  });
 });

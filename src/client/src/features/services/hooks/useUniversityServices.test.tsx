@@ -47,14 +47,13 @@ describe("useUniversityServices", () => {
     expect(service.listServices).not.toHaveBeenCalled();
   });
 
-  it("aborts the request on unmount", () => {
-    let signal: AbortSignal | undefined;
-    const service = fake((s) => {
-      signal = s;
-      return new Promise(() => {});
-    });
-    const { unmount } = renderHook(() => useUniversityServices(service));
+  // The signal is not passed to fetch (not portable across realms); the hook ignores late answers instead.
+  it("ignores the answer after unmount", async () => {
+    let resolve: (value: UniversityService[]) => void = () => undefined;
+    const service = fake(() => new Promise((r) => (resolve = r)));
+    const { result, unmount } = renderHook(() => useUniversityServices(service));
     unmount();
-    expect(signal?.aborted).toBe(true);
+    await act(async () => resolve([moodle]));
+    expect(result.current.status).toBe("loading");
   });
 });

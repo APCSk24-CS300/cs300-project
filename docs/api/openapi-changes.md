@@ -194,3 +194,21 @@ Other fixes: removed invalid `paths.admin: null`; declared all tags; `Permission
 | 2026-11-20 | Initial gap register created during WP-0 repository/API audit. No OpenAPI YAML edit was made. |
 | 2026-11-25 | Contract 1.2.0: applied API-GAP-001, 003-009 and accepted review items; API-GAP-002 remains proposed. |
 | 2026-11-26 | Single-role model: reverted `/roles` to `/role` with `{ role, reason }`; `roles[]` -> `role`; removed multi-duty wording and BR v1.2.0 references; import resource `user-roles` -> `user-role`. |
+
+## API-GAP-HUB-01 — University Services Hub implementation notes
+
+| Field | Value |
+|---|---|
+| Feature | University Services Hub (UC-07), spec `src/specs/004-university-service-hub/` |
+| Status | `accepted` — implemented in `src/server` (HubRoute / HubController) |
+
+Differences between the implementation and `openapi.yaml` 1.2.0 for the hub operations:
+
+1. **Envelope.** Hub endpoints use the backend's existing `ServiceResponse` envelope, like every other backend endpoint: `{ success, statusCode, payload: { message, data } }`. Field errors are in `payload.data.details[]` as `{ field, code, message }`. The YAML's `{ success, data }` / `ErrorResponse` shape is not used yet.
+2. **409 on create and update.** `POST /admin/services` and `PATCH /admin/services/{serviceId}` return `409` with `details[0].code = DUPLICATE_VALUE` when the name (case and outer spaces ignored) is already used.
+3. **DELETE returns the link.** `DELETE /admin/services/{serviceId}` returns `200` with the deactivated `UniversityService` (and its `ETag`) instead of `MessageSuccess`. Deactivating an inactive link is a no-op `200`.
+4. **Reactivation** is `PATCH` with `{ "isActive": true }`.
+5. **Optional `reason`** (≤ 200 chars) on POST/PATCH bodies, stored in `AuditLog.reason`.
+6. **Validation:** name 1–100, URL absolute `http`/`https` without credentials and ≤ 2048, description ≤ 500, `displayOrder` 0–9999; unknown fields are rejected with `UNKNOWN_FIELD`.
+7. **Frontend access** goes through the Next.js route `/api/backend/*`, which adds the Bearer token from an httpOnly cookie.
+

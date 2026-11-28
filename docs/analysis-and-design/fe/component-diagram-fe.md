@@ -33,6 +33,8 @@ The main architectural components are:
 - **Activity Discovery:** Retrieves and displays featured activities.
 - **Shared UI:** Provides reusable interface components and layouts.
 - **API Client:** Centralizes HTTP communication with the Backend.
+- **University Services:** The hub page (`/services`), the signed-in landing cards, and the admin page (`/admin/services`). Data comes from `HubService` / `AdminHubService` (mock or real).
+- **Backend Forwarder:** Next.js route `/api/backend/*` that forwards hub requests to the backend with the Bearer token from an httpOnly cookie.
 - **Route Authorization:** Protects restricted routes based on user sessions and roles.
 
 The Frontend communicates with the Backend through a centralized API Client rather than making HTTP requests directly from UI components.
@@ -63,6 +65,7 @@ flowchart TB
         subgraph Features["Feature Modules"]
             Landing["Landing Feature<br/>LandingPage"]
             Activities["Activity Discovery Feature<br/>ActivitiesSection"]
+            ServicesHub["University Services Feature<br/>ServiceHub / AdminServiceLinks"]
         end
 
         subgraph Shared["Shared Components"]
@@ -75,6 +78,8 @@ flowchart TB
             ActivityHook["Activity Hook<br/>useLandingActivities"]
             ActivityMapper["Activity Mapper<br/>activity.mapper.ts"]
             APIClient["Centralized API Client<br/>src/libs/api-client.ts"]
+            HubDataService["Hub Services<br/>HubService / AdminHubService: Real / Mock / Factory"]
+            BackendForwarder["Backend Forwarder<br/>app/api/backend/[...path]"]
         end
 
         AppRouter --> RootLayout
@@ -102,6 +107,11 @@ flowchart TB
         ActivityHook --> ActivityService
         ActivityService --> ActivityMapper
         ActivityService --> APIClient
+        Landing --> ServicesHub
+        ServicesHub --> HubDataService
+        ServicesHub --> SharedUI
+        HubDataService --> APIClient
+        APIClient -. "api mode" .-> BackendForwarder
 
         AuthFeature -. "Real service implementation" .-> APIClient
     end
@@ -110,11 +120,12 @@ flowchart TB
 
     User --> AppRouter
     APIClient --> Backend
+    BackendForwarder -->|"Bearer token from httpOnly cookie"| Backend
 
     classDef frontend fill:#e8f1ff,stroke:#3674c5,color:#17365d
     classDef external fill:#fff0d9,stroke:#c58a36,color:#69430c
 
-    class AppRouter,RootLayout,PublicRoutes,ProtectedRoutes,AuthProvider,AuthFeature,RouteProxy,Landing,Activities,SharedUI,LayoutUI,ActivityService,ActivityHook,ActivityMapper,APIClient frontend
+    class AppRouter,RootLayout,PublicRoutes,ProtectedRoutes,AuthProvider,AuthFeature,RouteProxy,Landing,Activities,SharedUI,LayoutUI,ActivityService,ActivityHook,ActivityMapper,APIClient,ServicesHub,HubDataService,BackendForwarder frontend
     class Backend external
 ```
 

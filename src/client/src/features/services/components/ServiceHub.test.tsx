@@ -55,7 +55,11 @@ describe("ServiceHub", () => {
     const { container } = renderWithProviders(<ServiceHub />, { route: "/services" });
     expect(await screen.findByText("You don't have permission to view this page")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /opens in a new tab/ })).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Go to my dashboard" })).toHaveAttribute("href", "/student/dashboard");
+    // The hub's 403 can arrive before AuthProvider has loaded the user (in the app, the protected
+    // layout renders nothing until then), so wait for the role-specific href.
+    await waitFor(() =>
+      expect(screen.getByRole("link", { name: "Go to my dashboard" })).toHaveAttribute("href", "/student/dashboard"),
+    );
     await expectNoA11yViolations(container);
   });
 

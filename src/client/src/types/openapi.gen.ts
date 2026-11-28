@@ -59,14 +59,34 @@ export interface paths {
         put?: never;
         /**
          * Upload or update profile avatar
-         * @description Upload a JPG or PNG image up to 5 MB. The new image replaces the current avatar.
+         * @description Upload a JPG or PNG image up to 10 MB inclusive. File content is validated, not only its filename or client-provided media type. A successful upload replaces the authenticated user's current avatar. The approved implementation stores validated image files in a configured persistent directory and stores only the authenticated same-origin image URL in PostgreSQL User.avatar_url.
          */
         post: operations["uploadMyAvatar"];
         /**
          * Remove profile avatar
-         * @description Remove the current avatar and restore the default avatar.
+         * @description No request body is accepted. Remove the authenticated user's current avatar and restore the default avatar; the user ID is derived from authentication context.
          */
         delete: operations["deleteMyAvatar"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/profile/avatar/files/{fileName}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read the authenticated user's current avatar file
+         * @description Reads the file only when it matches the authenticated user's current avatar URL.
+         */
+        get: operations["readMyAvatarFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -108,7 +128,7 @@ export interface paths {
         head?: never;
         /**
          * Change current user's password
-         * @description Verify the current password before setting a new password.
+         * @description Verify the current password before setting a new password. The frontend validates new-password confirmation, which is not sent in the request. The successful response contains only a message and never returns password values.
          */
         patch: operations["changeMyPassword"];
         trace?: never;
@@ -791,7 +811,7 @@ export interface components {
             /** @example Operation completed successfully */
             message: string;
         };
-        /** @description Error envelope. `code` values used by this contract: UNAUTHENTICATED, FORBIDDEN, NOT_FOUND, VALIDATION_FAILED, CURRENT_PASSWORD_INCORRECT, UNSUPPORTED_FILE, DUPLICATE_VALUE, INVALID_STATE, ROLE_POLICY_VIOLATION, POLICY_VERSION_IMMUTABLE, IMPORT_EXPIRED, PRECONDITION_FAILED. */
+        /** @description Error envelope. `code` values used by this contract: UNAUTHENTICATED, FORBIDDEN, NOT_FOUND, VALIDATION_FAILED, CURRENT_PASSWORD_INCORRECT, INTERNAL_ERROR, UNSUPPORTED_FILE, DUPLICATE_VALUE, INVALID_STATE, ROLE_POLICY_VIOLATION, POLICY_VERSION_IMMUTABLE, IMPORT_EXPIRED, PRECONDITION_FAILED. */
         ErrorResponse: {
             /** @example false */
             success: boolean;
@@ -807,33 +827,37 @@ export interface components {
                 message: string;
             }[];
         };
-        /** @description The account owner can edit phone number only. Full name, student number, and faculty are staff-controlled. */
+        /** @description The account owner can edit phone number only. Full name and academic identity information are read-only. */
         UpdateProfileRequest: {
-            /** @example 0901234567 */
+            /**
+             * @description Approved domestic or international phone format; null clears the saved number.
+             * @example 0901234567
+             */
             phoneNumber?: string | null;
         };
         /** @description Staff-controlled; read-only to the account owner. */
         AcademicInfo: {
-            studentNumber?: string | null;
-            faculty?: components["schemas"]["FacultySummary"] | null;
-            major?: string | null;
-            enrollmentYear?: number | null;
+            /** @description Student.user_id (also User.user_id) when a Student row exists; null for accounts without a Student record. Read-only to the account owner. */
+            readonly studentNumber: string | null;
+            readonly faculty: components["schemas"]["FacultySummary"] | null;
+            readonly major: string | null;
+            readonly enrollmentYear: number | null;
         };
         Profile: {
             /** @example user-001 */
-            id?: string;
+            id: string;
             /**
              * Format: email
              * @example student@hcmus.edu.vn
              */
-            email?: string;
+            email: string;
             /** @example Nguyen Van A */
-            readonly fullName?: string;
+            readonly fullName: string;
             /** @example 0901234567 */
-            phoneNumber?: string | null;
-            /** Format: uri */
+            phoneNumber: string | null;
+            /** Format: uri-reference */
             avatarUrl?: string | null;
-            academicInfo?: components["schemas"]["AcademicInfo"] | null;
+            readonly academicInfo: components["schemas"]["AcademicInfo"] | null;
             role?: components["schemas"]["UserRole"];
             interests?: components["schemas"]["ActivityCategorySummary"][];
             status?: components["schemas"]["AccountStatus"];
@@ -843,17 +867,27 @@ export interface components {
             success: boolean;
             data: components["schemas"]["Profile"];
         };
+        AvatarUploadRequest: {
+            /**
+             * Format: binary
+             * @description JPG or PNG image. Maximum file size is 10485760 bytes (10 MiB) inclusive; larger files are rejected.
+             */
+            avatar: string;
+        };
         AvatarResponse: {
             /** @example true */
             success: boolean;
             /** @example Avatar updated successfully */
             message?: string;
             data: {
-                /** Format: uri */
-                avatarUrl?: string;
+                /**
+                 * Format: uri-reference
+                 * @description Legal same-origin URL for the separately stored, fully decoded JPG/PNG image; null after removal.
+                 */
+                avatarUrl: string;
             };
         };
-        /** @description New-password confirmation is checked by the FE before sending. The new password must be at least 8 characters. */
+        /** @description The request contains only currentPassword and newPassword. New-password confirmation is checked by the FE before sending. The new password must be at least 6 characters. */
         ChangePasswordRequest: {
             /** Format: password */
             currentPassword: string;
@@ -1489,13 +1523,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "multipart/form-data": {
-                    /**
-                     * Format: binary
-                     * @description JPG or PNG image, maximum 5 MB.
-                     */
-                    avatar: string;
-                };
+                "multipart/form-data": components["schemas"]["AvatarUploadRequest"];
             };
         };
         responses: {
@@ -1508,7 +1536,7 @@ export interface operations {
                     "application/json": components["schemas"]["AvatarResponse"];
                 };
             };
-            /** @description File is not JPG/PNG or exceeds 5 MB (`code: UNSUPPORTED_FILE`). Existing avatar is kept (UC-03 A8). */
+            /** @description File content is not JPG/PNG or file size exceeds 10 MB (`code: UNSUPPORTED_FILE`). The existing avatar is kept (UC-03 A8). */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1518,6 +1546,24 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+            /** @description Another avatar update completed first; retry with the current profile. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Avatar storage or profile update failed; the existing avatar is kept. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     deleteMyAvatar: {
@@ -1529,8 +1575,71 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["MessageSuccess"];
+            /** @description Avatar removed and default avatar restored. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "Avatar removed successfully"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ApiMessage"];
+                };
+            };
             401: components["responses"]["Unauthorized"];
+            /** @description Another avatar update completed first; retry with the current profile. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Avatar removal failed; the existing avatar is kept. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    readMyAvatarFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                fileName: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Avatar image bytes. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/jpeg": string;
+                    "image/png": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description The file is not the authenticated user's current avatar. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     getMyInterests: {
@@ -1620,6 +1729,22 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+            /** @description The password change could not be completed. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": false,
+                     *       "code": "INTERNAL_ERROR",
+                     *       "message": "Password could not be changed. Please try again."
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     listActivityCategoriesForInterests: {

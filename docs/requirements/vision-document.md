@@ -173,43 +173,17 @@ The Waiting List status is temporary. Its eventual outcome is handled in Workflo
 #### 1.4. Registration Cancellation and Waiting List Resolution
 
 ```mermaid
-
 flowchart TD
-    A[Registered student cancels registration]
-    A --> B[Release reserved slot]
-
-    B --> C{Waiting list empty?}
-    C -->|Yes| D[Slot becomes available]
-    C -->|No| E[Select first student in FIFO order]
-
-    E --> F{Student still eligible?}
-    F -->|No| G[Remove student and notify]
-    G --> C
-
-    F -->|Yes| M{Approval required?}
-
-    M -->|Yes| N[Set Pending Approval status and reserve slot]
-    N --> O[Manager reviews registration]
-    O --> P{Approved?}
-
-    P -->|No| Q[Registration rejected]
-    Q --> Q1[Notify student and release slot]
-    Q1 --> C
-
-    P -->|Yes| R[Registration confirmed]
-    M -->|No| R
-
-    R --> S[Update registration status and calendar]
-    S --> T[Notify student of confirmation]
-
-    U[Waiting list closes] --> V[Close remaining waiting-list entries]
-    V --> W[Set status to Registration Unavailable]
-    W --> X[Notify affected students]
-
+    A[Confirmed student cancels before deadline] --> B[Set Cancelled and release place]
+    B --> C{Eligible waitlisted student?}
+    C -->|No| D[Place available]
+    C -->|Yes| E[Select next eligible entry by priority and FIFO]
+    E --> F[Confirm automatically within capacity]
+    F --> G[Update status, calendar, and notify]
+    H[Student leaves waiting list] --> I[Remove waiting entry; do not create Cancelled registration]
+    J[Waiting list closes] --> K[Close/remove outstanding waiting entries according to queue-retention policy]
 ```
-
-When a confirmed student cancels within the allowed period, the system releases capacity and promotes the next eligible waiting entry automatically.
-When the activity complete, remaining entries receive a final unavailable status notification.
+When a confirmed student cancels within the allowed period, the system releases capacity and promotes the next eligible waiting entry automatically. A student who leaves the waiting list is removed without acquiring Cancelled registration status. Capacity-reduction re-queuing must place affected confirmed students ahead of ordinary waiting entries when a waiting list is enabled. Closure/retention of unpromoted entries requires a separate policy decision; do not add a new registration status.
 
 ### Workflow 2: Activity Recognition and Score Appeal
 

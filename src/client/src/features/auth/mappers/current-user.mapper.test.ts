@@ -12,9 +12,12 @@ const base = (user: Partial<Data["user"]> = {}): Data => ({
     role: "student",
     status: "active",
     avatarUrl: null,
+    phoneNumber: null,
     academicInfo: {
       studentNumber: "23127001",
       faculty: { id: "120", code: "CIT", name: "Computer and Information Technology field" },
+      major: null,
+      enrollmentYear: null,
     },
     ...user,
   },

@@ -29,7 +29,8 @@
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.12.1",
-    "pg": "^8.23.1"
+    "pg": "^8.23.1",
+    "sharp": "^0.35.5"
   },
   "allowScripts": {
     "bcrypt@6.0.0": true

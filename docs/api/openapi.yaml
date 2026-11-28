@@ -124,21 +124,19 @@ paths:
       tags:
       - Profile
       summary: Upload or update profile avatar
-      description: Upload a JPG or PNG image up to 5 MB. The new image replaces the current avatar.
+      description: Upload a JPG or PNG image up to 10 MB inclusive. File content is validated, not only its filename
+        or client-provided media type. A successful upload replaces the authenticated user's current avatar. The
+        approved implementation stores validated image files in a configured persistent directory and stores only the authenticated same-origin image URL in PostgreSQL User.avatar_url.
       operationId: uploadMyAvatar
       requestBody:
         required: true
         content:
           multipart/form-data:
             schema:
-              type: object
-              required:
-              - avatar
-              properties:
-                avatar:
-                  type: string
-                  format: binary
-                  description: JPG or PNG image, maximum 5 MB.
+              $ref: '#/components/schemas/AvatarUploadRequest'
+            encoding:
+              avatar:
+                contentType: image/jpeg, image/png
       responses:
         '200':
           description: Avatar updated successfully.
@@ -147,25 +145,86 @@ paths:
               schema:
                 $ref: '#/components/schemas/AvatarResponse'
         '400':
-          description: 'File is not JPG/PNG or exceeds 5 MB (`code: UNSUPPORTED_FILE`). Existing avatar is kept
-            (UC-03 A8).'
+          description: 'File content is not JPG/PNG or file size exceeds 10 MB (`code: UNSUPPORTED_FILE`). The
+            existing avatar is kept (UC-03 A8).'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Another avatar update completed first; retry with the current profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Avatar storage or profile update failed; the existing avatar is kept.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
       - Profile
       summary: Remove profile avatar
-      description: Remove the current avatar and restore the default avatar.
+      description: No request body is accepted. Remove the authenticated user's current avatar and restore the default
+        avatar; the user ID is derived from authentication context.
       operationId: deleteMyAvatar
       responses:
         '200':
-          $ref: '#/components/responses/MessageSuccess'
+          description: Avatar removed and default avatar restored.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiMessage'
+              example:
+                success: true
+                message: Avatar removed successfully
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Another avatar update completed first; retry with the current profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Avatar removal failed; the existing avatar is kept.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profile/avatar/files/{fileName}:
+    get:
+      tags:
+      - Profile
+      summary: Read the authenticated user's current avatar file
+      description: Reads the file only when it matches the authenticated user's current avatar URL.
+      operationId: readMyAvatarFile
+      parameters:
+      - name: fileName
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Avatar image bytes.
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: The file is not the authenticated user's current avatar.
   /profile/interests:
     get:
       tags:
@@ -218,7 +277,9 @@ paths:
       tags:
       - Profile
       summary: Change current user's password
-      description: Verify the current password before setting a new password.
+      description: Verify the current password before setting a new password. The frontend validates new-password
+        confirmation, which is not sent in the request. The successful response contains only a message and never
+        returns password values.
       operationId: changeMyPassword
       requestBody:
         required: true
@@ -246,6 +307,16 @@ paths:
                   message: Current password is incorrect
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          description: The password change could not be completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                code: INTERNAL_ERROR
+                message: Password could not be changed. Please try again.
   /activity-categories:
     get:
       tags:
@@ -1981,8 +2052,8 @@ components:
       - code
       - message
       description: 'Error envelope. `code` values used by this contract: UNAUTHENTICATED, FORBIDDEN, NOT_FOUND,
-        VALIDATION_FAILED, CURRENT_PASSWORD_INCORRECT, UNSUPPORTED_FILE, DUPLICATE_VALUE, INVALID_STATE, ROLE_POLICY_VIOLATION,
-        POLICY_VERSION_IMMUTABLE, IMPORT_EXPIRED, PRECONDITION_FAILED.'
+        VALIDATION_FAILED, CURRENT_PASSWORD_INCORRECT, INTERNAL_ERROR, UNSUPPORTED_FILE, DUPLICATE_VALUE, INVALID_STATE,
+        ROLE_POLICY_VIOLATION, POLICY_VERSION_IMMUTABLE, IMPORT_EXPIRED, PRECONDITION_FAILED.'
       properties:
         success:
           type: boolean
@@ -2012,33 +2083,51 @@ components:
     UpdateProfileRequest:
       type: object
       minProperties: 1
+      additionalProperties: false
       properties:
         phoneNumber:
           type: string
           nullable: true
+          pattern: '^(?:0\d{9}|\+84\d{9})$'
+          description: Approved domestic or international phone format; null clears the saved number.
           example: '0901234567'
-      description: The account owner can edit phone number only. Full name, student number, and faculty are staff-controlled.
+      description: The account owner can edit phone number only. Full name and academic identity information are read-only.
     AcademicInfo:
       type: object
+      required:
+      - studentNumber
+      - faculty
+      - major
+      - enrollmentYear
       properties:
         studentNumber:
           type: string
           nullable: true
+          description: Student.user_id (also User.user_id) when a Student row exists; null for accounts without a Student record. Read-only to the account owner.
+          readOnly: true
         faculty:
           type: object
           allOf:
           - $ref: '#/components/schemas/FacultySummary'
           nullable: true
+          readOnly: true
         major:
           type: string
           nullable: true
+          readOnly: true
         enrollmentYear:
           type: integer
           nullable: true
-      readOnly: true
+          readOnly: true
       description: Staff-controlled; read-only to the account owner.
     Profile:
       type: object
+      required:
+      - id
+      - email
+      - fullName
+      - phoneNumber
+      - academicInfo
       properties:
         id:
           type: string
@@ -2057,13 +2146,14 @@ components:
           example: '0901234567'
         avatarUrl:
           type: string
-          format: uri
+          format: uri-reference
           nullable: true
         academicInfo:
           allOf:
           - $ref: '#/components/schemas/AcademicInfo'
           nullable: true
           type: object
+          readOnly: true
         role:
           $ref: '#/components/schemas/UserRole'
         interests:
@@ -2083,6 +2173,16 @@ components:
           example: true
         data:
           $ref: '#/components/schemas/Profile'
+    AvatarUploadRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - avatar
+      properties:
+        avatar:
+          type: string
+          format: binary
+          description: JPG or PNG image. Maximum file size is 10485760 bytes (10 MiB) inclusive; larger files are rejected.
     AvatarResponse:
       type: object
       required:
@@ -2097,12 +2197,16 @@ components:
           example: Avatar updated successfully
         data:
           type: object
+          required:
+          - avatarUrl
           properties:
             avatarUrl:
               type: string
-              format: uri
+              format: uri-reference
+              description: Legal same-origin URL for the separately stored, fully decoded JPG/PNG image; null after removal.
     ChangePasswordRequest:
       type: object
+      additionalProperties: false
       required:
       - currentPassword
       - newPassword
@@ -2113,9 +2217,9 @@ components:
         newPassword:
           type: string
           format: password
-          minLength: 8
-      description: New-password confirmation is checked by the FE before sending. The new password must be at least
-        8 characters.
+          minLength: 6
+      description: The request contains only currentPassword and newPassword. New-password confirmation is checked
+        by the FE before sending. The new password must be at least 6 characters.
     UniversityService:
       type: object
       required:

@@ -9,6 +9,11 @@ import { LLMError } from '../../src/clients/LLMClient.ts';
 process.env.JWT_SECRET = 'integration-test-secret';
 const jwt = (await import('jsonwebtoken')).default;
 const { createApp } = await import('../../src/app.ts');
+const { FakeIdentityStore, FakeSettingsSource, FakeRequestLogStore } = await import('../helpers/fakes.ts');
+
+const identityStore = new FakeIdentityStore({ 'no-ai': { roles: ['student'], facultyId: 'F1', permissions: [] } });
+const settingsSource = new FakeSettingsSource();
+const logStore = new FakeRequestLogStore();
 
 const token = jwt.sign({ sub: 'student-1' }, 'integration-test-secret');
 const auth = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
@@ -22,14 +27,14 @@ const realError = console.error;
 
 before(async () => {
 	console.error = () => {};          // keep expected failure logs out of the test output
-	server = createApp({ llmClient: fake, quiet: true }).listen(0);
+	server = createApp({ llmClient: fake, identityStore, settingsSource, requestLogStore: logStore, quiet: true }).listen(0);
 	await new Promise(r => server.once('listening', r));
 	base = `http://localhost:${(server.address() as AddressInfo).port}`;
 });
 after(() => { console.error = realError; server.close(); });
 
-function post(body: unknown, headers: Record<string, string> = auth) {
-	return fetch(`${base}/api/ai/prompt`, { method: 'POST', headers, body: JSON.stringify(body) });
+function post(body: unknown, headers: Record<string, string> = auth, path = '/api/ai/prompt') {
+	return fetch(`${base}${path}`, { method: 'POST', headers, body: JSON.stringify(body) });
 }
 function reset(b: LLMClient['generate'] = async () => ({ text: 'OK answer', blocked: false })) { behavior = b; calls = []; }
 
@@ -111,4 +116,62 @@ test('US3: the 11th request in a minute -> 429 with Retry-After (limit is per us
 	assert.ok(Number(res.headers.get('retry-after')) >= 1);
 	// another student is not affected
 	assert.equal((await post({ message: 'hi' })).status, 200);
+});
+
+// ---- specs/003 Foundational ----
+// a fresh user, so the per-user rate limit used up by the tests above does not interfere
+const auth003 = { Authorization: `Bearer ${jwt.sign({ sub: 'student-003' }, 'integration-test-secret')}`, 'Content-Type': 'application/json' };
+
+test('003: /api/ai/chat answers like /api/ai/prompt and returns a request_id', async () => {
+	reset();
+	const res = await post({ message: 'How do I earn training points?' }, auth003, '/api/ai/chat');
+	const json: any = await res.json();
+	assert.equal(res.status, 200);
+	assert.equal(json.payload.data.reply, 'OK answer');
+	assert.match(json.payload.data.request_id, /^[0-9a-f-]{36}$/);
+});
+
+test('003: every answered question writes one usage row with tokens and no content', async () => {
+	reset(async () => ({ text: 'answer', blocked: false, usage: { inputTokens: 120, outputTokens: 30 }, model: 'gemini-2.5-flash' }));
+	logStore.rows = [];
+	const res = await post({ message: 'my secret question text' }, auth003, '/api/ai/chat');
+	const json: any = await res.json();
+	assert.equal(logStore.rows.length, 1);
+	const row = logStore.rows[0];
+	assert.equal(row.requestId, json.payload.data.request_id);
+	assert.equal(row.userId, 'student-003');
+	assert.equal(row.role, 'student');
+	assert.equal(row.facultyId, 'F1');
+	assert.equal(row.outcome, 'answered');
+	assert.equal(row.inputTokens, 120);
+	assert.equal(row.outputTokens, 30);
+	assert.equal(row.units, 150);
+	assert.ok(!JSON.stringify(row).includes('my secret question text'));
+});
+
+test('003: a user without the ai.chat permission gets 403 and never reaches the AI', async () => {
+	reset();
+	const noAi = jwt.sign({ sub: 'no-ai' }, 'integration-test-secret');
+	const res = await post({ message: 'hi' }, { Authorization: `Bearer ${noAi}`, 'Content-Type': 'application/json' }, '/api/ai/chat');
+	assert.equal(res.status, 403);
+	assert.equal(calls.length, 0);
+});
+
+test('003: a token without a subject gets 401', async () => {
+	reset();
+	const noSub = jwt.sign({ role: 'x' }, 'integration-test-secret');
+	const res = await post({ message: 'hi' }, { Authorization: `Bearer ${noSub}`, 'Content-Type': 'application/json' }, '/api/ai/chat');
+	assert.equal(res.status, 401);
+});
+
+test('003: identity lookup failure -> 503, not a crash', async () => {
+	reset();
+	identityStore.fail = true;
+	try {
+		const res = await post({ message: 'hi' }, auth003, '/api/ai/chat');
+		assert.equal(res.status, 503);
+		assert.equal(calls.length, 0);
+	} finally {
+		identityStore.fail = false;
+	}
 });

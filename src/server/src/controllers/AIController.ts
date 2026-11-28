@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { AIService } from '../services/AIService.ts';
 import { validatePromptRequest } from '../helper/validatePromptRequest.ts';
 import { generate400Response } from '../helper/generate400Response.ts';
+import type { AIIdentity } from '../types/AIIdentity.ts';
 
 /** HTTP handling for the AI endpoint: validate the body, call AIService, send the response. */
 export class AIController {
@@ -12,7 +13,7 @@ export class AIController {
 	}
 
 	/**
-	 * Handler for <code>/api/ai/prompt</code>. Sends the student's message (and, optionally, the earlier turns of the conversation) to the AI Student Assistant and returns its answer. The server does not store conversations, so the client must send the earlier turns with every request. Requires a Bearer access token. Each user may send at most 10 requests per minute. Supports <code>POST</code> requests.
+	 * Handler for <code>/api/ai/chat</code> and its alias <code>/api/ai/prompt</code>. Requires the <code>ai.chat</code> permission. Sends the student's message (and, optionally, the earlier turns of the conversation) to the AI Student Assistant and returns its answer. The server does not store conversations, so the client must send the earlier turns with every request. Requires a Bearer access token. Each user may send at most 10 requests per minute. Supports <code>POST</code> requests.
 	 * @param {Request} req - Express request. The JSON body is <code>{ "message": string, "history"?: { "role": "user" | "assistant", "text": string }[] }</code>. <code>message</code> is 1-2000 characters; <code>history</code> has at most 20 turns of 1-2000 characters each, oldest first.
 	 * @param {Response} res - Express response.
 	 * @param {NextFunction} next - Express next function.
@@ -33,7 +34,8 @@ export class AIController {
 	 *     "message": "Prompt answered (OK)",
 	 *     "data": {
 	 *       "reply": "You earn training points by joining verified activities such as volunteering, clubs and academic events...",
-	 *       "blocked": false
+	 *       "blocked": false,
+	 *       "request_id": "6f1c2a9e-0b7d-4a51-9c43-2f8e1d5a7b10"
 	 *     }
 	 *   }
 	 * }
@@ -53,7 +55,8 @@ export class AIController {
 	 *     "message": "Prompt answered (OK)",
 	 *     "data": {
 	 *       "reply": "The Blood Donation Club runs a donation day each semester...",
-	 *       "blocked": false
+	 *       "blocked": false,
+	 *       "request_id": "6f1c2a9e-0b7d-4a51-9c43-2f8e1d5a7b10"
 	 *     }
 	 *   }
 	 * }
@@ -108,6 +111,7 @@ export class AIController {
 	 * - `200 OK` - Successful request. If the AI refuses for safety reasons, `blocked` is `true` and `reply` is a fixed polite refusal
 	 * - `400 BAD_REQUEST` - Invalid body; `payload.data.details` lists every problem (missing/blank/too long message, bad history)
 	 * - `401 UNAUTHORIZED` - Missing, malformed or invalid Bearer token
+	 * - `403 FORBIDDEN` - The caller's roles do not include the `ai.chat` permission
 	 * - `405 METHOD_NOT_ALLOWED` - The endpoint does not support the HTTP method specified
 	 * - `415 UNSUPPORTED_MEDIA_TYPE` - Content-Type is not exactly `application/json`
 	 * - `429 TOO_MANY_REQUESTS` - More than 10 requests in a minute; see the `Retry-After` header
@@ -120,9 +124,9 @@ export class AIController {
 			return void res.status(response.statusCode).json(response.get());
 		}
 
-		const user = res.locals.user as { sub?: string } | undefined;
-		const userId = user?.sub ?? req.ip ?? 'unknown';
-		const { response, retryAfterSeconds } = await this.service.prompt(validation.value, userId);
+		// set by the LoadIdentity middleware, which always runs before this handler
+		const identity = res.locals.identity as AIIdentity;
+		const { response, retryAfterSeconds } = await this.service.prompt(validation.value, identity);
 		if (retryAfterSeconds !== undefined) {
 			res.set('Retry-After', String(retryAfterSeconds));
 		}

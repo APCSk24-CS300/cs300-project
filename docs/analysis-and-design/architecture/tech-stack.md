@@ -10,7 +10,7 @@
 
 This document lists the technologies used to build and run myHCMUS and explains what each one is used for. It belongs to PA4 section B (Software Architecture). How these technologies fit together is shown in the [Container Diagram](container-diagram.md).
 
-Every entry is taken from the source code on the `dev` branch at commit `95b150f` (2026/11/28), after the PA4 functional groups were merged. Each table has a **Source** column that points to the file where the technology is declared, so a reader can check it. Where a technology is configured but not used yet, the table says so. Planned technologies are listed separately in [section 7](#7-planned-or-not-yet-implemented), and known problems in [section 8](#8-known-issues).
+Every entry is taken from the source code on the `dev` branch at commit `95b150f` (2026/11/28), after the PA4 functional groups were merged. Each table has a **Source** column that points to the file where the technology is declared, so a reader can check it. Where a technology is configured but not used yet, the table says so. Planned technologies are listed separately in [section 7](#7-planned-or-not-yet-implemented).
 
 ## 2. Overview
 
@@ -96,7 +96,7 @@ myHCMUS does not use an external authentication service. On `dev` there are two 
 | Stored or sent as | `httpOnly` cookie named `session` | `Authorization: Bearer` header |
 | Used by | `proxy.ts`, which reads the cookie on page requests | `validateAccessToken` on the hub and AI routes |
 
-The two are **not linked yet**. The login form uses `mockAuthService`, and backend login does not work end to end (section 8). To call the backend in the meantime, the backend forwarder sends a development-only token from `DEV_BACKEND_TOKEN`, which is created with `src/server/scripts/mint-dev-token.ts` for a seeded user.
+The two are **not linked yet**. The login form uses `mockAuthService`, and backend login does not work end to end yet. To call the backend in the meantime, the backend forwarder sends a development-only token from `DEV_BACKEND_TOKEN`, which is created with `src/server/scripts/mint-dev-token.ts` for a seeded user.
 
 **Permissions.** The backend checks permissions on every protected route by reading the user's roles from the database (`LoadIdentity`, `RequirePermission`, `IdentityRepository`). The hub uses `hub.services.read` and `hub.services.manage`, and the AI assistant uses `ai.chat` (students and managers).
 
@@ -163,16 +163,3 @@ These tools support the team's work and are not part of the running system. Deta
 | Gemini classifier and embedding models, pgvector search | Topic classification and knowledge-base search for the AI assistant. | Settings, the `vector(768)` column and the `ai_gateway` grants exist. No code calls these models or searches vectors yet. |
 | Hosting platform | Makes the system reachable outside a developer machine. | Not chosen. See the deployment diagram. |
 | Docker image for the frontend | Lets the frontend start together with the backend and the database. | The frontend is not in `docker-compose.yml`. |
-
-## 8. Known issues
-
-These are differences between the code and its intended behavior that affect the tech stack. Each should be fixed in code, and this document updated in the same pull request.
-
-1. **Backend login and registration do not work end to end.** In `AuthRepository.ts`, `checkUserExistsWithEmail` and `checkUserExistsWithPhoneNumber` always return true, so registration answers `409`. `getUserFromEmail`, `getUserPasswordHash` and `getName` return whole rows instead of values, so login fails with `500`.
-2. **The two token mechanisms are not linked**, so the forwarder relies on the development-only `DEV_BACKEND_TOKEN` (section 6.1).
-3. **A hard-coded development token is accepted.** `validateAccessToken` accepts a fixed token string. It must be removed before release.
-4. **The activity list cannot use the backend.** `activity.service.ts` calls `/activities/landing`, which the forwarder's allow list rejects and the backend does not provide.
-5. **Route guard bugs in `proxy.ts`.** A forbidden role is sent to `/forbiden` instead of `/forbidden`. The redirect for a logged-in user on `/login` uses `return` inside `forEach`, so it never takes effect.
-6. **The health check does not test the database.** The query in `databaseCheckHelper.ts` is commented out.
-7. **Example environment files are incomplete** (section 6.3).
-8. **The core constraint test script is outdated** (section 5).

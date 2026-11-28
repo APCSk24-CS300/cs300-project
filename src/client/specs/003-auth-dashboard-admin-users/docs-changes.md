@@ -2,6 +2,8 @@
 
 > Every place where this feature (spec, plan, analysis remediation, implementation) **differs from or adds to `docs/`**.
 >
+> Since plan 005 (`specs/005-integrate-hub/`), this file is also the register for the University Services Hub integration: DOC-16 to DOC-18, and the DOC-11 update.
+>
 > Status values follow `docs/api/openapi-changes.md`: `proposed`, `accepted`, `rejected`, `deferred`.
 >
 > **This file does not change `docs/`.** The docs owners decide; the frontend team raises each entry with BE and the docs owners. Until an entry is `accepted`, the frontend implements it **only in the mock** (MSW), and real-mode use is blocked (constitution R-II v1.1.0, C-IV v1.1.0).
@@ -25,6 +27,9 @@
 | DOC-13 | Forgot/reset password and social sign-in on the login page | FR-012 | proposed |
 | DOC-14 | Optional sign-in lock (NFR-SEC-05) behavior | FR-005 | proposed |
 | DOC-15 | Dashboard summary operations | GAP-J, FR-025 | proposed |
+| DOC-16 | Hub response envelope: request that BE adopt the OpenAPI envelope | 005 Q7, API-GAP-HUB-01 | proposed |
+| DOC-17 | Real-mode transport: same-origin `/api/backend` forwarder with the user's bearer | 005 Q1/Q2, spec 004 FR-017 | proposed |
+| DOC-18 | Hub parts of dev's `docs/` edits that are stale after the 005 adaptation | 005 R7 | proposed |
 
 ---
 
@@ -144,9 +149,9 @@
 |---|---|
 | Affected doc + section | `docs/analysis-and-design/client/user-flow.md`: §1.5 "Authenticated Navigation". |
 | Current text | Student: Dashboard, Activities, DRS Management, My Registrations, Calendar, AI Student Assistant, University Services, Profile. Organizer: Activity Management, Registration Management, Attendance and Results, Appeals, Reports, Profile. Administrator: User Management, Activity Categories, System Configuration, Reports and Analytics, Audit Logs. |
-| Proposed change | Add **Dashboard** to the Manager and Administrator lists, and **Profile** to the Administrator list (UC-03 and UC-32 apply to all users). Note that unbuilt destinations are shown disabled with "Coming soon" until delivered. |
+| Proposed change | Add **Dashboard** to the Manager and Administrator lists, and **Profile** to the Administrator list (UC-03 and UC-32 apply to all users). Note that unbuilt destinations are shown disabled with "Coming soon" until delivered. **Update (005):** add **University Services** (`/services`, UC-07, shared by every role) to the Manager and Administrator lists, and **Service Links** (`/admin/services`, BR-ADM-01) to the Administrator list. The Student item now points to `/services`, not a student-only page. |
 | Reason | Product-owner decision Q2 (full menu with "Coming soon"). UC-32 gives every role a homepage, and UC-03 gives every role a profile. |
-| FE impact | `NAVIGATION` per FR-024 (T008, T086). |
+| FE impact | `NAVIGATION` per FR-024 (T008, T086). 005 step 3: `libs/navigation.ts` and `libs/route-access.ts` (`/services` is a shared protected path). |
 | Status | `proposed` |
 
 ## DOC-12 — Logout destination
@@ -195,6 +200,39 @@
 
 ---
 
+## DOC-16 — Hub response envelope: request that BE adopt the OpenAPI envelope
+
+| Field | Value |
+|---|---|
+| Affected doc + section | `docs/api/openapi.yaml` 1.2.0, tag "University Services Hub" (all 6 operations) and `ErrorResponse`; `docs/api/openapi-changes.md` API-GAP-HUB-01 item 1 (`accepted`). |
+| Current text | The YAML defines `{ success, data }` and `ErrorResponse { success, code, message, errors[{field,message}] }`. API-GAP-HUB-01 records that the hub backend uses the `ServiceResponse` envelope: `{ success, statusCode, payload: { message: "<text> (<STATUS>)", data } }`, with field errors in `payload.data.details[{field, code, message}]`. |
+| Proposed change | **Request to BE and the docs owners:** move the hub endpoints, and later all endpoints, to the OpenAPI envelope, then close item 1 of API-GAP-HUB-01. Until then, the FE accepts the hub envelope through one adapter. |
+| Reason | One client, two envelopes. The 003 endpoints follow the YAML; the hub follows `ServiceResponse`. With `ServiceResponse`, clients must branch on the HTTP status and `details[].code`, because there is no top-level `code`. A single envelope removes the adapter and the double error parsing. |
+| FE impact | Approved decision Q7. The adapter is `unwrapServiceResponse` in `libs/api-client.ts`. `toApiError` reads both error shapes: a known `details[].code` such as `DUPLICATE_VALUE` wins, otherwise the status mapping (409 `DUPLICATE_VALUE`, 412 `PRECONDITION_FAILED`, 403 `FORBIDDEN`). <br>The MSW hub handlers answer in `ServiceResponse`, except for token and account checks, which reuse the Authentication middleware's contract shape (DOC-01, DOC-06: `UNAUTHENTICATED`, `ACCOUNT_DISABLED`, `PASSWORD_CHANGE_REQUIRED`). <br>When BE switches, only `unwrapServiceResponse`, the hub part of `toApiError`, and `mocks/utils/service-response.ts` change. |
+| Status | `proposed` |
+
+## DOC-17 — Real-mode transport: same-origin `/api/backend` forwarder with the user's bearer
+
+| Field | Value |
+|---|---|
+| Affected doc + section | `docs/api/openapi-changes.md` API-GAP-HUB-01 item 7; `docs/analysis-and-design/fe/component-diagram-fe.md` "Backend Forwarder" (line 37); spec 004 FR-017 and research R-01. |
+| Current text | "Frontend access goes through the Next.js route `/api/backend/*`, which adds the Bearer token from an httpOnly cookie." (Dev's code actually injects one server-wide `DEV_BACKEND_TOKEN`.) |
+| Proposed change | Real mode uses `NEXT_PUBLIC_API_BASE_URL=/api/backend`. The route forwards to `BACKEND_API_URL`. <br>**Token:** the route passes on the signed-in user's `Authorization: Bearer` header, which the API client attaches (the token is kept in browser storage, per 003 DOC-03). `DEV_BACKEND_TOKEN` is a dev-only, opt-in fallback, used only when `NODE_ENV` is not production **and** `ALLOW_DEV_BACKEND_TOKEN=true` **and** the request has no `Authorization` header. It is never used for `auth/*`, and every use logs a server warning. <br>**Missing token:** the request is still forwarded, and the backend answers 401. <br>**Allowed paths:** exactly the operations the client calls (hub, `admin/services`, `auth/login\|logout\|me`, `profile/password`, `admin/users\|faculties\|roles`, `activities/landing`). It is not an open proxy. |
+| Reason | The backend has no CORS, so the browser cannot call `:8080` from `:3000`. One server-wide token would make every user act as one seeded account and hide permission bugs (005 Q1). The httpOnly-cookie design in R-01 needs an Authentication BE that issues backend tokens; that BE does not exist yet. |
+| FE impact | `app/api/backend/[...path]/route.ts`, `libs/backend-path.ts`, `.env.example` (`BACKEND_API_URL`, `ALLOW_DEV_BACKEND_TOKEN=false`, `DEV_BACKEND_TOKEN`). <br>Per Q2, until BE login is DB-backed, real mode is tested only with a token minted by `src/server/scripts/mint-dev-token.ts`. 003 login cannot be exercised against the BE yet (GAP-E). |
+| Status | `proposed` |
+
+## DOC-18 — Hub parts of dev's `docs/` edits that are stale after the 005 adaptation
+
+| Field | Value |
+|---|---|
+| Affected doc + section | Two files, edited on origin/dev by PR #105: <br>• `docs/analysis-and-design/fe/component-diagram-fe.md`: line 36 "University Services", line 37 "Backend Forwarder", node `HubDataService` (line 81); <br>• `docs/analysis-and-design/client/pages/student.md`: "University Services" (line 27). |
+| Current text | "Data comes from `HubService` / `AdminHubService` (mock or real)"; "Hub Services: HubService / AdminHubService: Real / Mock / Factory"; "forwards hub requests to the backend with the Bearer token from an httpOnly cookie"; "Data: `GET /api/v1/hub/services` through the frontend's `/api/backend` forwarder." |
+| Proposed change | **`component-diagram-fe.md`:** <br>• `HubService` and `AdminHubService` each have one real implementation over the API client; there are no mock classes and no factories. <br>• The mock is the MSW network handler set (`src/mocks/handlers/hub.ts`, client constitution C-IV v1.1.0), selected only by `NEXT_PUBLIC_API_MODE`. <br>• The forwarder text follows DOC-17 (it also serves auth and admin-users calls). <br>**`student.md`:** the forwarder is real mode only, and mock mode is answered by MSW. Add the "forbidden" state, a 403 shown with the shared forbidden view. <br>**Not stale:** `RoleNav` (deleted in 005) does not appear in `docs/`, and the BE component diagram is unaffected. |
+| Reason | The hub FE was written on the pre-003 frontend: mock service classes, a factory on `NEXT_PUBLIC_DATA_SOURCE`, the `admin` role code, and `RoleNav`. Plan 005 adapted it to the 003 architecture: one API client, MSW, `AppShell` / `SideNav`, and shared states. |
+| FE impact | None. This entry only records documentation drift, for the docs owners. |
+| Status | `proposed` |
+
 ## Not documentation changes (BE / DB alignment only)
 
 These are mismatches between `src/server` or `src/db` and the documented contract. The docs are already correct here, and BE should align. They are listed so this file can serve as the full hand-off.
@@ -212,3 +250,4 @@ These are mismatches between `src/server` or `src/db` and the documented contrac
 | 2026-11-27 | Created during the `/speckit-analyze` remediation (DOC-01 to DOC-15). |
 | 2026-11-27 | `/speckit-implement`: no new deviation from `docs/` came up. The implementation follows DOC-01 to DOC-15 as written. FE-internal changes need no `docs/` change: unsigned mock tokens, a `setRole` dev helper, and the token provider registered at module load. |
 | 2026-11-27 | Second analysis pass. **DOC-01**: the proposal now exempts `GET /auth/me` (returns `status: 'inactive'`) and `POST /auth/logout` from `ACCOUNT_DISABLED`, needed for the reload case (H6). **DOC-02**: FE impact now covers reload (`reason=role-missing`). The other fixes in this pass are FE-internal and need no `docs/` change: stale-hint clearing (H5), `useForbidden` wiring (M7), wording fixes (M8–M10, L7, L8). |
+| 2026-11-28 | Plan 005 (hub integration): added DOC-16 (envelope request), DOC-17 (forwarder and token) and DOC-18 (stale hub docs from PR #105); updated DOC-11 (University Services for every role, Service Links for administrators). |

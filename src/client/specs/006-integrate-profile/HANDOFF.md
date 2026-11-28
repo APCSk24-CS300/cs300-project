@@ -23,7 +23,7 @@
 | 5 Hooks / services | done — gates green: tsc, 66 files / 455 tests, lint, build, server/db identical | step 5 commit | `useMyProfile` (`useAsyncResource`, server-confirmed `apply`, retry drops it); ProfilePage on it; saves call `auth.refresh()` (AccountMenu follows `/auth/me`, no second store); `toUserMessage` contexts `profilePhone` / `avatarUpload` / `avatarRemove`; server field error → field; forbidden → `ForbiddenView` | 455 |
 | 6 UI | done — gates green: tsc, 65 files / 457 tests, lint, build, server/db identical | step 6 commit | ProfilePage on PageHeader + SurfaceCard sections (picture, read-only account details incl. role, contact, password); `PhoneForm` (RHF + zod, shared rule; 409/400 on the field); `ChangePasswordForm variant="profile"` (one form, one service path; dev's PasswordChangeForm + validators deleted, tests moved as "profile variant: …"); `AvatarEditor` on Button / Alert / ConfirmDialog; `ProfileAvatar` (api.blob + object URL, initials, Retry picture) on the page and in AccountMenu via a `renderAvatar` slot; tokens only | 457 |
 | 7 Forwarder (binary / multipart) | done — gates green: tsc, 65 files / 465 tests, lint, build, server/db identical | step 7 commit | allowlist `profile`, `profile/avatar`, `profile/avatar/files/{one safe name}`; request body read as bytes within `MAX_FORWARDED_BODY_BYTES` (10 MiB + 64 KiB; 413 before the backend, also when Content-Length lies); `Content-Type` kept whole (multipart boundary); response streamed with image headers | 465 |
-| 8 Docs (DOC-19 to DOC-23, …) | not started | — | — | — |
+| 8 Docs | done — docs only (`specs/`, not read by the build or tests), so it reuses the step 7 gates: 465 tests, lint, build green | step 8 commit | `docs-changes.md`: DOC-19 (cookie BFF not adopted; contract auth request), DOC-20 (profile envelope, object `details`), DOC-21 (avatar URL, authenticated read), DOC-22 (YAML changed without a version bump), DOC-23 (password 8 vs 6); updates to DOC-07, DOC-09 (stays open) and DOC-11; `quickstart.md`; this file | 465 |
 | 9 Final gates + walkthrough | not started | — | — | — |
 
 ### Step 4: done
@@ -59,6 +59,19 @@
 
 ## Decisions made this session that are not yet in plan.md
 
+**Steps 4–8 (resumed session):**
+- **jsdom test setup.** `tests/setup.ts` replaces jsdom's `FormData` / `File` / `Blob` with the Node realm's classes. Node's fetch, which MSW uses in tests, cannot serialize jsdom's `FormData`, so multipart arrived as "[object FormData]". The Node `FormData` constructor is taken from a parsed form body, so no new dependency is needed. The setup also stubs `URL.createObjectURL` (jsdom has none).
+- **409 copy.** The BE uses 409 for both a taken phone number and an avatar race, so `toUserMessage` has three contexts: `profilePhone`, `avatarUpload` and `avatarRemove` (the plan said one `"profile"` context). Session codes (401 / 403 / `ACCOUNT_DISABLED`) keep their own copy.
+- **Phone errors.** A 409 duplicate phone and a 400 `{ field }` are shown **on the phone field**. Other failures are an alert.
+- **Profile password variant.** The profile variant of `ChangePasswordForm` keeps valid input after a validation error, and keeps the new password after a wrong current password (spec FR-011). Dev's form cleared all three fields; that test title was replaced (`coverage.md`, last table).
+- **AccountMenu picture.** It comes through a `renderAvatar` slot (AppShell → AppHeader → AccountMenu), filled by the protected layout with `ProfileAvatar`. Shared `components/` stay independent of `features/profile`.
+- **Forwarder limit.** `MAX_FORWARDED_BODY_BYTES` lives in `libs/backend-path.ts`, because a Next route file may export only its handlers. The forwarder answers **413** above 10 MiB + 64 KiB.
+- **Mock 409.** `uploadAvatar:conflict` / `removeAvatar:conflict` failure-switch ids simulate the BE's 409.
+- **Bug found and fixed in step 6.** `ProfileAvatar` showed "Picture could not be loaded" while loading (`null === null`). A regression test covers it.
+- **Commits.** One commit per step, at the user's request (this replaced the "one commit for steps 4–8" instruction).
+
+**Steps 1–3 (first session):**
+
 - **Step 1 compile fix.** Dev's `PasswordChangeForm` is **adapted**, not swapped for `ChangePasswordForm`. Our first-sign-in form redirects to the dashboard on success, which is wrong on the profile page, so the real replacement stays in step 6. The plan said "temporary import of `ChangePasswordForm`".
 - **Also removed in step 1:** dev's `features/auth/services/auth.service.test.ts`, which tests the pre-003 `/api/auth` paths and `{ success }` bodies. It covers no UC-03 scenario (recorded in `coverage.md`).
 - **Message suffix.** `toApiError` now strips the ServiceResponse `" (STATUS_NAME)"` suffix from messages. This also changes the 005 hub messages: one 005 test expectation was updated.
@@ -87,7 +100,7 @@
 
 `git diff origin/dev -- src/server src/db` is **empty**, checked at steps 1, 2 and 3.
 
-## Exact next action
+## Exact next action (superseded: see the end of this file)
 
 In `src/client/src/mocks/handlers/profile.ts`, add the `GET`/`PATCH /profile`, `POST`/`DELETE /profile/avatar` and `GET /profile/avatar/files/:name` handlers described in "Step 4: left", item 1. Then continue with items 2–5.
 
@@ -109,3 +122,11 @@ In `src/client/src/mocks/handlers/profile.ts`, add the `GET`/`PATCH /profile`, `
 | A8 | **Account status on authenticated calls** | `ACCOUNT_DISABLED` handling (DOC-01) | profile: SQL `is_active`; `/api/auth/me` answers 401 "Account unavailable" for inactive accounts | DOC-01 |
 | A9 | **Role codes** | `administrator` (the contract) | DB `administrator` ✔; dev's FE mapped it to `admin` (removed) | — |
 | A10 | **Session transport** | bearer in the token store plus the hint cookie (003 DOC-03, 005 Q1) | dev's alternative was httpOnly cookies through a Next BFF (not adopted, Q1) | DOC-19 |
+
+## Exact next action (current)
+
+Step 9:
+1. Run the final gates (`quickstart.md` §1); the run must leave `git diff origin/dev -- src/server src/db` empty.
+2. Prepare the walkthrough: the mock walkthrough in `quickstart.md` §2 (in a browser, at 360 px and at desktop width), and the real-mode curl checks in §3 with a minted token.
+3. Do **not** commit step 9. The user decides whether step 9 fixes get their own commit.
+

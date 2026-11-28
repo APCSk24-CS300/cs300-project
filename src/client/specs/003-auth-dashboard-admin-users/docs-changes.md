@@ -4,6 +4,8 @@
 >
 > Since plan 005 (`specs/005-integrate-hub/`), this file is also the register for the University Services Hub integration: DOC-16 to DOC-18, and the DOC-11 update.
 >
+> Since plan 006 (`specs/006-integrate-profile/`), it also records the Profile Management integration: DOC-19 to DOC-23, and the DOC-07, DOC-09 and DOC-11 updates.
+>
 > Status values follow `docs/api/openapi-changes.md`: `proposed`, `accepted`, `rejected`, `deferred`.
 >
 > **This file does not change `docs/`.** The docs owners decide; the frontend team raises each entry with BE and the docs owners. Until an entry is `accepted`, the frontend implements it **only in the mock** (MSW), and real-mode use is blocked (constitution R-II v1.1.0, C-IV v1.1.0).
@@ -30,6 +32,11 @@
 | DOC-16 | Hub response envelope: request that BE adopt the OpenAPI envelope | 005 Q7, API-GAP-HUB-01 | proposed |
 | DOC-17 | Real-mode transport: same-origin `/api/backend` forwarder with the user's bearer | 005 Q1/Q2, spec 004 FR-017 | proposed |
 | DOC-18 | Hub parts of dev's `docs/` edits that are stale after the 005 adaptation | 005 R7 | proposed |
+| DOC-19 | Dev's cookie-BFF session not adopted; ask BE for contract auth | 006 Q1/Q6, GAP-E | proposed |
+| DOC-20 | Profile envelope and object-shaped error `details` | 006 O5, extends DOC-16 | proposed |
+| DOC-21 | Avatar file URL and its authenticated read | 006 O8/Q5 | proposed |
+| DOC-22 | `openapi.yaml` changed without a version bump or a changes row | 006 docs re-read | proposed |
+| DOC-23 | Password minimum: the FE enforces 8; contract, BE and BRs say 6 | 006 Q3, links DOC-09 | proposed |
 
 ---
 
@@ -107,7 +114,7 @@
 | Current text | UC-03 A5: "Phone number is invalid; system highlights the invalid field". No format is defined anywhere; the contract example is `'0901234567'`. |
 | Proposed change | Define the accepted phone format (e.g., Vietnamese 10-digit `0xxxxxxxxx`, or E.164), or state explicitly that any trimmed string is accepted. |
 | Reason | Without a rule, "invalid" can't be tested, and FE and BE validation may disagree. |
-| FE impact | For now the client only trims `phoneNumber` and applies no format rule (analysis L3, T061, T066). A rule will be added once defined. |
+| FE impact | For now the client only trims `phoneNumber` and applies no format rule (analysis L3, T061, T066). A rule will be added once defined. **Update (006):** dev's `openapi.yaml` now defines the pattern for `UpdateProfileRequest.phoneNumber` only: `^(?:0\d{9}|\+84\d{9})$`, with null clearing it. The FE uses it through one shared rule (`libs/validation/phone.ts`) for the profile **and** for admin create (approved 006 Q4). For admin create it is enforced only by the FE and the MSW mock, until `CreateUserRequest` gets the same pattern. Still open for `CreateUserRequest`. |
 | Status | `proposed` (open question) |
 
 ## DOC-08 — `ROLE_POLICY_VIOLATION` on account creation
@@ -129,7 +136,7 @@
 | Current text | NFR-SEC-02: "Passwords shall be at least 6 characters". BR-ACC-09: "at least six characters". UC-03 A7: "shorter than six characters". `ChangePasswordRequest`: `minLength: 8` ("must be at least 8 characters"). |
 | Proposed change | Pick one minimum and align all four documents. 8 is recommended, because it satisfies both today. |
 | Reason | The conflicting rules make UC-03 A7 untestable. |
-| FE impact | The FE uses 8 for overridden temporary passwords and for "Set a new password" (FR-036b, FR-045). |
+| FE impact | The FE uses 8 for overridden temporary passwords and for "Set a new password" (FR-036b, FR-045). **Update (006):** dev's `openapi.yaml` changed `minLength` from 8 to 6, so now only the FE says 8. Approved 006 Q3 keeps 8 everywhere in the FE (both change-password variants, the mock, the copy). This entry **stays open**, and the request to agree on one value is **DOC-23**. |
 | Status | `proposed` |
 
 ## DOC-10 — "Organizer" terminology in client design docs
@@ -149,7 +156,7 @@
 |---|---|
 | Affected doc + section | `docs/analysis-and-design/client/user-flow.md`: §1.5 "Authenticated Navigation". |
 | Current text | Student: Dashboard, Activities, DRS Management, My Registrations, Calendar, AI Student Assistant, University Services, Profile. Organizer: Activity Management, Registration Management, Attendance and Results, Appeals, Reports, Profile. Administrator: User Management, Activity Categories, System Configuration, Reports and Analytics, Audit Logs. |
-| Proposed change | Add **Dashboard** to the Manager and Administrator lists, and **Profile** to the Administrator list (UC-03 and UC-32 apply to all users). Note that unbuilt destinations are shown disabled with "Coming soon" until delivered. **Update (005):** add **University Services** (`/services`, UC-07, shared by every role) to the Manager and Administrator lists, and **Service Links** (`/admin/services`, BR-ADM-01) to the Administrator list. The Student item now points to `/services`, not a student-only page. |
+| Proposed change | Add **Dashboard** to the Manager and Administrator lists, and **Profile** to the Administrator list (UC-03 and UC-32 apply to all users). Note that unbuilt destinations are shown disabled with "Coming soon" until delivered. **Update (005):** add **University Services** (`/services`, UC-07, shared by every role) to the Manager and Administrator lists, and **Service Links** (`/admin/services`, BR-ADM-01) to the Administrator list. The Student item now points to `/services`, not a student-only page. **Update (006):** **Profile** is one shared, available `/profile` item for every role (UC-03), and AccountMenu has "My profile". |
 | Reason | Product-owner decision Q2 (full menu with "Coming soon"). UC-32 gives every role a homepage, and UC-03 gives every role a profile. |
 | FE impact | `NAVIGATION` per FR-024 (T008, T086). 005 step 3: `libs/navigation.ts` and `libs/route-access.ts` (`/services` is a shared protected path). |
 | Status | `proposed` |
@@ -233,6 +240,61 @@
 | FE impact | None. This entry only records documentation drift, for the docs owners. |
 | Status | `proposed` |
 
+## DOC-19 — Dev's cookie-BFF session is not adopted; ask BE for the contract auth
+
+| Field | Value |
+|---|---|
+| Affected doc + section | `src/specs/004-profile-management/implementation.md` ("Authentication and configuration", "Storage and API"); `docs/api/openapi.yaml` `/auth/login`, `/auth/logout`, `/auth/me`; 003 GAP-E. |
+| Current text | implementation.md: "The Next.js login route calls existing backend `POST /api/auth/login` … Next.js stores the backend access token and signed UI session in separate HTTP-only, SameSite=Lax cookies … Configure `API_BACKEND_URL` … and a strong `SESSION_SECRET`." The BE serves `POST /api/auth/login` (ServiceResponse, `payload.data.token`) and `GET /api/auth/me` (`roles[]`, `permissions[]`), unversioned; there is no BE logout. |
+| Proposed change | **Request to BE:** serve `/api/v1/auth/login`, `/api/v1/auth/logout` and `/api/v1/auth/me` with the contract shapes plus the 003 gaps: DOC-01 to DOC-04, DOC-06, one role per account (GAP-G), and `status` and `mustChangePassword` on `/auth/me`. <br>**Docs owners:** `src/specs/004-profile-management/implementation.md` describes a cookie BFF (`app/api/auth/*`, `app/api/v1/profile/*`, `SESSION_SECRET`, `API_BACKEND_URL`, a role chosen at login, `administrator → admin`). None of it is in the integrated frontend, so that text is stale (plan 006 R7). |
+| Reason | Plan 006 approved Q1: keep the 003 / 005 session model (bearer in the token store, forwarded by `/api/backend`). Choosing a role at login contradicts "each account has exactly one role". Dev's `me` route also did not compile against the 003 code. |
+| FE impact | Removed in the 006 merge (`ea889ce`): `app/api/auth/{login,logout,me}`, `libs/backend-session.ts`, `app/api/v1/profile/[[...segments]]` and their tests. Real-mode sign-in stays blocked until the BE matches (approved Q6; no `auth/*` path remapping). The full gap list for the next phase is in `specs/006-integrate-profile/HANDOFF.md` "Next phase: E2E authentication". |
+| Status | `proposed` |
+
+## DOC-20 — Profile envelope and object-shaped error `details`
+
+| Field | Value |
+|---|---|
+| Affected doc + section | `docs/api/openapi.yaml`: `getMyProfile`, `updateMyProfile`, `uploadMyAvatar`, `deleteMyAvatar`, `ErrorResponse`; DOC-16 (hub envelope). |
+| Current text | The YAML documents `{ success, data }` and `ErrorResponse { code, message, errors[] }` for every profile operation. |
+| Proposed change | **Request to BE** (extends DOC-16): one envelope for all profile operations. Today the BE answers in **three shapes**: <br>• `GET/PATCH /profile`: ServiceResponse `{ success, statusCode, payload: { message: "<text> (<STATUS>)", data } }`, and a 400/409 carries **one object** `payload.data.details = { field: "phoneNumber" }` with the text in `payload.message` (not `errors[]`). The duplicate phone is 409 with no `code`. <br>• Avatar upload: `{ success, data: { avatarUrl } }`; avatar errors: `{ success: false, code?, message }`. <br>• Removal and password: `{ success, message }`; password errors: the contract `ErrorResponse` (`CURRENT_PASSWORD_INCORRECT`, `VALIDATION_FAILED`, `INTERNAL_ERROR`). <br>Also give the 409 a code: 409 means a taken phone number on `PATCH /profile` but an avatar race on `/profile/avatar`. |
+| Reason | One client has to parse three shapes. 409 has two meanings, so the copy can only be chosen by context. |
+| FE impact | Still one adapter per shape, in `libs/api-client.ts`: `unwrap`, `unwrapServiceResponse`, and `toApiError`, which maps an object `details { field }` to `fieldErrors[field] = payload.message` and strips the " (STATUS)" suffix (006 step 2). `profileFromEnvelope` picks the adapter. The copy contexts are `profilePhone`, `avatarUpload` and `avatarRemove` (006 step 5). The MSW mock answers exactly like the BE today. |
+| Status | `proposed` |
+
+## DOC-21 — Avatar file URL and its authenticated read
+
+| Field | Value |
+|---|---|
+| Affected doc + section | `docs/api/openapi.yaml`: `AvatarResponse.data.avatarUrl` and `Profile.avatarUrl` (`format: uri-reference`, "legal same-origin URL"), `readMyAvatarFile` (`GET /profile/avatar/files/{fileName}`). |
+| Current text | `avatarUrl` is a "legal same-origin URL". The BE returns `/api/v1/profile/avatar/files/{uuid}.png\|jpg`. The file read requires the bearer and answers `Cache-Control: private, no-store`. |
+| Proposed change | State in the contract that `avatarUrl` is the `readMyAvatarFile` path **relative to the API base** (or return the file name only), and that clients must send the bearer to read it. An `<img src>` cannot send it, so a client must fetch the file itself, unless BE offers short-lived signed URLs. |
+| Reason | "Same-origin" assumed a cookie-based BFF (DOC-19). With a bearer client the URL is not directly usable as `<img src>`, and its `/api/v1` prefix duplicates the client's base URL. |
+| FE impact | `ProfileAvatar` (006 step 6) takes the file name from `…/profile/avatar/files/{name}` only (any other shape shows initials). It reads `${base}/profile/avatar/files/{name}` through `api.blob` (bearer) and renders an object URL, with an initials fallback and "Retry picture" (UC-03 A9). The forwarder allows exactly one safe file-name segment and passes the bytes and headers through unchanged (006 step 7). |
+| Status | `proposed` |
+
+## DOC-22 — `openapi.yaml` was changed without a version bump or a changes row
+
+| Field | Value |
+|---|---|
+| Affected doc + section | `docs/api/openapi.yaml` (info.version still `1.2.0`); `docs/api/openapi-changes.md` (no row). |
+| Current text | PR #106 changed these without a version bump: <br>• avatar limit 5 MB → 10 MB (10485760 bytes inclusive); <br>• new `GET /profile/avatar/files/{fileName}`; <br>• 409 / 500 on the avatar operations; <br>• `INTERNAL_ERROR`; <br>• `UpdateProfileRequest` gets a phone `pattern` and `additionalProperties: false`; <br>• `AcademicInfo` fields required and readOnly; <br>• `Profile` requires `id, email, fullName, phoneNumber, academicInfo`; <br>• `avatarUrl` `uri` → `uri-reference`; <br>• **`ChangePasswordRequest.newPassword.minLength` 8 → 6**; <br>• `additionalProperties: false` on the password and avatar requests. |
+| Proposed change | Release these as **1.3.0**. Add an `openapi-changes.md` entry (API-GAP-PROFILE-01 or similar) that lists them, in particular the breaking `minLength` change (see DOC-23). |
+| Reason | Clients pin to a contract version. `openapi-typescript` regenerated different types under the same version (006 step 1), and the password change affects the 003 first-sign-in flow. |
+| FE impact | `src/types/openapi.gen.ts` regenerated from the new YAML in the 006 merge. No FE behaviour depends on the version string. |
+| Status | `proposed` |
+
+## DOC-23 — Password minimum: the FE enforces 8; contract, BE and BRs say 6
+
+| Field | Value |
+|---|---|
+| Affected doc + section | `docs/api/openapi.yaml` `ChangePasswordRequest.newPassword.minLength` (now 6); `docs/analysis-and-design/business-rules.md` BR-ACC-09 ("at least six characters"); `docs/requirements/vision-document.md` NFR-SEC-02 ("at least 6 characters"); `docs/requirements/use-case-specifications.md` UC-03 A7 ("shorter than six characters"); `src/server` `AuthService.changePassword` (6 code points). |
+| Current text | Contract, BE, BR, NFR and UC all say 6. |
+| Proposed change | **Ask the team to agree on one value** and align contract, BE and BRs. The FE recommends 8 (stricter, compatible with every 6-character rule). Until then the FE keeps 8. |
+| Reason | Plan 006 approved Q3: the FE keeps 8 everywhere. Being stricter is compatible: anything the FE sends also satisfies the BE. A 6- or 7-character password accepted by the BE cannot be set through our UI, which is a deliberate and visible restriction (plan 006 R5). |
+| FE impact | One rule: `libs/validation/password.ts` (`PASSWORD_MIN_LENGTH = 8`, counted in code points like the BE), used by both `ChangePasswordForm` variants and the MSW mock, with the copy "At least 8 characters." Admin-issued temporary passwords keep their own rule (`TEMP_PASSWORD_MIN_LENGTH = 8`, DOC-05). **DOC-09 stays open** and points here. |
+| Status | `proposed` |
+
 ## Not documentation changes (BE / DB alignment only)
 
 These are mismatches between `src/server` or `src/db` and the documented contract. The docs are already correct here, and BE should align. They are listed so this file can serve as the full hand-off.
@@ -251,3 +313,4 @@ These are mismatches between `src/server` or `src/db` and the documented contrac
 | 2026-11-27 | `/speckit-implement`: no new deviation from `docs/` came up. The implementation follows DOC-01 to DOC-15 as written. FE-internal changes need no `docs/` change: unsigned mock tokens, a `setRole` dev helper, and the token provider registered at module load. |
 | 2026-11-27 | Second analysis pass. **DOC-01**: the proposal now exempts `GET /auth/me` (returns `status: 'inactive'`) and `POST /auth/logout` from `ACCOUNT_DISABLED`, needed for the reload case (H6). **DOC-02**: FE impact now covers reload (`reason=role-missing`). The other fixes in this pass are FE-internal and need no `docs/` change: stale-hint clearing (H5), `useForbidden` wiring (M7), wording fixes (M8–M10, L7, L8). |
 | 2026-11-28 | Plan 005 (hub integration): added DOC-16 (envelope request), DOC-17 (forwarder and token) and DOC-18 (stale hub docs from PR #105); updated DOC-11 (University Services for every role, Service Links for administrators). |
+| 2026-11-28 | Plan 006 (profile integration): added DOC-19 (cookie BFF not adopted; contract auth request), DOC-20 (profile envelope, object `details`), DOC-21 (avatar URL and authenticated read), DOC-22 (YAML changed without a version bump), DOC-23 (password minimum 8 vs 6); updated DOC-07 (phone pattern), DOC-09 (stays open, see DOC-23) and DOC-11 (shared `/profile`). |

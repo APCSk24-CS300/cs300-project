@@ -8,12 +8,51 @@
 // warning is logged each time. Off by default, so permission bugs are not hidden by everyone acting
 // as one seeded user. Without any token the request is forwarded as is and the backend answers 401.
 import type { NextRequest } from "next/server";
-import { isAllowedBackendPath, isAuthPath } from "@/libs/backend-path";
+import { MAX_FORWARDED_BODY_BYTES, isAllowedBackendPath, isAuthPath } from "@/libs/backend-path";
 
-/** Request headers passed on to the backend. */
+/** Request headers passed on to the backend. `content-type` is kept whole (the multipart boundary). */
 const FORWARD_REQUEST_HEADERS = ["content-type", "if-match", "accept"];
-/** Response headers passed back to the browser. */
-const FORWARD_RESPONSE_HEADERS = ["content-type", "etag", "location", "allow", "retry-after", "www-authenticate"];
+/** Response headers passed back to the browser (incl. the avatar file read). */
+const FORWARD_RESPONSE_HEADERS = [
+  "content-type",
+  "content-length",
+  "etag",
+  "location",
+  "allow",
+  "retry-after",
+  "www-authenticate",
+  "cache-control",
+  "x-content-type-options",
+];
+
+class BodyTooLarge extends Error {}
+
+/** Reads the body as bytes (never as text: multipart and images must stay byte-exact), within the limit. */
+async function readBoundedBody(request: NextRequest): Promise<Uint8Array | undefined> {
+  const declared = Number(request.headers.get("content-length") ?? "");
+  if (Number.isFinite(declared) && declared > MAX_FORWARDED_BODY_BYTES) throw new BodyTooLarge();
+  if (!request.body) return undefined;
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > MAX_FORWARDED_BODY_BYTES) {
+      await reader.cancel();
+      throw new BodyTooLarge();
+    }
+    chunks.push(value);
+  }
+  const body = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return body;
+}
 
 type Context = { params: Promise<{ path: string[] }> };
 
@@ -54,16 +93,28 @@ async function forward(request: NextRequest, context: Context): Promise<Response
   }
   for (const name of FORWARD_REQUEST_HEADERS) {
     const value = request.headers.get(name);
-    if (value) headers.set(name, name === "content-type" ? value.split(";")[0]!.trim() : value);
+    if (value) headers.set(name, value);
   }
 
   const hasBody = request.method !== "GET" && request.method !== "HEAD";
+  let body: Uint8Array | undefined;
+  if (hasBody) {
+    try {
+      body = await readBoundedBody(request);
+    } catch (error) {
+      if (error instanceof BodyTooLarge) {
+        return envelope(413, "The request is too large. A profile picture can be up to 10 MB.");
+      }
+      return envelope(400, "The request body could not be read");
+    }
+  }
+
   let upstream: Response;
   try {
     upstream = await fetch(`${base.replace(/\/$/, "")}/${path}${request.nextUrl.search}`, {
       method: request.method,
       headers,
-      body: hasBody ? await request.text() : undefined,
+      body: body && body.byteLength > 0 ? (body as BodyInit) : undefined,
       cache: "no-store",
       signal: AbortSignal.timeout(10_000),
     });
@@ -76,7 +127,8 @@ async function forward(request: NextRequest, context: Context): Promise<Response
     const value = upstream.headers.get(name);
     if (value) responseHeaders.set(name, value);
   }
-  return new Response(upstream.status === 204 ? null : await upstream.text(), {
+  // Streamed through unchanged (bytes, not text): image responses must stay byte-exact.
+  return new Response(upstream.status === 204 ? null : upstream.body, {
     status: upstream.status,
     headers: responseHeaders,
   });

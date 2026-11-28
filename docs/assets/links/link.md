@@ -13,6 +13,8 @@ This document provides quick access to useful university-related resources and s
 - **CTDB Student Portal** – Access the CTDB student portal.
   - https://portal.ctdb.hcmus.edu.vn/Login
 
+- **HCMUS Student Portal** – Access the student portal for student-related information and services.
+  - https://student.hcmus.edu.vn/login
 
 
 

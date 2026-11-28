@@ -8,9 +8,17 @@ export const NAVIGATION_ITEMS: Record<
   student: [
     { label: "Dashboard", href: "/student/dashboard" },
     { label: "Activities", href: "/student/activities" },
+    { label: "University Services", href: "/services" },
   ],
-  manager: [{ label: "Dashboard", href: "/manager/dashboard" }],
-  admin: [{ label: "Dashboard", href: "/admin/dashboard" }],
+  manager: [
+    { label: "Dashboard", href: "/manager/dashboard" },
+    { label: "University Services", href: "/services" },
+  ],
+  admin: [
+    { label: "Dashboard", href: "/admin/dashboard" },
+    { label: "University Services", href: "/services" },
+    { label: "Service Links", href: "/admin/services" },
+  ],
 };
 
 export function getDashboardPath(role?: RoleCode | null): string {

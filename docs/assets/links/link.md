@@ -16,6 +16,13 @@ This document provides quick access to useful university-related resources and s
 - **HCMUS Student Portal** – Access the student portal for student-related information and services.
   - https://student.hcmus.edu.vn/login
 
+- **Student Portal 4** – Access the university's student portal system.
+  - https://new-portal4.hcmus.edu.vn/Login.aspx
+
+
+
+
+
 
 
 https://courses.ctda.hcmus.edu.vn/

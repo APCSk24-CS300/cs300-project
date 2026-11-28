@@ -24,6 +24,7 @@ export type ApiErrorCode =
   | "POLICY_VERSION_IMMUTABLE"
   | "IMPORT_EXPIRED"
   | "PRECONDITION_FAILED"
+  | "INTERNAL_ERROR"
   // gaps (openapi-gaps.ts)
   | "INVALID_CREDENTIALS"
   | "ACCOUNT_DISABLED"
@@ -90,6 +91,7 @@ const KNOWN_CODES = new Set<string>([
   "UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "VALIDATION_FAILED",
   "CURRENT_PASSWORD_INCORRECT", "UNSUPPORTED_FILE", "DUPLICATE_VALUE", "INVALID_STATE",
   "ROLE_POLICY_VIOLATION", "POLICY_VERSION_IMMUTABLE", "IMPORT_EXPIRED", "PRECONDITION_FAILED",
+  "INTERNAL_ERROR",
   "INVALID_CREDENTIALS", "ACCOUNT_DISABLED", "ACCOUNT_LOCKED", "ROLE_MISSING",
   "PASSWORD_CHANGE_REQUIRED", "SERVICE_UNAVAILABLE",
 ]);
@@ -103,6 +105,15 @@ function codeFromStatus(status: number): ApiErrorCode {
   if (status === 503) return "SERVICE_UNAVAILABLE";
   if (status === 400 || status === 422) return "VALIDATION_FAILED";
   return "UNKNOWN";
+}
+
+/** ServiceResponse appends " (<STATUS_NAME>)" to every message; field copy should not show it. */
+function stripStatusSuffix(message: string): string {
+  return message.replace(/\s\([A-Z_]+\)$/, "");
+}
+
+function isFieldObject(value: unknown): value is { field: string } {
+  return typeof value === "object" && value !== null && !Array.isArray(value) && typeof (value as { field?: unknown }).field === "string";
 }
 
 async function toApiError(response: Response): Promise<ApiError> {
@@ -120,13 +131,19 @@ async function toApiError(response: Response): Promise<ApiError> {
     errors?: unknown;
     payload?: { message?: unknown; data?: { details?: unknown } | null };
   };
-  // Two error shapes (docs-changes DOC-16): the contract ErrorResponse `{ code, message, errors[] }`
-  // and the backend ServiceResponse `{ payload: { message, data: { details[] } } }` used by the hub.
+  // Error shapes (docs-changes DOC-16, DOC-20): the contract ErrorResponse `{ code, message, errors[] }`
+  // and the backend ServiceResponse `{ payload: { message, data: { details } } }`, where `details` is a
+  // list (hub) or one `{ field }` object (profile 400/409), whose text is then `payload.message`.
+  const payloadMessage =
+    typeof record.payload?.message === "string" ? stripStatusSuffix(record.payload.message) : undefined;
+  const payloadDetails = record.payload?.data?.details;
   const rawDetails = Array.isArray(record.errors)
     ? record.errors
-    : Array.isArray(record.payload?.data?.details)
-      ? record.payload.data.details
-      : [];
+    : Array.isArray(payloadDetails)
+      ? payloadDetails
+      : isFieldObject(payloadDetails) && payloadMessage !== undefined
+        ? [{ field: payloadDetails.field, message: payloadMessage }]
+        : [];
   const details: { field: string; code?: string; message: string }[] = [];
   const fieldErrors: Record<string, string> = {};
   for (const entry of rawDetails) {
@@ -150,8 +167,8 @@ async function toApiError(response: Response): Promise<ApiError> {
   const message =
     typeof record.message === "string"
       ? record.message
-      : typeof record.payload?.message === "string"
-        ? record.payload.message
+      : payloadMessage !== undefined
+        ? payloadMessage
         : code;
   return new ApiError({
     status: response.status,
@@ -167,6 +184,8 @@ type RequestOptions = Omit<RequestInit, "body" | "method"> & {
   body?: unknown;
   /** Skip the session callbacks (used by login, where 401/403 are form errors). */
   skipSessionHandlers?: boolean;
+  /** Read the body as a Blob (images) instead of JSON. Errors are still parsed as JSON. */
+  responseType?: "json" | "blob";
 };
 
 type ReadOptions = Omit<RequestOptions, "body">;
@@ -181,7 +200,7 @@ async function send<T>(
   method: string,
   options: RequestOptions = {},
 ): Promise<ApiResponse<T>> {
-  const { body: rawBody, skipSessionHandlers, ...init } = options;
+  const { body: rawBody, skipSessionHandlers, responseType = "json", ...init } = options;
   const baseUrl = getApiBaseUrl();
   const url = /^https?:\/\//.test(endpoint) ? endpoint : `${baseUrl}${endpoint}`;
   const headers = new Headers(init.headers);
@@ -228,6 +247,10 @@ async function send<T>(
 
   if (response.status === 204) {
     return { data: undefined as T, headers: response.headers };
+  }
+
+  if (responseType === "blob") {
+    return { data: (await response.blob()) as T, headers: response.headers };
   }
 
   return { data: (await response.json()) as T, headers: response.headers };
@@ -280,6 +303,12 @@ export const api = {
     (await send<T>(endpoint, "PATCH", { ...options, body })).data,
   delete: async <T>(endpoint: string, options?: ReadOptions) =>
     (await send<T>(endpoint, "DELETE", options)).data,
+  /**
+   * GET a binary resource (e.g. the authenticated avatar file) with the same base URL, bearer and
+   * error mapping as every other call. `<img src>` cannot carry the bearer (plan 006 O8, Q5).
+   */
+  blob: async (endpoint: string, options?: Omit<ReadOptions, "responseType">) =>
+    (await send<Blob>(endpoint, "GET", { ...options, responseType: "blob" })).data,
   /** Same as the verbs above but also returns headers (e.g. `ETag`). */
   request: <T>(endpoint: string, method: string, options?: RequestOptions) =>
     send<T>(endpoint, method, options),

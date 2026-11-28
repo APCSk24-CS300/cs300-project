@@ -150,7 +150,7 @@ describe("api client", () => {
       expect(error).toMatchObject({
         status: 400,
         code: "VALIDATION_FAILED",
-        message: "Validation failed (BAD_REQUEST)",
+        message: "Validation failed", // the " (BAD_REQUEST)" suffix is stripped (step 006-2)
         fieldErrors: { url: "Use a full http:// or https:// address", name: "Name is required" },
       });
       expect(error.details).toEqual([
@@ -229,5 +229,93 @@ describe("api client", () => {
     expect(new Headers((init as RequestInit).headers).get("Authorization")).toBe("Bearer user-token");
     expect(new Headers((fetchMock.mock.calls[1]![1] as RequestInit).headers).get("Authorization")).toBeNull();
     vi.unstubAllEnvs();
+  });
+  describe("profile responses (plan 006 step 2, DOC-20)", () => {
+    function serviceError(status: number, message: string, details?: unknown) {
+      return json({ success: false, statusCode: status, payload: { message, ...(details !== undefined ? { data: { details } } : {}) } }, status);
+    }
+
+    it("maps an object-shaped details { field } to that field, using payload.message without the status suffix", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue(
+          serviceError(400, "Enter a 10-digit number starting with 0 or +84 followed by 9 digits (BAD_REQUEST)", { field: "phoneNumber" }),
+        ),
+      );
+      const error = (await api.patch("/profile", { phoneNumber: "1" }).catch((e: unknown) => e)) as ApiError;
+      expect(error).toMatchObject({
+        status: 400,
+        code: "VALIDATION_FAILED",
+        message: "Enter a 10-digit number starting with 0 or +84 followed by 9 digits",
+        fieldErrors: { phoneNumber: "Enter a 10-digit number starting with 0 or +84 followed by 9 digits" },
+      });
+      expect(error.details).toEqual([{ field: "phoneNumber", message: "Enter a 10-digit number starting with 0 or +84 followed by 9 digits" }]);
+    });
+
+    it("maps a 409 duplicate phone to DUPLICATE_VALUE on the field", async () => {
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue(serviceError(409, "Phone number is already in use (CONFLICT)", { field: "phoneNumber" })));
+      await expect(api.patch("/profile", { phoneNumber: "0901234567" })).rejects.toMatchObject({
+        code: "DUPLICATE_VALUE",
+        fieldErrors: { phoneNumber: "Phone number is already in use" },
+      });
+    });
+
+    it("ignores details objects without a field (e.g. { fields: [...] })", async () => {
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue(serviceError(400, "Only phoneNumber may be updated (BAD_REQUEST)", { fields: ["fullName"] })));
+      await expect(api.patch("/profile", { fullName: "x" })).rejects.toMatchObject({
+        code: "VALIDATION_FAILED",
+        message: "Only phoneNumber may be updated",
+        fieldErrors: {},
+      });
+    });
+
+    it("keeps CURRENT_PASSWORD_INCORRECT and knows INTERNAL_ERROR (contract envelope)", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi
+          .fn()
+          .mockResolvedValueOnce(
+            json({ success: false, code: "CURRENT_PASSWORD_INCORRECT", message: "Current password is incorrect", errors: [{ field: "currentPassword", code: "INCORRECT", message: "Current password is incorrect" }] }, 400),
+          )
+          .mockResolvedValueOnce(json({ success: false, code: "INTERNAL_ERROR", message: "Password could not be changed. Please try again." }, 500)),
+      );
+      await expect(api.patch("/profile/password", {})).rejects.toMatchObject({
+        status: 400,
+        code: "CURRENT_PASSWORD_INCORRECT",
+        fieldErrors: { currentPassword: "Current password is incorrect" },
+      });
+      await expect(api.patch("/profile/password", {})).rejects.toMatchObject({ status: 500, code: "INTERNAL_ERROR" });
+    });
+
+    it("api.blob reads a binary body with the bearer, and parses a JSON error as usual", async () => {
+      const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47]);
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(new Response(png, { status: 200, headers: { "Content-Type": "image/png" } }))
+        .mockResolvedValueOnce(json({ success: false, message: "Picture not found" }, 404));
+      vi.stubGlobal("fetch", fetchMock);
+      setTokenProvider(() => "user-token");
+
+      const blob = await api.blob("/profile/avatar/files/a.png");
+      expect(blob.type).toBe("image/png");
+      expect(blob.size).toBe(png.byteLength); // bytes are not re-read: jsdom and Node Blobs are different realms
+      const [url, init] = fetchMock.mock.calls[0]!;
+      expect(url).toBe("http://localhost:8080/api/v1/profile/avatar/files/a.png");
+      expect((init as RequestInit).method).toBe("GET");
+      expect(new Headers((init as RequestInit).headers).get("Authorization")).toBe("Bearer user-token");
+
+      await expect(api.blob("/profile/avatar/files/b.png")).rejects.toMatchObject({ status: 404, code: "NOT_FOUND" });
+    });
+
+    it("sends FormData unchanged so the browser sets the multipart boundary", async () => {
+      const fetchMock = vi.fn().mockImplementation(async () => json({ success: true, data: { avatarUrl: "/x" } }));
+      vi.stubGlobal("fetch", fetchMock);
+      const form = new FormData();
+      form.append("avatar", new Blob([new Uint8Array([1])], { type: "image/png" }), "a.png");
+      await api.post("/profile/avatar", form);
+      const init = fetchMock.mock.calls[0]![1] as RequestInit;
+      expect(init.body).toBe(form);
+      expect(new Headers(init.headers).get("Content-Type")).toBeNull();
+    });
   });
 });

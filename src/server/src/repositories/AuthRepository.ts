@@ -236,7 +236,7 @@ class InMemoryAuthRepository implements AuthRepository {
             WHERE user_id = $1
         `;
         const result = await DbConnection.pool.query<User>(query, [id]);
-        return result != null;
+        return result.rows.length > 0;
     }
 
     public async checkUserExistsWithEmail(email: string): Promise<boolean> {
@@ -246,7 +246,7 @@ class InMemoryAuthRepository implements AuthRepository {
             WHERE email = $1
         `;
         const result = await DbConnection.pool.query<User>(query, [email]);
-        return result != null;
+        return result.rows.length > 0;
     }
 
     public async checkUserExistsWithPhoneNumber(phone: string, excludingUserId?: string): Promise<boolean> {
@@ -282,7 +282,7 @@ class InMemoryAuthRepository implements AuthRepository {
         const query = `
             SELECT password_hash
             FROM "User"
-            WHERE user_id = $1
+            WHERE user_id = $1 AND is_active IS NOT FALSE
         `;
         const result = await DbConnection.pool.query<{ password_hash: string }>(query, [id]);
         return result.rows[0]?.password_hash ?? null;
@@ -292,7 +292,7 @@ class InMemoryAuthRepository implements AuthRepository {
         const query = `
             UPDATE "User"
             SET password_hash = $3
-            WHERE user_id = $1 AND password_hash = $2
+            WHERE user_id = $1 AND password_hash = $2 AND is_active IS NOT FALSE
             RETURNING user_id
         `;
         const result = await DbConnection.pool.query<{ user_id: string }>(query, [
@@ -310,7 +310,7 @@ class InMemoryAuthRepository implements AuthRepository {
 			WHERE email = $1
 		`;
 		const result = await DbConnection.pool.query(query, [email]);
-		return result.rows[0] ?? null;
+		return result.rows[0]?.user_id ?? null;
 	}
 
 	public async getName(id: string): Promise<string> {
@@ -320,7 +320,7 @@ class InMemoryAuthRepository implements AuthRepository {
 			WHERE user_id = $1
 		`;
 		const result = await DbConnection.pool.query(query, [id]);
-		return result.rows[0] ?? null;
+		return result.rows[0]?.full_name ?? null;
 	}
 
     public async updateUserSessionToken(id: string, newSessionToken: string): Promise<void> {

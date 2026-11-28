@@ -99,7 +99,15 @@ function authHeaders(userId: string): Record<string, string> {
 
 test('denies profile reads and updates without a valid bearer token', async () => {
 	await withServer(async (baseUrl, profiles) => {
-		for (const headers of [{}, { Authorization: 'Bearer invalid-token' }]) {
+		for (const headers of [
+			{},
+			{ Authorization: 'Bearer invalid-token' },
+			{ Authorization: 'Bearer MIKU_MIKU_OO_EE_OO' },
+			{ Authorization: `Bearer ${jwt.sign({ sub: 'user-1' }, 'wrong-secret')}` },
+			{ Authorization: `Bearer ${jwt.sign({ sub: 'user-1' }, TEST_JWT_SECRET, { expiresIn: -1 })}` },
+			{ Authorization: `Bearer ${jwt.sign({}, TEST_JWT_SECRET)}` },
+			{ Authorization: `${authHeaders('user-1').Authorization} extra` }
+		]) {
 			const read = await fetch(`${baseUrl}/api/v1/profile`, { headers });
 			assert.equal(read.status, 401);
 

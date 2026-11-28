@@ -1,3 +1,8 @@
+import { createSessionRoute } from './routes/SessionRoute.ts';
+import { createAvatarRoute } from './routes/AvatarRoute.ts';
+import { AvatarService } from './services/AvatarService.ts';
+import { AvatarFileStorage } from './services/AvatarFileStorage.ts';
+import { AvatarRepository } from './repositories/AvatarRepository.ts';
 // libs
 import express from 'express';
 import bodyParser from 'body-parser';
@@ -75,12 +80,17 @@ export function createApp(options: AppOptions = {}) {
 		AuthService
 	);
 
+	app.use('/api/auth', createSessionRoute(DbConnection.pool));
 	app.use('/api/auth', AuthRoute);
 	app.use('/api/ai', createAIRoute(aiController, {
 		rateLimit: createRateLimiter(PROMPT_LIMIT, PROMPT_WINDOW_MS),
 		loadIdentity: createLoadIdentity(identityStore),
 		requirePermission: createRequirePermission(identityStore)
 	}));
+	app.use('/api/v1/profile/avatar', createAvatarRoute(new AvatarService(
+		new AvatarRepository(DbConnection.pool),
+		new AvatarFileStorage()
+	)));
 	app.use('/api/v1/profile', createProfileRoute(profileController, passwordController));
 	app.get('/', rootCallback);
 	app.get('/health', healthCallback);

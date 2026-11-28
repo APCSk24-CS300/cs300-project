@@ -92,7 +92,7 @@ test('rejects short passwords and confirmPassword without accessing credentials'
 	const { service, credentials, hasher } = createService();
 
 	for (const request of [
-		{ currentPassword: 'old-password', newPassword: '1234567' },
+		{ currentPassword: 'old-password', newPassword: '12345' },
 		{ currentPassword: 'old-password', newPassword: 'new-password-8', confirmPassword: 'new-password-8' }
 	]) {
 		const result = await service.changePassword('user-1', request);
@@ -207,4 +207,12 @@ test('returns a generic error without logging password values when storage fails
 	} finally {
 		console.error = originalError;
 	}
+});
+
+test('accepts exactly six Unicode characters after current-password verification', async () => {
+ const credentials = new FakeCredentials();
+ const hasher = new FakeHasher();
+ const service = new AuthService(credentials, hasher);
+ const result = await service.changePassword('user-1', { currentPassword: 'old-password', newPassword: '😀😀😀😀😀😀' });
+ assert.equal(result.statusCode, 200);
 });

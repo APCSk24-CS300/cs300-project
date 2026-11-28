@@ -188,11 +188,11 @@ export class AuthService {
 				message: 'New password is required'
 			}]);
 		}
-		if (Array.from(newPassword).length < 8) {
+		if (Array.from(newPassword).length < 6) {
 			return validationFailure('Password change request is invalid', [{
 				field: 'newPassword',
 				code: 'MIN_LENGTH',
-				message: 'New password must be at least 8 characters'
+				message: 'New password must be at least 6 characters'
 			}]);
 		}
 

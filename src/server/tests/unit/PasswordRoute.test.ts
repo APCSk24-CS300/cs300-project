@@ -4,24 +4,29 @@ import express from 'express';
 import type { AddressInfo } from 'node:net';
 import { ProfileController } from '../../src/controllers/ProfileController.ts';
 import { PasswordController } from '../../src/controllers/PasswordController.ts';
-import { createProfileRoute } from '../../src/routes/ProfileRoute.ts';
 import type { ProfileService } from '../../src/services/ProfileService.ts';
-import {
-	AuthService,
-	type PasswordHasher
-} from '../../src/services/AuthService.ts';
+import type { PasswordHasher } from '../../src/services/AuthService.ts';
 import {
 	type PasswordChangeResult
 } from '../../src/services/AuthService.ts';
 import type { PasswordCredentialStore } from '../../src/repositories/AuthRepository.ts';
 import { generate200Response } from '../../src/helper/generate200Response.ts';
 
+const TEST_JWT_SECRET = 'password-route-test-secret';
+process.env.JWT_SECRET = TEST_JWT_SECRET;
+const { default: config } = await import('../../src/config/config.ts');
+config.jwt.secret = TEST_JWT_SECRET;
+const jwt = (await import('jsonwebtoken')).default;
+const { AuthService } = await import('../../src/services/AuthService.ts');
+const { createProfileRoute } = await import('../../src/routes/ProfileRoute.ts');
+const authorization = `Bearer ${jwt.sign({ sub: 'dev' }, TEST_JWT_SECRET)}`;
+
 class FakeProfileService implements Pick<ProfileService, 'getProfile' | 'updateProfile'> {
 	async getProfile() { return generate200Response({}); }
 	async updateProfile() { return generate200Response({}); }
 }
 
-class FakePasswordService implements Pick<AuthService, 'changePassword'> {
+class FakePasswordService implements Pick<InstanceType<typeof AuthService>, 'changePassword'> {
 	calls: { userId: string; request: unknown }[] = [];
 
 	async changePassword(userId: string, request: unknown): Promise<PasswordChangeResult> {
@@ -68,7 +73,7 @@ class FakeHasher implements PasswordHasher {
 }
 
 async function withServer(
-	passwordService: Pick<AuthService, 'changePassword'>,
+	passwordService: Pick<InstanceType<typeof AuthService>, 'changePassword'>,
 	run: (baseUrl: string) => Promise<void>
 ): Promise<void> {
 	const app = express();
@@ -100,7 +105,7 @@ test('exposes authenticated PATCH /profile/password and accepts only the contrac
 		const response = await fetch(`${baseUrl}/api/v1/profile/password`, {
 			method: 'PATCH',
 			headers: {
-				Authorization: 'Bearer MIKU_MIKU_OO_EE_OO',
+				Authorization: authorization,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(request)
@@ -126,7 +131,7 @@ test('validates input and integrates AuthService through the authenticated API',
 		const response = await fetch(`${baseUrl}/api/v1/profile/password`, {
 			method: 'PATCH',
 			headers: {
-				Authorization: 'Bearer MIKU_MIKU_OO_EE_OO',
+				Authorization: authorization,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
@@ -143,11 +148,11 @@ test('validates input and integrates AuthService through the authenticated API',
 		assert.deepEqual(credentials.reads, []);
 		assert.deepEqual(credentials.updates, []);
 
-		const shortPassword = '1234567';
+		const shortPassword = '12345';
 		const shortResponse = await fetch(`${baseUrl}/api/v1/profile/password`, {
 			method: 'PATCH',
 			headers: {
-				Authorization: 'Bearer MIKU_MIKU_OO_EE_OO',
+				Authorization: authorization,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({ currentPassword, newPassword: shortPassword })
@@ -164,7 +169,7 @@ test('validates input and integrates AuthService through the authenticated API',
 		const incorrectResponse = await fetch(`${baseUrl}/api/v1/profile/password`, {
 			method: 'PATCH',
 			headers: {
-				Authorization: 'Bearer MIKU_MIKU_OO_EE_OO',
+				Authorization: authorization,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
@@ -183,7 +188,7 @@ test('validates input and integrates AuthService through the authenticated API',
 		const successResponse = await fetch(`${baseUrl}/api/v1/profile/password`, {
 			method: 'PATCH',
 			headers: {
-				Authorization: 'Bearer MIKU_MIKU_OO_EE_OO',
+				Authorization: authorization,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({ currentPassword, newPassword })
@@ -218,9 +223,15 @@ test('requires authentication and rejects unsupported methods', async () => {
 			})
 		});
 		assert.equal(unauthorized.status, 401);
+		const bypass = await fetch(`${baseUrl}/api/v1/profile/password`, {
+			method: 'PATCH',
+			headers: { Authorization: 'Bearer MIKU_MIKU_OO_EE_OO', 'Content-Type': 'application/json' },
+			body: JSON.stringify({ currentPassword: 'old-password', newPassword: 'new-password-8' })
+		});
+		assert.equal(bypass.status, 401);
 
 		const methodNotAllowed = await fetch(`${baseUrl}/api/v1/profile/password`, {
-			headers: { Authorization: 'Bearer MIKU_MIKU_OO_EE_OO' }
+			headers: { Authorization: authorization }
 		});
 		assert.equal(methodNotAllowed.status, 405);
 		assert.equal(methodNotAllowed.headers.get('allow'), 'PATCH');

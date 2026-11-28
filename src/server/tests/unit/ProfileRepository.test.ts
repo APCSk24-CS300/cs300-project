@@ -61,7 +61,7 @@ test('gets profile by supplied user ID with available academic data and no passw
 		phoneNumber: '0901234567',
 		avatarUrl: null,
 		academicInfo: {
-			studentNumber: null,
+			studentNumber: 'student-1',
 			faculty: { id: 'faculty-1', code: 'SCI', name: 'Faculty of Science' },
 			major: 'Computer Science',
 			enrollmentYear: 2024
@@ -122,4 +122,10 @@ test('propagates database failures', async () => {
 	const repository = new ProfileRepository(executor);
 
 	await assert.rejects(repository.getProfileByUserId('student-1'), /database unavailable/);
+});
+
+test('a user with a Student row keeps the same student number even with staff duties', async () => {
+ const row = studentRow({ user_id: 'student-manager', student_user_id: 'student-manager' });
+ const profile = await new ProfileRepository(new FakeProfileQueryExecutor([[row]])).getProfileByUserId('student-manager');
+ assert.equal(profile?.academicInfo?.studentNumber, 'student-manager');
 });

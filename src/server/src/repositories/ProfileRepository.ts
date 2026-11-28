@@ -50,8 +50,8 @@ function mapProfile(row: ProfileQueryRow): Profile {
 		}
 
 		academicInfo = {
-			// The current schema has no authoritative student-number column.
-			studentNumber: null,
+			// UC-03: a Student row uses its referenced User.user_id as the read-only student number.
+			studentNumber: row.student_user_id,
 			faculty: {
 				id: row.faculty_id,
 				code: row.faculty_code,
@@ -85,7 +85,7 @@ export class ProfileRepository {
 			`SELECT ${PROFILE_COLUMNS}
 			 FROM "User" u
 			 ${PROFILE_JOINS}
-			 WHERE u.user_id = $1`,
+			 WHERE u.user_id = $1 AND u.is_active IS NOT FALSE`,
 			[userId]);
 
 		return rows[0] ? mapProfile(rows[0]) : null;
@@ -96,7 +96,7 @@ export class ProfileRepository {
 			`WITH u AS (
 				UPDATE "User"
 				SET phone_number = $2
-				WHERE user_id = $1
+				WHERE user_id = $1 AND is_active IS NOT FALSE
 				RETURNING user_id, email, full_name, phone_number, avatar_url
 			)
 			SELECT ${PROFILE_COLUMNS}

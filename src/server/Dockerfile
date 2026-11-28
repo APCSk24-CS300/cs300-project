@@ -1,6 +1,8 @@
 FROM node:22
 WORKDIR /app
 
+VOLUME ["/app/data/avatars"]
+
 COPY package*.json ./
 RUN npm i -g ts-node
 RUN npm i -g nodemon

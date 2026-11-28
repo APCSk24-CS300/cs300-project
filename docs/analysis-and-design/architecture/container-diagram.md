@@ -176,15 +176,3 @@ PA4 requires the diagrams to match the code. This table states, for each arrow, 
 | Frontend Application to University Services | Dashed | Working, by design as hyperlinks only. Signed-in users open the links from `/services`. On the public landing page the cards are a locked preview. | `src/client/src/features/services/components/ServiceCard.tsx` |
 
 **Update rule:** when a connection is implemented, change its arrow from dashed (`-.->`) to solid (`-->`). When a limit in this table is removed or a new one appears, update the table. Do both in the same pull request as the code change.
-
-## 6. Issues found while drawing the diagram
-
-These do not change the containers, but they affect whether the arrows work end to end.
-
-1. **No real backend token for the frontend.** The frontend's login uses `mockAuthService` and its own `session` cookie (signed with `SESSION_SECRET`). The backend's login bugs (section 5) mean no real token can be issued, so the forwarder relies on `DEV_BACKEND_TOKEN`.
-2. **A hard-coded development token is still accepted.** `validateAccessToken` accepts a fixed token string. It must be removed before release.
-3. **The AI assistant has no frontend.** The backend endpoint works, but there is no chat screen and the forwarder cannot reach `/api/ai` (row above).
-4. **The activity list cannot reach the backend.** `activity.service.ts` calls `/activities/landing`, which the forwarder's allow list rejects and the backend does not provide.
-5. **The health check does not test the database.** The query in `databaseCheckHelper.ts` is commented out, so `/health` reports the database as up without contacting it.
-6. **Wrong redirect path in `proxy.ts`.** A role that is not allowed on a path is sent to `/forbiden`, but the page is `/forbidden`.
-7. **The frontend is not in Docker Compose.** It is started separately with `npm run dev`. This matters for the deployment diagram.

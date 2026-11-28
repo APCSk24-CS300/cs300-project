@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { ChevronDownIcon, LogoutIcon, NavItemIcon } from "@/components/icons/NavIcons";
 import { PROFILE_PATH } from "@/libs/route-access";
 import { cn } from "@/libs/cn";
@@ -13,14 +13,22 @@ export interface AccountMenuUser {
   role: RoleCode;
 }
 
+/** Sizes the menu asks for: the trigger and the menu header. */
+export type AccountAvatarSize = "trigger" | "header";
+
 type AccountMenuProps = {
   user: AccountMenuUser;
   onLogout: () => void;
   pending?: boolean;
+  /**
+   * The user's picture (plan 006 O8). A slot so this shared component stays independent of the
+   * profile feature; the protected layout passes the authenticated ProfileAvatar. Without it: initials.
+   */
+  renderAvatar?: (size: AccountAvatarSize) => ReactNode;
 };
 
 /** Menu-button with the account name, role label, "My profile" (UC-03) and "Log out" (UC-02 step 1, A1). */
-export function AccountMenu({ user, onLogout, pending = false }: AccountMenuProps) {
+export function AccountMenu({ user, onLogout, pending = false, renderAvatar }: AccountMenuProps) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -69,9 +77,15 @@ export function AccountMenu({ user, onLogout, pending = false }: AccountMenuProp
         onClick={() => setOpen((v) => !v)}
         className="flex min-h-11 items-center gap-2.5 rounded-pill px-2 py-1 text-left transition-colors hover:bg-surface-muted"
       >
-        <span aria-hidden="true" className="flex size-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-on-primary shadow-xs">
-          {initials}
-        </span>
+        {renderAvatar ? (
+          <span aria-hidden="true" className="flex">
+            {renderAvatar("trigger")}
+          </span>
+        ) : (
+          <span aria-hidden="true" className="flex size-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-on-primary shadow-xs">
+            {initials}
+          </span>
+        )}
         <span className="hidden flex-col sm:flex">
           <span className="text-[15px] font-semibold leading-tight text-heading">{user.fullName}</span>
           <span className="text-[13px] text-text-muted">{ROLE_LABEL[user.role]}</span>
@@ -89,9 +103,15 @@ export function AccountMenu({ user, onLogout, pending = false }: AccountMenuProp
           className="absolute right-0 z-40 mt-2 w-72 rounded-2xl border border-divider bg-surface p-2.5 shadow-card"
         >
           <div className="flex items-start gap-3 px-3 py-2.5">
-            <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-              {initials}
-            </span>
+            {renderAvatar ? (
+              <span aria-hidden="true" className="flex shrink-0">
+                {renderAvatar("header")}
+              </span>
+            ) : (
+              <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                {initials}
+              </span>
+            )}
             <div className="min-w-0 flex-1">
               <p className="truncate text-[15px] font-semibold text-heading">{user.fullName}</p>
               <p className="truncate text-[13px] text-text-muted">{user.email}</p>

@@ -56,4 +56,11 @@ describe("AccountMenu (UC-02 step 1, A1)", () => {
     await userEvent.click(screen.getByRole("menuitem", { name: "My profile" }));
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
   });
+
+  it("shows the picture from the avatar slot in the trigger and the header (plan 006 O8)", async () => {
+    render(<AccountMenu user={user} onLogout={vi.fn()} renderAvatar={(size) => <span data-testid={`avatar-${size}`} />} />);
+    expect(screen.getByTestId("avatar-trigger")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /account menu/i }));
+    expect(screen.getByTestId("avatar-header")).toBeInTheDocument();
+  });
 });

@@ -1,27 +1,44 @@
 import { describe, expect, it } from "vitest";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { http, HttpResponse } from "msw";
 import { ProfilePage } from "@/features/profile/components/ProfilePage";
-import { readDb, setMockFailures, updateDb } from "@/mocks/db/store";
 import { useAuth } from "@/hooks/useAuth";
-import { renderWithProviders, signInAs } from "../../../../tests/test-utils";
+import { putAvatarFile } from "@/mocks/db/avatar-files";
+import { readDb, setMockFailures, updateDb } from "@/mocks/db/store";
+import { server } from "@/mocks/node";
+import { PHONE_INVALID } from "@/libs/validation/phone";
+import { expectNoA11yViolations, renderWithProviders, signInAs } from "../../../../tests/test-utils";
 
 // Against the MSW profile handlers (they answer like src/server); the mock DB is reset before each test.
-// Titles are dev's; scenario map: specs/006-integrate-profile/coverage.md (PP).
+// Titles are dev's (step 4) plus step 5/6 additions; scenario map: specs/006-integrate-profile/coverage.md (PP).
 const STUDENT = "student1@example.invalid";
 const AVATAR = "/api/v1/profile/avatar/files/saved.png";
+const PNG_BYTES = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 1]);
 
-function setup(change?: (user: ReturnType<typeof readDb>["users"][number]) => void) {
+function seed(change?: (user: ReturnType<typeof readDb>["users"][number]) => void, withFile = true) {
   updateDb((db) => {
     const user = db.users.find((u) => u.email === STUDENT)!;
     user.phoneNumber = "0901234567";
     user.avatarUrl = AVATAR;
     change?.(user);
   });
+  if (withFile) putAvatarFile("saved.png", { bytes: PNG_BYTES, mime: "image/png" });
+}
+
+function setup(change?: Parameters<typeof seed>[0], withFile = true) {
+  seed(change, withFile);
   signInAs(STUDENT);
   return renderWithProviders(<ProfilePage />, { route: "/profile" });
 }
 
 const stored = () => readDb().users.find((u) => u.email === STUDENT)!;
+const phoneBox = () => screen.getByRole("textbox", { name: /^phone number/i });
+
+async function editPhone(value: string) {
+  fireEvent.click(await screen.findByRole("button", { name: "Edit phone number" }));
+  fireEvent.change(phoneBox(), { target: { value } });
+  fireEvent.click(screen.getByRole("button", { name: "Save" }));
+}
 
 describe("ProfilePage", () => {
   it("shows loading state before rendering saved profile and read-only identity", async () => {
@@ -35,14 +52,27 @@ describe("ProfilePage", () => {
     expect(screen.getByText("Computer and Information Technology field")).toBeInTheDocument();
     expect(screen.getByText("Read only")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Change password" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Current password")).toBeInTheDocument();
+    expect(screen.getByLabelText(/^current password/i)).toBeInTheDocument();
     expect(container.querySelector('[name="fullName"]')).not.toBeInTheDocument();
     expect(container.querySelector('[name="studentNumber"]')).not.toBeInTheDocument();
     expect(container.querySelector('[name="faculty"]')).not.toBeInTheDocument();
     expect(screen.getByText("23127001").tagName).toBe("DD");
     expect(screen.getByText("Computer and Information Technology field").tagName).toBe("DD");
-    expect(screen.getByRole("img", { name: "Nguyễn Văn An's profile picture" })).toHaveAttribute("src", AVATAR);
+    // The picture is fetched through the API client (bearer) and shown from an object URL (Q5).
+    const image = await screen.findByRole("img", { name: "Nguyễn Văn An's profile picture" });
+    expect(image.getAttribute("src")).toMatch(/^blob:/);
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    await expectNoA11yViolations(container);
+  });
+
+  it("shows name, email, student number and faculty as text, not inputs", async () => {
+    setup();
+    const details = (await screen.findByRole("heading", { name: "Account details" })).closest("section")!;
+    for (const value of ["Nguyễn Văn An", STUDENT, "Student", "23127001", "Computer and Information Technology field"]) {
+      expect(within(details).getByText(value).tagName).toBe("DD");
+    }
+    expect(within(details).queryByRole("textbox")).not.toBeInTheDocument();
+    expect(within(details).queryByRole("button")).not.toBeInTheDocument();
   });
 
   it("shows unavailable academic details and an avatar fallback", async () => {
@@ -57,6 +87,7 @@ describe("ProfilePage", () => {
     expect(await screen.findByText("No academic information available")).toBeInTheDocument();
     expect(screen.getByText("Not provided")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "No profile picture" })).toHaveTextContent("T");
+    expect(screen.queryByRole("button", { name: "Remove picture" })).not.toBeInTheDocument();
   });
 
   it("shows an error and retries the profile request", async () => {
@@ -75,27 +106,18 @@ describe("ProfilePage", () => {
 
   it("validates the phone number without discarding the entered value", async () => {
     setup();
+    await editPhone("12345");
 
-    fireEvent.click(await screen.findByRole("button", { name: "Edit phone number" }));
-    const phoneInput = screen.getByRole("textbox", { name: "Phone number" });
-    fireEvent.change(phoneInput, { target: { value: "12345" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
-
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Enter 0 followed by 9 digits, or +84 followed by 9 digits.", // shared rule (plan 006 Q4)
-    );
-    expect(phoneInput).toHaveValue("12345");
-    expect(phoneInput).toHaveAttribute("aria-invalid", "true");
+    expect(await screen.findByText(PHONE_INVALID)).toBeInTheDocument(); // shared rule (plan 006 Q4)
+    expect(phoneBox()).toHaveValue("12345");
+    expect(phoneBox()).toHaveAttribute("aria-invalid", "true");
     expect(stored().phoneNumber).toBe("0901234567"); // nothing sent, nothing changed
-    expect(screen.queryByRole("textbox", { name: "Student number" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: /student number/i })).not.toBeInTheDocument();
   });
 
   it("saves a valid phone number and refreshes the displayed profile", async () => {
     setup();
-
-    fireEvent.click(await screen.findByRole("button", { name: "Edit phone number" }));
-    fireEvent.change(screen.getByRole("textbox", { name: "Phone number" }), { target: { value: "+84901234567" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    await editPhone("+84901234567");
 
     expect(await screen.findByText("+84901234567")).toBeInTheDocument();
     expect(screen.getByText("Phone number updated successfully.")).toBeInTheDocument();
@@ -108,28 +130,21 @@ describe("ProfilePage", () => {
     setup();
 
     fireEvent.click(await screen.findByRole("button", { name: "Edit phone number" }));
-    fireEvent.change(screen.getByRole("textbox", { name: "Phone number" }), { target: { value: "0911111111" } });
+    fireEvent.change(phoneBox(), { target: { value: "0911111111" } });
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
     expect(screen.getByText("0901234567")).toBeInTheDocument();
-    expect(screen.queryByRole("textbox", { name: "Phone number" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: /^phone number/i })).not.toBeInTheDocument();
     expect(stored().phoneNumber).toBe("0901234567");
   });
 
   it("shows save errors and keeps the entered phone number for correction", async () => {
-    // Another account already uses the number (the BE answers 409 for either format).
-    updateDb((db) => {
-      db.users.find((u) => u.email === "manager1@example.invalid")!.phoneNumber = "+84911111111";
-    });
+    setMockFailures(["updateProfile"]); // 500: a failure that is not about the field (A9)
     setup();
+    await editPhone("0911111111");
 
-    fireEvent.click(await screen.findByRole("button", { name: "Edit phone number" }));
-    const phoneInput = screen.getByRole("textbox", { name: "Phone number" });
-    fireEvent.change(phoneInput, { target: { value: "0911111111" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
-
-    expect(await screen.findByRole("alert")).toHaveTextContent("This phone number is already used by another account."); // toUserMessage "profilePhone" (step 5)
-    expect(phoneInput).toHaveValue("0911111111");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Your phone number could not be saved. Please try again.");
+    expect(phoneBox()).toHaveValue("0911111111");
     expect(screen.queryByText("Phone number updated successfully.")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
@@ -140,18 +155,19 @@ describe("ProfilePage", () => {
 });
 
 it("offers retry when the saved picture fails to load", async () => {
-  setup();
-  const image = await screen.findByAltText("Nguyễn Văn An's profile picture");
-  fireEvent.error(image);
+  setup(undefined, false); // the URL is saved but the file read answers 404 (UC-03 A9)
+  expect(await screen.findByText("Retry picture")).toBeInTheDocument();
   expect(screen.getByRole("img", { name: "No profile picture" })).toBeInTheDocument();
+  putAvatarFile("saved.png", { bytes: PNG_BYTES, mime: "image/png" });
   fireEvent.click(screen.getByText("Retry picture"));
-  expect(screen.getByAltText("Nguyễn Văn An's profile picture")).toBeInTheDocument();
+  expect(await screen.findByRole("img", { name: "Nguyễn Văn An's profile picture" })).toBeInTheDocument();
 });
 
 it("restores the default picture after confirmed removal", async () => {
   setup();
-  fireEvent.click(await screen.findByText("Remove picture"));
-  fireEvent.click(screen.getByText("Confirm removal"));
+  await screen.findByRole("img", { name: "Nguyễn Văn An's profile picture" });
+  fireEvent.click(screen.getByRole("button", { name: "Remove picture" }));
+  fireEvent.click(within(screen.getByRole("dialog", { name: "Remove your profile picture?" })).getByText("Confirm removal"));
   await waitFor(() => expect(screen.getByRole("img", { name: "No profile picture" })).toBeInTheDocument());
   expect(stored().avatarUrl).toBeNull();
 });
@@ -161,12 +177,10 @@ it("shows a server validation error on the phone field while preserving the draf
     db.users.find((u) => u.email === "manager1@example.invalid")!.phoneNumber = "0911111111";
   });
   setup();
-  fireEvent.click(await screen.findByRole("button", { name: "Edit phone number" }));
-  const input = screen.getByRole("textbox", { name: "Phone number" });
-  fireEvent.change(input, { target: { value: "0911111111" } });
-  fireEvent.click(screen.getByRole("button", { name: "Save" }));
-  await waitFor(() => expect(input).toHaveAttribute("aria-invalid", "true"));
-  expect(input).toHaveValue("0911111111");
+  await editPhone("+84911111111"); // the same number in the other format: 409 on the field
+  await waitFor(() => expect(phoneBox()).toHaveAttribute("aria-invalid", "true"));
+  expect(screen.getByText("This phone number is already used by another account.")).toBeInTheDocument();
+  expect(phoneBox()).toHaveValue("+84911111111");
   expect(screen.queryByText("Phone number updated successfully.")).not.toBeInTheDocument();
 });
 
@@ -178,9 +192,7 @@ function SessionProbe() {
 }
 
 it("refreshes the signed-in user (AccountMenu) after a saved change", async () => {
-  updateDb((db) => {
-    db.users.find((u) => u.email === STUDENT)!.avatarUrl = AVATAR;
-  });
+  seed();
   signInAs(STUDENT);
   // One AuthProvider for the page and the probe, as in the app (AccountMenu reads the same provider).
   renderWithProviders(
@@ -191,15 +203,13 @@ it("refreshes the signed-in user (AccountMenu) after a saved change", async () =
     { route: "/profile" },
   );
   await waitFor(() => expect(screen.getByTestId("session-avatar")).toHaveTextContent(AVATAR));
-  fireEvent.click(await screen.findByText("Remove picture"));
+  fireEvent.click(await screen.findByRole("button", { name: "Remove picture" }));
   fireEvent.click(screen.getByText("Confirm removal"));
   // The provider re-read /auth/me: AccountMenu's user follows the server, no second store (plan 006 O4).
   await waitFor(() => expect(screen.getByTestId("session-avatar")).toHaveTextContent("null"));
 });
 
 it("shows the forbidden view when the API refuses the profile with 403", async () => {
-  const { server } = await import("@/mocks/node");
-  const { http, HttpResponse } = await import("msw");
   server.use(
     http.get("http://localhost:8080/api/v1/profile", () =>
       HttpResponse.json({ success: false, code: "FORBIDDEN", message: "Forbidden" }, { status: 403 }),
@@ -211,4 +221,3 @@ it("shows the forbidden view when the API refuses the profile with 403", async (
     expect(screen.getByRole("link", { name: "Go to my dashboard" })).toHaveAttribute("href", "/student/dashboard"),
   );
 });
-

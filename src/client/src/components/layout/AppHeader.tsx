@@ -1,12 +1,14 @@
 "use client";
 
 import { Logo } from "@/components/layout/Logo";
-import { AccountMenu, type AccountMenuUser } from "@/components/layout/AccountMenu";
+import { AccountMenu, type AccountAvatarSize, type AccountMenuUser } from "@/components/layout/AccountMenu";
 import { MenuIcon } from "@/components/icons/MenuIcon";
+import type { ReactNode } from "react";
 import { ROLE_LABEL } from "@/libs/roles";
 
 type AppHeaderProps = {
   user: AccountMenuUser;
+  renderAvatar?: (size: AccountAvatarSize) => ReactNode;
   homeHref: string;
   onLogout: () => void;
   logoutPending?: boolean;
@@ -16,7 +18,7 @@ type AppHeaderProps = {
   nav?: { open: boolean; controlsId: string; onToggle: () => void };
 };
 
-export function AppHeader({ user, homeHref, onLogout, logoutPending, demoMode = false, nav }: AppHeaderProps) {
+export function AppHeader({ user, homeHref, onLogout, logoutPending, demoMode = false, nav, renderAvatar }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-divider bg-surface/95 backdrop-blur">
       <div className="mx-auto flex h-17 w-full max-w-[1440px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
@@ -44,7 +46,7 @@ export function AppHeader({ user, homeHref, onLogout, logoutPending, demoMode = 
             </span>
           ) : null}
         </div>
-        <AccountMenu user={user} onLogout={onLogout} pending={logoutPending} />
+        <AccountMenu user={user} onLogout={onLogout} pending={logoutPending} renderAvatar={renderAvatar} />
       </div>
     </header>
   );

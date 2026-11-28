@@ -6,7 +6,7 @@ import { cn } from "@/libs/cn";
 import type { NavItem } from "@/libs/navigation";
 import { ROLE_LABEL } from "@/libs/roles";
 import { AppHeader } from "@/components/layout/AppHeader";
-import type { AccountMenuUser } from "@/components/layout/AccountMenu";
+import type { AccountAvatarSize, AccountMenuUser } from "@/components/layout/AccountMenu";
 import { Logo } from "@/components/layout/Logo";
 import { SideNav } from "@/components/layout/SideNav";
 
@@ -18,6 +18,8 @@ type AppShellProps = {
   onLogout: () => void;
   logoutPending?: boolean;
   demoMode?: boolean;
+  /** The user's picture for the account menu (plan 006 O8); see AccountMenu. */
+  renderAvatar?: (size: AccountAvatarSize) => ReactNode;
   children: ReactNode;
 };
 
@@ -33,6 +35,7 @@ export function AppShell({
   onLogout,
   logoutPending,
   demoMode,
+  renderAvatar,
   children,
 }: AppShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -62,6 +65,7 @@ export function AppShell({
         onLogout={onLogout}
         logoutPending={logoutPending}
         demoMode={demoMode}
+        renderAvatar={renderAvatar}
         nav={hasNav ? { open: drawerOpen, controlsId: navId, onToggle: () => setDrawerOpen((v) => !v) } : undefined}
       />
       <div className="mx-auto flex w-full max-w-[1440px] gap-6 px-4 py-6 pb-14 sm:px-6 lg:gap-8 lg:px-8">

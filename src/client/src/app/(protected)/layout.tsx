@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { NAVIGATION, getDashboardPath } from "@/libs/navigation";
 import { useIsMockMode } from "@/mocks/MockProvider";
 import { RequireSession } from "@/features/auth/components/RequireSession";
+import { ProfileAvatar } from "@/features/profile/components/ProfileAvatar";
 
 function ProtectedShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -26,6 +27,10 @@ function ProtectedShell({ children }: { children: ReactNode }) {
       navItems={status === "mustChangePassword" ? [] : NAVIGATION[user.role]}
       currentPath={pathname}
       demoMode={demoMode}
+      // The account menu shows the signed-in user's picture; it follows AuthProvider.refresh() (plan 006 O4).
+      renderAvatar={() => (
+        <ProfileAvatar avatarUrl={user.avatarUrl} name={user.fullName} size="md" />
+      )}
       logoutPending={loggingOut}
       onLogout={async () => {
         setLoggingOut(true);

@@ -186,3 +186,10 @@ if (typeof HTMLDialogElement !== "undefined") {
 if (typeof window !== "undefined") {
   window.scrollTo = vi.fn();
 }
+
+// jsdom has no object URLs; the avatar image and preview use them (plan 006 step 6). Tests may override.
+if (typeof URL !== "undefined" && typeof URL.createObjectURL !== "function") {
+  let next = 0;
+  URL.createObjectURL = () => `blob:test-${++next}`;
+  URL.revokeObjectURL = () => undefined;
+}

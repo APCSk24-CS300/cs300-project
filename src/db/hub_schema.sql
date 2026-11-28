@@ -72,15 +72,28 @@ JOIN "Permission" p ON
     OR (r.code = 'administrator' AND p.code = 'hub.services.manage')
 ON CONFLICT DO NOTHING;
 
--- Starting links from the landing page config. "HCMUS" and "Student Portal" are left to seed.sql
--- (PR #103), which inserts them without ON CONFLICT: seeding them here too would make seed.sql fail
--- when it runs after this file. Library and IT Support were "Coming soon", so they start inactive.
--- The Tuition Payment, Library and IT Support URLs are placeholders: set the real ones on the admin page.
+-- The six HCMUS service links. seed.sql (PR #103) already inserts "HCMUS" and "Student Portal"
+-- without ON CONFLICT, so this file must not insert those names (seed.sql would fail if run after it).
+-- Instead it fixes those two rows in place, only while they still hold seed.sql's original values,
+-- so an admin's later edits are never overwritten when this file is re-run.
+UPDATE "ServiceLink"
+   SET url = 'https://student.hcmus.edu.vn/login',
+       description = 'Student information, timetable and grades',
+       display_order = 2
+ WHERE name = 'Student Portal' AND url = 'https://portal.hcmus.edu.vn';
+
+-- The university website is not one of the six hub links: kept (links are never deleted) but inactive.
+UPDATE "ServiceLink"
+   SET is_active = FALSE,
+       display_order = 7
+ WHERE name = 'HCMUS' AND url = 'https://hcmus.edu.vn' AND is_active;
+
 INSERT INTO "ServiceLink" (name, url, description, display_order, is_active) VALUES
-    ('Moodle',          'https://moodle.hcmus.edu.vn/', 'Courses, assignments and lecture materials', 3, TRUE),
-    ('Tuition Payment', 'https://hcmus.edu.vn/',        'Pay tuition and check payment status',       4, TRUE),
-    ('HCMUS Library',   'https://hcmus.edu.vn/',        'Search the catalogue and borrow books',      5, FALSE),
-    ('IT Support',      'https://hcmus.edu.vn/',        'Accounts, email and network help',           6, FALSE)
+    ('Moodle',                     'https://courses.ctda.hcmus.edu.vn/',          'Courses, assignments and lecture materials',  1, TRUE),
+    ('Course Registration Portal', 'https://new-portal4.hcmus.edu.vn/Login.aspx', 'Course registration, timetable and results',  3, TRUE),
+    ('Special Programs Portal',    'https://portal.ctdb.hcmus.edu.vn/Login',      'Portal for special training programs',        4, TRUE),
+    ('Tuition Payment',            'https://hocphi.hcmus.edu.vn/',                'Pay tuition and check payment status',        5, TRUE),
+    ('Student Handbook 2025',      'https://hcmus.edu.vn/wp-content/uploads/2025/08/STSV2025_ONLINE.pdf', 'Rules, procedures and student support (PDF)', 6, TRUE)
 ON CONFLICT DO NOTHING;
 
 -- Permissions can only be granted to roles that exist. On a fresh schema the roles come from seed.sql,

@@ -7,7 +7,7 @@ import type {
 
 import type { SessionUser } from "@/features/auth/types";
 
-const BASE = "/auth";
+const BASE = "/api/auth";
 
 class AuthService {
   async login(data: LoginRequest): Promise<AuthResponse> {
@@ -31,7 +31,7 @@ class AuthService {
   }
 
   async changePassword(data: ChangePasswordRequest): Promise<MessageResponse> {
-    return api.post<MessageResponse>(`${BASE}/change-password`, data);
+    return api.patch<MessageResponse>("/api/v1/profile/password", data);
   }
 }
 

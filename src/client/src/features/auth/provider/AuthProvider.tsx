@@ -1,7 +1,7 @@
 "use client";
 
 import { AuthContext } from "@/features/auth/context/AuthContext";
-import { mockAuthService } from "@/features/auth/services/mock.auth.service";
+import { authService } from "@/features/auth/services/auth.service";
 import { SessionUser } from "@/features/auth/types/auth";
 import { LoginRequest } from "@/features/auth/types/auth.dto";
 import { useState, useCallback, useEffect, useMemo } from "react";
@@ -14,7 +14,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const authServiceInstance = mockAuthService;
+  const authServiceInstance = authService;
   const removeUser = useCallback(async () => {
     setUser(null);
   }, []);
@@ -26,7 +26,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const response = await authServiceInstance.login(data);
         if (response.user != null) {
           setUser(response.user);
-          console.log(response.user);
           return response.user;
         }
         throw new Error("Login failed: user is null");

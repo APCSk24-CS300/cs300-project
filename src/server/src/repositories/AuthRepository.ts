@@ -1,7 +1,7 @@
 import type { User } from "../types/UserRegistrationData.ts";
 import DbConnection from "../connections/db.ts";
 
-interface AuthRepository {
+export interface AuthRepository {
 
     getStudentUserID() : Promise<number>;
 
@@ -15,17 +15,24 @@ interface AuthRepository {
 
     checkUserExistsWithEmail(email: string): Promise<boolean>;
 
-    checkUserExistsWithPhoneNumber(phone: string): Promise<boolean>;
+    checkUserExistsWithPhoneNumber(phone: string, excludingUserId?: string): Promise<boolean>;
 
     getUserEmail(id: string): Promise<string>;
 
-    getUserPasswordHash(id: string): Promise<string>;
+    getUserPasswordHash(id: string): Promise<string | null>;
+
+    updateUserPasswordHash(id: string, currentHash: string, newHash: string): Promise<boolean>;
 
     getUserRefreshTokenHash(id: string): Promise<string>;
 
     updateUserSessionToken(id: string, newSessionToken: string): Promise<void>;
 
 }
+
+export type PasswordCredentialStore = Pick<
+    AuthRepository,
+    'getUserPasswordHash' | 'updateUserPasswordHash'
+>;
 
 class InMemoryAuthRepository implements AuthRepository {
     private  ROLE_IDS = {
@@ -229,7 +236,7 @@ class InMemoryAuthRepository implements AuthRepository {
             WHERE user_id = $1
         `;
         const result = await DbConnection.pool.query<User>(query, [id]);
-        return result != null;
+        return result.rows.length > 0;
     }
 
     public async checkUserExistsWithEmail(email: string): Promise<boolean> {
@@ -239,17 +246,16 @@ class InMemoryAuthRepository implements AuthRepository {
             WHERE email = $1
         `;
         const result = await DbConnection.pool.query<User>(query, [email]);
-        return result != null;
+        return result.rows.length > 0;
     }
 
-    public async checkUserExistsWithPhoneNumber(phone: string): Promise<boolean> {
-        const query = ` 
-            SELECT *
-            FROM "User"
-            WHERE phone_number = $1
-        `;
-        const result = await DbConnection.pool.query<User>(query, [phone]);
-        return result != null;
+    public async checkUserExistsWithPhoneNumber(phone: string, excludingUserId?: string): Promise<boolean> {
+        const query = excludingUserId === undefined
+            ? `SELECT 1 FROM "User" WHERE phone_number = $1 LIMIT 1`
+            : `SELECT 1 FROM "User" WHERE phone_number = $1 AND user_id <> $2 LIMIT 1`;
+        const values = excludingUserId === undefined ? [phone] : [phone, excludingUserId];
+        const result = await DbConnection.pool.query(query, values);
+        return result.rows.length > 0;
     }
 
     public async getUserEmail(id: string): Promise<string> {
@@ -272,14 +278,29 @@ class InMemoryAuthRepository implements AuthRepository {
         return result.rows[0] ?? null;
     }
 
-    public async getUserPasswordHash(id: string): Promise<string> {
+    public async getUserPasswordHash(id: string): Promise<string | null> {
         const query = `
             SELECT password_hash
             FROM "User"
-            WHERE user_id = $1
+            WHERE user_id = $1 AND is_active IS NOT FALSE
         `;
-        const result = await DbConnection.pool.query(query, [id]);
-        return result.rows[0] ?? null;
+        const result = await DbConnection.pool.query<{ password_hash: string }>(query, [id]);
+        return result.rows[0]?.password_hash ?? null;
+    }
+
+    public async updateUserPasswordHash(id: string, currentHash: string, newHash: string): Promise<boolean> {
+        const query = `
+            UPDATE "User"
+            SET password_hash = $3
+            WHERE user_id = $1 AND password_hash = $2 AND is_active IS NOT FALSE
+            RETURNING user_id
+        `;
+        const result = await DbConnection.pool.query<{ user_id: string }>(query, [
+            id,
+            currentHash,
+            newHash
+        ]);
+        return result.rows.length > 0;
     }
 
 	public async getUserFromEmail(email: string): Promise<string> {
@@ -289,7 +310,7 @@ class InMemoryAuthRepository implements AuthRepository {
 			WHERE email = $1
 		`;
 		const result = await DbConnection.pool.query(query, [email]);
-		return result.rows[0] ?? null;
+		return result.rows[0]?.user_id ?? null;
 	}
 
 	public async getName(id: string): Promise<string> {
@@ -299,7 +320,7 @@ class InMemoryAuthRepository implements AuthRepository {
 			WHERE user_id = $1
 		`;
 		const result = await DbConnection.pool.query(query, [id]);
-		return result.rows[0] ?? null;
+		return result.rows[0]?.full_name ?? null;
 	}
 
     public async updateUserSessionToken(id: string, newSessionToken: string): Promise<void> {

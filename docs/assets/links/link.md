@@ -1,7 +1,7 @@
 # Useful Links
 
-This document provides quick access to useful university-related
-resources and student services.
+This document provides quick access to useful university-related resources and student services at HCMUS.
+
 
 
 

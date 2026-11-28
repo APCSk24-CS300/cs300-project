@@ -1,7 +1,7 @@
 # Weekly Reports
-**Workers**: Trần Tôn Minh Kỳ  
+**Workers**: Quách Thiên Lạc 
 **Reviewers**: Quách Thiên Lạc, Phạm Vân Trang, Phan Minh Khôi, Nguyễn Khang Thịnh, Nguyễn Văn Tĩnh  
-**Editors**: Trần Tôn Minh Kỳ  
+**Editors**: Quách Thiên Lạc  
 
 ## ======== Sprint 4 &mdash; 20/11 Weekly meeting 1 ========
 ![weekly-1-tasks](../../../assets/PA4-weekly-meeting-1-tasks.png)
@@ -88,7 +88,7 @@ Issues/Obstacles:
 - The server and client setup is completed, enabling the implementation of endpoints and screens.
 - 
 ## ======== Sprint 4 &mdash; 26/11 Weekly meeting 2 ========
-![weekly-1-tasks](../../../assets/PA3-weekly-meeting-2-tasks.png)
+![weekly-1-tasks](../../../assets/PA4-weekly-meeting-2-tasks.png)
 
 ### Presence
 Team members present:

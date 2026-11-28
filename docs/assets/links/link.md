@@ -21,6 +21,8 @@ This document provides quick access to useful university-related resources and s
 
   ## Student Services
 
+- **Tuition Fee Management** – Access tuition fee information and payment-related services.
+  - https://hocphi.hcmus.edu.vn/
 
 
 

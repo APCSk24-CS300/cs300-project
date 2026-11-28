@@ -9,13 +9,24 @@ services:
       - '8080:8080'
     env_file:
       - server/.env
+      # The DB credentials live in db/.env; the server reads the same POSTGRES_USER/PASSWORD.
+      - db/.env
+    environment:
+      # schema.sql creates the database "myHCMUS" (POSTGRES_DB in db/.env only names the bootstrap DB).
+      POSTGRES_DB: myHCMUS
+      AVATAR_STORAGE_DIRECTORY: /app/data/avatars
     volumes:
       - ./server:/app
       - node_modules:/app/node_modules
+      # Avatar files persist outside the bind-mounted source (UC-03, implementation.md).
+      - avatars:/app/data/avatars
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
   db:
-    image: postgres:18
+    image: pgvector/pgvector:pg18-trixie
     container_name: myHCMUS-db
     restart: always
     env_file:
@@ -24,6 +35,9 @@ services:
           - "5432:5432"
     volumes:
             - myHCMUS-db:/var/lib/postgresql
+            # First start on an empty volume: schema → ai_schema → seed → hub_schema (no *_test.sql).
+            - ./db:/myhcmus-db:ro
+            - ./db/docker-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
             test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
             interval: 5s
@@ -33,3 +47,4 @@ services:
 volumes:
   node_modules:
   myHCMUS-db:
+  avatars:

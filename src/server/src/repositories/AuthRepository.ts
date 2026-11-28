@@ -1,0 +1,332 @@
+import type { User } from "../types/UserRegistrationData.ts";
+import DbConnection from "../connections/db.ts";
+
+export interface AuthRepository {
+
+    getStudentUserID() : Promise<number>;
+
+    getActivityManagerID(): Promise<number>;
+
+    getAdminUserID(): Promise <number>;
+
+    insertUser(user: User): Promise<void>;
+
+    checkUserExists(id: string): Promise<boolean>;
+
+    checkUserExistsWithEmail(email: string): Promise<boolean>;
+
+    checkUserExistsWithPhoneNumber(phone: string, excludingUserId?: string): Promise<boolean>;
+
+    getUserEmail(id: string): Promise<string>;
+
+    getUserPasswordHash(id: string): Promise<string | null>;
+
+    updateUserPasswordHash(id: string, currentHash: string, newHash: string): Promise<boolean>;
+
+    getUserRefreshTokenHash(id: string): Promise<string>;
+
+    updateUserSessionToken(id: string, newSessionToken: string): Promise<void>;
+
+}
+
+export type PasswordCredentialStore = Pick<
+    AuthRepository,
+    'getUserPasswordHash' | 'updateUserPasswordHash'
+>;
+
+class InMemoryAuthRepository implements AuthRepository {
+    private  ROLE_IDS = {
+        STUDENT: 1,
+        MANAGER: 2,
+        ADMINISTRATOR: 3
+    }
+
+    public async getStudentUserID(): Promise<number> {
+        const query = `
+            SELECT role_id
+            FROM "Role"
+            WHERE code = 'student'
+        `;
+        const result = await DbConnection.pool.query(query, []);
+        return result.rows[0] ?? null;
+    }
+
+    public async getActivityManagerID(): Promise<number> {
+        const query = `
+            SELECT role_id
+            FROM "Role"
+            WHERE code = 'manager'
+        `;
+        const result = await DbConnection.pool.query(query, []);
+        return result.rows[0] ?? null;
+    }
+
+    public async getAdminUserID(): Promise<number> {
+        const query = `
+            SELECT role_id
+            FROM "Role"
+            WHERE code = 'administrator'
+        `;
+        const result = await DbConnection.pool.query(query, []);
+        return result.rows[0] ?? null;
+    }
+
+    public async insertUser(user: User): Promise<void> {
+ {
+    const { data } = user;
+    const { role_data } = data;
+
+    if (!user.user_id?.trim()) {
+        throw new Error("Invalid user_id");
+    }
+
+    if (!user.password_hash?.trim()) {
+        throw new Error("Invalid password_hash");
+    }
+
+    if (
+        !(user.created_at instanceof Date) ||
+        Number.isNaN(user.created_at.getTime()) ||
+        !(data.granted_at instanceof Date) ||
+        Number.isNaN(data.granted_at.getTime())
+    ) {
+        throw new Error("Invalid timestamp");
+    }
+
+    if (
+        data.role_id === this.ROLE_IDS.STUDENT &&
+        (
+            !role_data.faculty_id?.trim() ||
+            !Number.isInteger(role_data.enrollment_year) ||
+            (role_data.enrollment_year ?? 0) <= 0
+        )
+    ) {
+        throw new Error("Invalid student data");
+    }
+
+    if (!Object.values(this.ROLE_IDS).some(id => id === data.role_id)) {
+        throw new Error(`Unsupported role_id: ${data.role_id}`);
+    }
+
+    const client = await DbConnection.pool.connect();
+
+    try {
+        await client.query("BEGIN");
+
+        // 1. Insert user
+        await client.query(
+            `
+            INSERT INTO "User" (
+                user_id,
+                is_active,
+                email,
+                phone_number,
+                password_hash,
+                full_name,
+                created_at
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            `,
+            [
+                user.user_id,
+                user.is_active,
+                data.email,
+                data.phone_number,
+                user.password_hash,
+                data.full_name,
+                user.created_at,
+            ]
+        );
+
+        // 2. Assign role
+        await client.query(
+            `
+            INSERT INTO "UserRole" (
+                user_id,
+                role_id,
+                granted_by_user_id,
+                granted_at
+            )
+            VALUES ($1, $2, $3, $4)
+            `,
+            [
+                user.user_id,
+                data.role_id,
+                data.granted_by_user_id,
+                data.granted_at,
+            ]
+        );
+
+        // 3. Insert role-specific data
+        switch (data.role_id) {
+            case this.ROLE_IDS.STUDENT:
+                await client.query(
+                    `
+                    INSERT INTO "Student" (
+                        user_id,
+                        major_id,
+                        faculty_id,
+                        enrollment_year
+                    )
+                    VALUES ($1, $2, $3, $4)
+                    `,
+                    [
+                        user.user_id,
+                        role_data.major_id ?? null,
+                        role_data.faculty_id,
+                        role_data.enrollment_year,
+                    ]
+                );
+                break;
+
+            case this.ROLE_IDS.MANAGER:
+                await client.query(
+                    `
+                    INSERT INTO "Manager" (
+                        user_id,
+                        position_title
+                    )
+                    VALUES ($1, $2)
+                    `,
+                    [
+                        user.user_id,
+                        role_data.position_title ?? null,
+                    ]
+                );
+                break;
+
+            case this.ROLE_IDS.ADMINISTRATOR:
+                await client.query(
+                    `
+                    INSERT INTO "Administrator" (
+                        user_id,
+                        office_name,
+                        position_title
+                    )
+                    VALUES ($1, $2, $3)
+                    `,
+                    [
+                        user.user_id,
+                        role_data.office_name ?? null,
+                        role_data.position_title ?? null,
+                    ]
+                );
+                break;
+        }
+
+        await client.query("COMMIT");
+    } catch (error) {
+        try {
+            await client.query("ROLLBACK");
+        } catch {
+            // Preserve the original transaction error.
+        }
+
+        throw error;
+    } finally {
+        client.release();
+    }
+}
+    }
+
+    public async checkUserExists(id: string): Promise<boolean> {
+        const query = ` 
+            SELECT *
+            FROM "User"
+            WHERE user_id = $1
+        `;
+        const result = await DbConnection.pool.query<User>(query, [id]);
+        return result.rows.length > 0;
+    }
+
+    public async checkUserExistsWithEmail(email: string): Promise<boolean> {
+        const query = ` 
+            SELECT *
+            FROM "User"
+            WHERE email = $1
+        `;
+        const result = await DbConnection.pool.query<User>(query, [email]);
+        return result.rows.length > 0;
+    }
+
+    public async checkUserExistsWithPhoneNumber(phone: string, excludingUserId?: string): Promise<boolean> {
+        const query = excludingUserId === undefined
+            ? `SELECT 1 FROM "User" WHERE phone_number = $1 LIMIT 1`
+            : `SELECT 1 FROM "User" WHERE phone_number = $1 AND user_id <> $2 LIMIT 1`;
+        const values = excludingUserId === undefined ? [phone] : [phone, excludingUserId];
+        const result = await DbConnection.pool.query(query, values);
+        return result.rows.length > 0;
+    }
+
+    public async getUserEmail(id: string): Promise<string> {
+        const query = `
+            SELECT email
+            FROM "User"
+            WHERE user_id = $1
+        `;
+        const result = await DbConnection.pool.query(query, [id]);
+        return result.rows[0] ?? null;
+    }
+    
+    public async getUserRefreshTokenHash(id: string): Promise<string> {
+        const query = `
+            SELECT refresh_token_id
+            FROM "User"
+            WHERE user_id = $1
+        `;
+        const result = await DbConnection.pool.query(query, [id]);
+        return result.rows[0] ?? null;
+    }
+
+    public async getUserPasswordHash(id: string): Promise<string | null> {
+        const query = `
+            SELECT password_hash
+            FROM "User"
+            WHERE user_id = $1 AND is_active IS NOT FALSE
+        `;
+        const result = await DbConnection.pool.query<{ password_hash: string }>(query, [id]);
+        return result.rows[0]?.password_hash ?? null;
+    }
+
+    public async updateUserPasswordHash(id: string, currentHash: string, newHash: string): Promise<boolean> {
+        const query = `
+            UPDATE "User"
+            SET password_hash = $3
+            WHERE user_id = $1 AND password_hash = $2 AND is_active IS NOT FALSE
+            RETURNING user_id
+        `;
+        const result = await DbConnection.pool.query<{ user_id: string }>(query, [
+            id,
+            currentHash,
+            newHash
+        ]);
+        return result.rows.length > 0;
+    }
+
+	public async getUserFromEmail(email: string): Promise<string> {
+		const query = `
+			SELECT user_id
+			FROM "User"
+			WHERE email = $1
+		`;
+		const result = await DbConnection.pool.query(query, [email]);
+		return result.rows[0]?.user_id ?? null;
+	}
+
+	public async getName(id: string): Promise<string> {
+		const query = `
+			SELECT full_name
+			FROM "User"
+			WHERE user_id = $1
+		`;
+		const result = await DbConnection.pool.query(query, [id]);
+		return result.rows[0]?.full_name ?? null;
+	}
+
+    public async updateUserSessionToken(id: string, newSessionToken: string): Promise<void> {
+        // delete old session row in Session table and add a new one
+    }
+}
+
+const inMemoryAuthRepository = new InMemoryAuthRepository();
+export default inMemoryAuthRepository;

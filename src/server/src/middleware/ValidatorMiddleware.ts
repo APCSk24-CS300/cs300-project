@@ -41,7 +41,7 @@ class ValidatorMiddleware {
 		const credentialsScheme = credentialsParts[0];
 		const credentialsToken = credentialsParts[1];
 
-		if (credentialsScheme !== 'Bearer') {
+		if (credentialsScheme !== 'Bearer' || credentialsParts.length !== 2 || !credentialsToken) {
 			const response = new ServiceResponse;
 			response.success = false;
 			response.statusCode = 401;
@@ -54,13 +54,12 @@ class ValidatorMiddleware {
 				.json(response.get());
 		}
 
-		if (credentialsToken === "MIKU_MIKU_OO_EE_OO") {
-			next();
-			return;
-		}
-		
 		try {
-			jwt.verify(credentialsToken, config.jwt.secret);
+			const decoded = jwt.verify(credentialsToken, config.jwt.secret);
+			if (typeof decoded !== 'object' || typeof decoded.sub !== 'string' || !decoded.sub.trim()) {
+				throw new Error('Access token requires a user subject');
+			}
+			res.locals.user = decoded;
 		} catch (err) {
 			const response = new ServiceResponse;
 			response.success = false;

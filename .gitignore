@@ -1,7 +1,27 @@
 build
 src/.agents
+src/.claude
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+src/.agents/*
+src/.claude/*
+src/.specify/*
+# !src/.specify/memory/constitution.md
+docs/pa
+!CLAUDE.md
+.specify/
+.claude/
+# Added by code-review-graph
+.code-review-graph/
+# >>> code-review-graph install files >>>
+# Added by `code-review-graph install --gitignore`. `uninstall` removes this block.
+/.claude/
+/.mcp.json
+/CLAUDE.md
+# <<< code-review-graph install files <<<
+
+# Python venv (code-review-graph, local only)
+/.venv/

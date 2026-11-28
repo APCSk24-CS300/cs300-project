@@ -1,0 +1,3133 @@
+openapi: 3.0.3
+info:
+  title: myHCMUS API
+  version: 1.2.0
+  description: 'FE-oriented API contract for three functional groups: Profile Management (UC-03), University Services
+    Hub (UC-07) and System Administration (UC-29, UC-30, UC-31).
+
+
+    Each user has exactly one role: student, manager, or administrator. Manager actions also require the relevant
+    organization, activity, or request assignment.
+
+
+    Conventions:
+
+    - Base path is versioned: `/api/v1`. Breaking changes require a new major path version.
+
+    - Every response uses the `{ success, data | message }` envelope. Errors use `ErrorResponse`, whose `code` is
+    the stable machine-readable value FE logic may branch on; `message` is for display only.
+
+    - Property and query names are camelCase.
+
+    - Lists that can grow without bound (users, organizations, memberships, audit logs) are paginated with `page`/`limit`
+    and return `data.items` + `data.pagination`. Small reference lists (roles, permissions, faculties, semesters,
+    categories, service links) are returned whole.
+
+    - Optimistic concurrency: single-resource admin responses carry an `ETag` header equal to the quoted `version`
+    field of the resource. Mutations accept `If-Match`; a stale value returns `412 PRECONDITION_FAILED` and the
+    FE must reload the latest state (UC-29 A8, UC-30 A9).
+
+    - Accounts, categories, criteria and service links are deactivated, never physically deleted.
+
+    - Training-score awards, adjustments, appeals and student score views belong to the Participation/Training-Score
+    and Requests contracts, not to this file.'
+servers:
+- url: http://localhost:8080/api/v1
+  description: Local development server
+tags:
+- name: Authentication & Session
+  description: Current session context (login/logout pending API-GAP-002).
+- name: Profile
+  description: Current user's personal and academic profile (UC-03).
+- name: University Services Hub
+  description: Directory of external university services (UC-07) and its administration.
+- name: Reference Data
+  description: Faculties and semesters used by forms and filters.
+- name: Admin - Users
+  description: User account provisioning and administration (UC-29).
+- name: Admin - Roles & Permissions
+  description: Role and permission configuration (UC-29).
+- name: Admin - Organizations
+  description: Organizations and manager membership scope.
+- name: Admin - Activity Categories
+  description: Activity category configuration (UC-30).
+- name: Admin - Score Criteria
+  description: Training-score criteria and versioned scoring policies (UC-30).
+- name: Admin - Imports
+  description: 'Two-step CSV/XLSX bulk import: validate, review, confirm (UC-29, UC-30, NFR-COM-04).'
+- name: Admin - Audit Logs
+  description: Read-only audit history (NFR-SEC-06).
+- name: Admin - Reports
+  description: Administrative reports and statistics (UC-31).
+security:
+- bearerAuth: []
+paths:
+  /auth/me:
+    get:
+      tags:
+      - Authentication & Session
+      summary: Get current user context
+      description: Call after login and on page refresh to initialize role-aware navigation. Includes the user's
+        role, effective permission codes, and active operational assignments.
+      operationId: getCurrentUserContext
+      responses:
+        '200':
+          description: Current user context.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUserContextResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /profile:
+    get:
+      tags:
+      - Profile
+      summary: Get current user's profile
+      description: Retrieve the authenticated user's personal profile and read-only academic information, if available.
+      operationId: getMyProfile
+      responses:
+        '200':
+          description: Profile retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    patch:
+      tags:
+      - Profile
+      summary: Update current user's profile
+      description: Update phone number only. Full name, student number, and faculty are read-only to the account
+        owner.
+      operationId: updateMyProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Profile updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /profile/avatar:
+    post:
+      tags:
+      - Profile
+      summary: Upload or update profile avatar
+      description: Upload a JPG or PNG image up to 10 MB inclusive. File content is validated, not only its filename
+        or client-provided media type. A successful upload replaces the authenticated user's current avatar. The
+        approved implementation stores validated image files in a configured persistent directory and stores only the authenticated same-origin image URL in PostgreSQL User.avatar_url.
+      operationId: uploadMyAvatar
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AvatarUploadRequest'
+            encoding:
+              avatar:
+                contentType: image/jpeg, image/png
+      responses:
+        '200':
+          description: Avatar updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvatarResponse'
+        '400':
+          description: 'File content is not JPG/PNG or file size exceeds 10 MB (`code: UNSUPPORTED_FILE`). The
+            existing avatar is kept (UC-03 A8).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Another avatar update completed first; retry with the current profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Avatar storage or profile update failed; the existing avatar is kept.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Profile
+      summary: Remove profile avatar
+      description: No request body is accepted. Remove the authenticated user's current avatar and restore the default
+        avatar; the user ID is derived from authentication context.
+      operationId: deleteMyAvatar
+      responses:
+        '200':
+          description: Avatar removed and default avatar restored.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiMessage'
+              example:
+                success: true
+                message: Avatar removed successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Another avatar update completed first; retry with the current profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Avatar removal failed; the existing avatar is kept.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profile/avatar/files/{fileName}:
+    get:
+      tags:
+      - Profile
+      summary: Read the authenticated user's current avatar file
+      description: Reads the file only when it matches the authenticated user's current avatar URL.
+      operationId: readMyAvatarFile
+      parameters:
+      - name: fileName
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Avatar image bytes.
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: The file is not the authenticated user's current avatar.
+  /profile/interests:
+    get:
+      tags:
+      - Profile
+      summary: Get current user's interests
+      operationId: getMyInterests
+      responses:
+        '200':
+          description: Interests retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterestsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags:
+      - Profile
+      summary: Replace current user's interests
+      description: Replaces optional ActivityCategory preferences for discovery and advisory recommendations. Every
+        id must be an active category from GET /activity-categories; an empty array clears interests.
+      operationId: replaceMyInterests
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - categoryIds
+              properties:
+                categoryIds:
+                  type: array
+                  uniqueItems: true
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Interests updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterestsResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /profile/password:
+    patch:
+      tags:
+      - Profile
+      summary: Change current user's password
+      description: Verify the current password before setting a new password. The frontend validates new-password
+        confirmation, which is not sent in the request. The successful response contains only a message and never
+        returns password values.
+      operationId: changeMyPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/MessageSuccess'
+        '400':
+          description: 'Validation failed, or the current password is incorrect (`code: CURRENT_PASSWORD_INCORRECT`).
+            The password is unchanged (UC-03 A7).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                code: CURRENT_PASSWORD_INCORRECT
+                message: Current password is incorrect
+                errors:
+                - field: currentPassword
+                  code: INCORRECT
+                  message: Current password is incorrect
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          description: The password change could not be completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                code: INTERNAL_ERROR
+                message: Password could not be changed. Please try again.
+  /activity-categories:
+    get:
+      tags:
+      - Profile
+      summary: List active activity categories
+      description: Non-admin read for the interests panel (API-GAP-001). Returns active categories only.
+      operationId: listActivityCategoriesForInterests
+      responses:
+        '200':
+          description: Active categories retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ActivityCategory'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /hub/services:
+    get:
+      tags:
+      - University Services Hub
+      summary: List active university services
+      description: Retrieve active external service links ordered by displayOrder. An empty array means no links
+        are configured (UC-07 A1). Links open external sites; myHCMUS does not proxy or integrate with them.
+      operationId: listUniversityServices
+      responses:
+        '200':
+          description: Services retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UniversityService'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /hub/services/{serviceId}:
+    get:
+      tags:
+      - University Services Hub
+      summary: Get university service details
+      description: Retrieve details of one active university service.
+      operationId: getUniversityService
+      parameters:
+      - $ref: '#/components/parameters/ServiceId'
+      responses:
+        '200':
+          description: Service retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/UniversityService'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Service does not exist or is inactive.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /admin/services:
+    get:
+      tags:
+      - University Services Hub
+      summary: List service links for administration
+      operationId: adminListServices
+      parameters:
+      - name: includeInactive
+        in: query
+        schema:
+          type: boolean
+          default: true
+      responses:
+        '200':
+          description: Service links retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UniversityService'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags:
+      - University Services Hub
+      summary: Create a university service link
+      operationId: createServiceLink
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateServiceLinkRequest'
+      responses:
+        '201':
+          description: Service link created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UniversityServiceResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /admin/services/{serviceId}:
+    patch:
+      tags:
+      - University Services Hub
+      summary: Update a university service link
+      operationId: updateServiceLink
+      parameters:
+      - $ref: '#/components/parameters/ServiceId'
+      - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateServiceLinkRequest'
+      responses:
+        '200':
+          description: Service link updated.
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UniversityServiceResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+    delete:
+      tags:
+      - University Services Hub
+      summary: Deactivate a service link
+      operationId: deactivateServiceLink
+      parameters:
+      - $ref: '#/components/parameters/ServiceId'
+      - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/MessageSuccess'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+      description: Sets isActive=false. The link disappears from the hub; the record is kept.
+  /semesters:
+    get:
+      tags:
+      - Reference Data
+      summary: List semesters
+      description: Returns semesters for FE filters and score-policy forms.
+      operationId: listSemesters
+      parameters:
+      - name: academicYear
+        in: query
+        schema:
+          type: string
+      - name: currentOnly
+        in: query
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Semesters retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Semester'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /admin/faculties:
+    get:
+      tags:
+      - Reference Data
+      summary: List faculties
+      operationId: listFaculties
+      responses:
+        '200':
+          description: Faculties retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FacultySummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /admin/users:
+    post:
+      tags:
+      - Admin - Users
+      summary: Create a user account
+      description: Provision one user account with one role. Student number and faculty are staff-controlled and
+        must be validated before eligibility-dependent actions.
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User account created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: 'Email or student number already exists (`code: DUPLICATE_VALUE`).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+      - Admin - Users
+      summary: List and search user accounts
+      operationId: listUsers
+      parameters:
+      - name: search
+        in: query
+        description: Search by full name, email, or student number.
+        schema:
+          type: string
+      - name: role
+        in: query
+        schema:
+          $ref: '#/components/schemas/UserRole'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/AccountStatus'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: facultyId
+        in: query
+        schema:
+          type: string
+      - name: sortBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - createdAt
+          - fullName
+          - email
+          default: createdAt
+      - name: sortOrder
+        in: query
+        schema:
+          type: string
+          enum:
+          - asc
+          - desc
+          default: desc
+      responses:
+        '200':
+          description: Users retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      description: Search by full name, email, or student number, and filter by role or status.
+  /admin/users/{userId}:
+    get:
+      tags:
+      - Admin - Users
+      summary: Get user details
+      operationId: getUserById
+      parameters:
+      - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+      - Admin - Users
+      summary: Update user information
+      description: Update staff-controlled user fields. Academic identity and role changes use dedicated endpoints;
+        include an audit reason.
+      operationId: updateUser
+      parameters:
+      - $ref: '#/components/parameters/UserId'
+      - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUpdateUserRequest'
+      responses:
+        '200':
+          description: User updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+  /admin/users/{userId}/academic-info:
+    patch:
+      tags:
+      - Admin - Users
+      summary: Validate or update student academic identity
+      description: Staff-controlled student number and faculty. Must be validated before eligibility-dependent registration
+        or appeal submission. Changes require an audit reason.
+      operationId: updateUserAcademicInfo
+      parameters:
+      - $ref: '#/components/parameters/UserId'
+      - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                studentNumber:
+                  type: string
+                  nullable: true
+                facultyId:
+                  type: string
+                  nullable: true
+                reason:
+                  type: string
+                  minLength: 1
+      responses:
+        '200':
+          description: Academic identity updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Student number already exists (`code: DUPLICATE_VALUE`).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+  /admin/users/{userId}/role:
+    put:
+      tags:
+      - Admin - Users
+      summary: Change a user's role
+      description: Set the user's single role and record an audit reason. A role change that violates permission
+        policy returns 400 `ROLE_POLICY_VIOLATION` (UC-29 A6). Updated permissions apply from the user's next request
+        (UC-29 A10).
+      operationId: updateUserRole
+      parameters:
+      - $ref: '#/components/parameters/UserId'
+      - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - role
+              - reason
+              properties:
+                role:
+                  $ref: '#/components/schemas/UserRole'
+                reason:
+                  type: string
+                  minLength: 1
+      responses:
+        '200':
+          description: Role updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+  /admin/users/{userId}/status:
+    patch:
+      tags:
+      - Admin - Users
+      summary: Activate or deactivate a user account
+      description: 'Activate or deactivate an account. This is how UC-29 ''delete user'' is implemented: accounts
+        are never physically deleted. Deactivation revokes active sessions and preserves historical records.'
+      operationId: updateUserStatus
+      parameters:
+      - $ref: '#/components/parameters/UserId'
+      - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - status
+              - reason
+              properties:
+                status:
+                  $ref: '#/components/schemas/AccountStatus'
+                reason:
+                  type: string
+                  minLength: 1
+      responses:
+        '200':
+          description: Account status updated successfully.
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+  /admin/roles:
+    get:
+      tags:
+      - Admin - Roles & Permissions
+      summary: List available roles
+      operationId: listRoles
+      responses:
+        '200':
+          description: Roles retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /admin/roles/{roleId}/permissions:
+    get:
+      tags:
+      - Admin - Roles & Permissions
+      summary: Get permissions assigned to a role
+      operationId: getRolePermissions
+      parameters:
+      - $ref: '#/components/parameters/RoleId'
+      responses:
+        '200':
+          description: Role permissions retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RolePermissionsResponse'
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+      - Admin - Roles & Permissions
+      summary: Replace permissions assigned to a role
+      operationId: replaceRolePermissions
+      parameters:
+      - $ref: '#/components/parameters/RoleId'
+      - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - permissionIds
+              - reason
+              properties:
+                permissionIds:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                  - permission-001
+                  - permission-002
+                  uniqueItems: true
+                reason:
+                  type: string
+                  minLength: 1
+      responses:
+        '200':
+          description: Role permissions updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RolePermissionsResponse'
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+      description: Replace the complete permission set for a role. Changes are audited.
+  /admin/permissions:
+    get:
+      tags:
+      - Admin - Roles & Permissions
+      summary: List available permissions
+      operationId: listPermissions
+      responses:
+        '200':
+          description: Permissions retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Permission'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      description: List permission codes such as registration.create, registration.review, activity.manage, attendance.record,
+        score.submit, score.adjust, appeal.submit, appeal.review, criteria.manage, and reports.view.
+  /admin/organizations:
+    get:
+      tags:
+      - Admin - Organizations
+      summary: List organizations
+      operationId: listOrganizations
+      parameters:
+      - name: search
+        in: query
+        schema:
+          type: string
+      - name: type
+        in: query
+        schema:
+          type: string
+          enum:
+          - club
+          - faculty_unit
+          - department
+          - student_affairs_office
+      - name: isActive
+        in: query
+        schema:
+          type: boolean
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Organizations retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /admin/organizations/{organizationId}/members:
+    get:
+      tags:
+      - Admin - Organizations
+      summary: List organization memberships
+      operationId: listOrganizationMembers
+      parameters:
+      - $ref: '#/components/parameters/OrganizationId'
+      - name: includeEnded
+        in: query
+        schema:
+          type: boolean
+          default: false
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Organization memberships retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    required:
+                    - items
+                    - pagination
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/OrganizationMembership'
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags:
+      - Admin - Organizations
+      summary: Assign a manager to an organization
+      operationId: assignOrganizationMember
+      parameters:
+      - $ref: '#/components/parameters/OrganizationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - userId
+              - responsibility
+              - startsAt
+              properties:
+                userId:
+                  type: string
+                responsibility:
+                  type: string
+                startsAt:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Organization membership assigned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationMembershipResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: The user already has an active membership in this organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      description: The user must have the manager role; otherwise 400 `ROLE_POLICY_VIOLATION`. Audited.
+  /admin/organizations/{organizationId}/members/{membershipId}:
+    patch:
+      tags:
+      - Admin - Organizations
+      summary: End an organization membership
+      description: Sets endsAt. Ended memberships are kept as history and no longer grant management scope.
+      operationId: endOrganizationMembership
+      parameters:
+      - $ref: '#/components/parameters/OrganizationId'
+      - $ref: '#/components/parameters/MembershipId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - endsAt
+              - reason
+              properties:
+                endsAt:
+                  type: string
+                  format: date-time
+                reason:
+                  type: string
+                  minLength: 1
+      responses:
+        '200':
+          description: Membership ended.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationMembershipResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /admin/activity-categories:
+    get:
+      tags:
+      - Admin - Activity Categories
+      summary: List activity categories
+      operationId: listActivityCategories
+      parameters:
+      - name: includeInactive
+        in: query
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Categories retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ActivityCategory'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags:
+      - Admin - Activity Categories
+      summary: Create activity category
+      operationId: createActivityCategory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateActivityCategoryRequest'
+      responses:
+        '201':
+          description: Category created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityCategoryResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: 'Category name already exists (`code: DUPLICATE_VALUE`).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /admin/activity-categories/{categoryId}:
+    patch:
+      tags:
+      - Admin - Activity Categories
+      summary: Update activity category
+      operationId: updateActivityCategory
+      parameters:
+      - $ref: '#/components/parameters/CategoryId'
+      - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActivityCategoryRequest'
+      responses:
+        '200':
+          description: Category updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityCategoryResponse'
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+    delete:
+      tags:
+      - Admin - Activity Categories
+      summary: Deactivate activity category
+      description: Deactivate the category (isActive=false). Categories are never physically deleted, so activities
+        and interests that reference them stay consistent (UC-30 A6).
+      operationId: deactivateActivityCategory
+      parameters:
+      - $ref: '#/components/parameters/CategoryId'
+      - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/MessageSuccess'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+  /admin/score-criteria:
+    get:
+      tags:
+      - Admin - Score Criteria
+      summary: List training-score criteria
+      operationId: listScoreCriteria
+      parameters:
+      - $ref: '#/components/parameters/SemesterId'
+      - name: includeInactive
+        in: query
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Criteria retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ScoreCriterion'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      description: With semesterId, each criterion's policyVersions is limited to versions of that semester.
+    post:
+      tags:
+      - Admin - Score Criteria
+      summary: Create training-score criterion
+      operationId: createScoreCriterion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScoreCriterionRequest'
+      responses:
+        '201':
+          description: Criterion created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoreCriterionResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: 'Criterion code already exists (`code: DUPLICATE_VALUE`).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /admin/score-criteria/{criteriaId}:
+    get:
+      tags:
+      - Admin - Score Criteria
+      summary: Get training-score criterion details
+      operationId: getScoreCriterion
+      parameters:
+      - $ref: '#/components/parameters/CriteriaId'
+      responses:
+        '200':
+          description: Criterion retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoreCriterionResponse'
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+      - Admin - Score Criteria
+      summary: Update training-score criterion
+      description: Updates identity fields only (name, description, isActive). Weights, ranges and caps change through
+        a new policy version so historical scores remain valid (NFR-SCA-INT-05).
+      operationId: updateScoreCriterion
+      parameters:
+      - $ref: '#/components/parameters/CriteriaId'
+      - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateScoreCriterionRequest'
+      responses:
+        '200':
+          description: Criterion updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoreCriterionResponse'
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+    delete:
+      tags:
+      - Admin - Score Criteria
+      summary: Deactivate training-score criterion
+      operationId: deactivateScoreCriterion
+      parameters:
+      - $ref: '#/components/parameters/CriteriaId'
+      - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/MessageSuccess'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+      description: Deactivate the criterion. Existing versions and awards are kept.
+  /admin/score-criteria/{criteriaId}/policy-versions:
+    get:
+      tags:
+      - Admin - Score Criteria
+      summary: List scoring policy versions
+      operationId: listScoringPolicyVersions
+      parameters:
+      - $ref: '#/components/parameters/CriteriaId'
+      - $ref: '#/components/parameters/SemesterId'
+      responses:
+        '200':
+          description: Policy versions retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ScoringPolicyVersion'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags:
+      - Admin - Score Criteria
+      summary: Create a scoring policy version
+      description: 'Creates a new draft version for one semester. There is no endpoint to edit a version: a version
+        used by an award is immutable, and any rule change is a new version (NFR-SCA-INT-05). Returns 400 when minPoints
+        > maxPoints.'
+      operationId: createScoringPolicyVersion
+      parameters:
+      - $ref: '#/components/parameters/CriteriaId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScoringPolicyVersionRequest'
+      responses:
+        '201':
+          description: Policy version created.
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoringPolicyVersionResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /admin/score-criteria/{criteriaId}/policy-versions/{versionId}/activate:
+    post:
+      tags:
+      - Admin - Score Criteria
+      summary: Activate a scoring policy version
+      description: Activates the version now or schedules it for activationAt. Call preview first and show it for
+        confirmation (NFR-USA-13). Existing awards keep the version originally applied. The previously active version
+        of the same criterion and semester becomes superseded.
+      operationId: activateScoringPolicyVersion
+      parameters:
+      - $ref: '#/components/parameters/CriteriaId'
+      - $ref: '#/components/parameters/VersionId'
+      - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '200':
+          description: Policy version activation scheduled or completed.
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoringPolicyVersionResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Version is not in draft status (`code: INVALID_STATE`).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  minLength: 1
+                  description: Audit reason (NFR-SEC-06).
+  /admin/score-criteria/{criteriaId}/policy-versions/{versionId}/preview:
+    post:
+      tags:
+      - Admin - Score Criteria
+      summary: Preview scoring policy impact
+      description: Preview affected semesters and resulting score changes before activation. Does not overwrite
+        historical awards.
+      operationId: previewScoringPolicyVersion
+      parameters:
+      - $ref: '#/components/parameters/CriteriaId'
+      - $ref: '#/components/parameters/VersionId'
+      responses:
+        '200':
+          description: Impact preview generated.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PolicyImpactPreview'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /admin/imports:
+    post:
+      tags:
+      - Admin - Imports
+      summary: Upload and validate an import file
+      description: Step 1 of 2. Parses a CSV or XLSX file and validates every row without writing anything. Returns
+        row-level results for review (UC-29 steps 4-5, UC-30 steps 4-5, NFR-COM-04). Score-criteria rows create
+        new draft policy versions and never edit a used version (UC-30 A5).
+      operationId: createImport
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - resource
+              - file
+              properties:
+                resource:
+                  $ref: '#/components/schemas/ImportResource'
+                file:
+                  type: string
+                  format: binary
+                  description: CSV or XLSX. Column templates are agreed with BE.
+      responses:
+        '201':
+          description: File validated; import session created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportSessionResponse'
+        '400':
+          description: 'File is unreadable or not CSV/XLSX (`code: UNSUPPORTED_FILE`) (UC-29 A3, UC-30 A2).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /admin/imports/{importId}:
+    get:
+      tags:
+      - Admin - Imports
+      summary: Get an import session
+      operationId: getImport
+      parameters:
+      - $ref: '#/components/parameters/ImportId'
+      responses:
+        '200':
+          description: Import session retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportSessionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - Admin - Imports
+      summary: Cancel an import session
+      description: Discards a validated session; nothing is saved (UC-29 A2/A7, UC-30 A1/A8).
+      operationId: cancelImport
+      parameters:
+      - $ref: '#/components/parameters/ImportId'
+      responses:
+        '200':
+          $ref: '#/components/responses/MessageSuccess'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Session is already confirmed (`code: INVALID_STATE`).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /admin/imports/{importId}/confirm:
+    post:
+      tags:
+      - Admin - Imports
+      summary: Confirm an import
+      description: 'Step 2 of 2. Applies valid rows in one transaction and writes audit entries; invalid rows are
+        skipped. Idempotent: confirming an already confirmed session returns the original result without applying
+        rows again, so a retry cannot import twice.'
+      operationId: confirmImport
+      parameters:
+      - $ref: '#/components/parameters/ImportId'
+      responses:
+        '200':
+          description: Import applied (or already applied).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportSessionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Session is cancelled or expired (`code: IMPORT_EXPIRED`), or data changed since validation;
+            validate the file again.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /admin/audit-logs:
+    get:
+      tags:
+      - Admin - Audit Logs
+      summary: List audit log entries
+      description: Read-only, newest first. Covers role/permission changes, configuration changes, imports, request
+        decisions and score changes (NFR-SEC-06). No endpoint can modify or delete entries.
+      operationId: listAuditLogs
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/From'
+      - $ref: '#/components/parameters/To'
+      - name: actorId
+        in: query
+        schema:
+          type: string
+      - name: action
+        in: query
+        schema:
+          type: string
+      - name: entityType
+        in: query
+        schema:
+          type: string
+      - name: entityId
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Audit entries retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    required:
+                    - items
+                    - pagination
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AuditLogEntry'
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /admin/reports/activities:
+    get:
+      tags:
+      - Admin - Reports
+      summary: Get activity organization statistics
+      operationId: getActivityReport
+      parameters:
+      - $ref: '#/components/parameters/SemesterId'
+      - $ref: '#/components/parameters/AcademicYear'
+      - $ref: '#/components/parameters/From'
+      - $ref: '#/components/parameters/To'
+      - name: organizationId
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Activity statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericReportResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          description: Invalid filter or date range, e.g. `to` earlier than `from` (UC-31 A2).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      description: 'Return aggregate values and chart-ready breakdowns for dashboard widgets. Filters: semester,
+        academic year, date range and organization. No matching records returns zeros, not an error (UC-31 A3).'
+  /admin/reports/overview:
+    get:
+      tags:
+      - Admin - Reports
+      summary: Get system overview statistics
+      operationId: getAdminOverviewReport
+      parameters:
+      - $ref: '#/components/parameters/SemesterId'
+      - $ref: '#/components/parameters/AcademicYear'
+      - $ref: '#/components/parameters/From'
+      - $ref: '#/components/parameters/To'
+      - name: organizationId
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Overview statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OverviewReportResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          description: Invalid filter or date range, e.g. `to` earlier than `from` (UC-31 A2).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      description: 'Return aggregate values and chart-ready breakdowns for dashboard widgets. Filters: semester,
+        academic year, date range and organization. No matching records returns zeros, not an error (UC-31 A3).'
+  /admin/reports/registrations:
+    get:
+      tags:
+      - Admin - Reports
+      summary: Get activity registration statistics
+      operationId: getRegistrationReport
+      parameters:
+      - $ref: '#/components/parameters/SemesterId'
+      - $ref: '#/components/parameters/AcademicYear'
+      - $ref: '#/components/parameters/From'
+      - $ref: '#/components/parameters/To'
+      - name: organizationId
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Registration statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericReportResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          description: Invalid filter or date range, e.g. `to` earlier than `from` (UC-31 A2).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      description: 'Return aggregate values and chart-ready breakdowns for dashboard widgets. Filters: semester,
+        academic year, date range and organization. No matching records returns zeros, not an error (UC-31 A3).'
+  /admin/reports/training-scores:
+    get:
+      tags:
+      - Admin - Reports
+      summary: Get training-score distribution statistics
+      operationId: getTrainingScoreReport
+      parameters:
+      - $ref: '#/components/parameters/SemesterId'
+      - $ref: '#/components/parameters/AcademicYear'
+      - $ref: '#/components/parameters/From'
+      - $ref: '#/components/parameters/To'
+      - name: organizationId
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Training-score statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingScoreReportResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          description: Invalid filter or date range, e.g. `to` earlier than `from` (UC-31 A2).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      description: 'Return aggregate values and chart-ready breakdowns for dashboard widgets. Filters: semester,
+        academic year, date range and organization. No matching records returns zeros, not an error (UC-31 A3).'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: User identifier.
+    ServiceId:
+      name: serviceId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: University service identifier.
+    RoleId:
+      name: roleId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Role identifier.
+    CategoryId:
+      name: categoryId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Activity category identifier.
+    CriteriaId:
+      name: criteriaId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Training-score criterion identifier.
+    AcademicYear:
+      name: academicYear
+      in: query
+      schema:
+        type: string
+      description: Academic year, for example 2026-2027.
+    SemesterId:
+      name: semesterId
+      in: query
+      schema:
+        type: string
+      description: Semester identifier returned by GET /semesters.
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+    IfMatch:
+      name: If-Match
+      in: header
+      required: false
+      schema:
+        type: string
+      description: ETag of the version the administrator reviewed. Strongly recommended for every admin mutation;
+        a mismatch returns 412.
+    OrganizationId:
+      name: organizationId
+      in: path
+      required: true
+      schema:
+        type: string
+    MembershipId:
+      name: membershipId
+      in: path
+      required: true
+      schema:
+        type: string
+    VersionId:
+      name: versionId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Scoring policy version identifier.
+    ImportId:
+      name: importId
+      in: path
+      required: true
+      schema:
+        type: string
+    From:
+      name: from
+      in: query
+      schema:
+        type: string
+        format: date
+    To:
+      name: to
+      in: query
+      schema:
+        type: string
+        format: date
+      description: Inclusive end date; must not be earlier than `from`.
+  schemas:
+    UserRole:
+      type: string
+      enum:
+      - student
+      - manager
+      - administrator
+    AccountStatus:
+      type: string
+      enum:
+      - active
+      - inactive
+    ApiMessage:
+      type: object
+      required:
+      - success
+      - message
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Operation completed successfully
+    ErrorResponse:
+      type: object
+      required:
+      - success
+      - code
+      - message
+      description: 'Error envelope. `code` values used by this contract: UNAUTHENTICATED, FORBIDDEN, NOT_FOUND,
+        VALIDATION_FAILED, CURRENT_PASSWORD_INCORRECT, INTERNAL_ERROR, UNSUPPORTED_FILE, DUPLICATE_VALUE, INVALID_STATE,
+        ROLE_POLICY_VIOLATION, POLICY_VERSION_IMMUTABLE, IMPORT_EXPIRED, PRECONDITION_FAILED.'
+      properties:
+        success:
+          type: boolean
+          example: false
+        code:
+          type: string
+          example: VALIDATION_FAILED
+        message:
+          type: string
+          example: Validation failed
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+            - field
+            - message
+            properties:
+              field:
+                type: string
+                example: phoneNumber
+              code:
+                type: string
+                example: INVALID_FORMAT
+              message:
+                type: string
+    UpdateProfileRequest:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        phoneNumber:
+          type: string
+          nullable: true
+          pattern: '^(?:0\d{9}|\+84\d{9})$'
+          description: Approved domestic or international phone format; null clears the saved number.
+          example: '0901234567'
+      description: The account owner can edit phone number only. Full name and academic identity information are read-only.
+    AcademicInfo:
+      type: object
+      required:
+      - studentNumber
+      - faculty
+      - major
+      - enrollmentYear
+      properties:
+        studentNumber:
+          type: string
+          nullable: true
+          description: Student.user_id (also User.user_id) when a Student row exists; null for accounts without a Student record. Read-only to the account owner.
+          readOnly: true
+        faculty:
+          type: object
+          allOf:
+          - $ref: '#/components/schemas/FacultySummary'
+          nullable: true
+          readOnly: true
+        major:
+          type: string
+          nullable: true
+          readOnly: true
+        enrollmentYear:
+          type: integer
+          nullable: true
+          readOnly: true
+      description: Staff-controlled; read-only to the account owner.
+    Profile:
+      type: object
+      required:
+      - id
+      - email
+      - fullName
+      - phoneNumber
+      - academicInfo
+      properties:
+        id:
+          type: string
+          example: user-001
+        email:
+          type: string
+          format: email
+          example: student@hcmus.edu.vn
+        fullName:
+          type: string
+          example: Nguyen Van A
+          readOnly: true
+        phoneNumber:
+          type: string
+          nullable: true
+          example: '0901234567'
+        avatarUrl:
+          type: string
+          format: uri-reference
+          nullable: true
+        academicInfo:
+          allOf:
+          - $ref: '#/components/schemas/AcademicInfo'
+          nullable: true
+          type: object
+          readOnly: true
+        role:
+          $ref: '#/components/schemas/UserRole'
+        interests:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityCategorySummary'
+        status:
+          $ref: '#/components/schemas/AccountStatus'
+    ProfileResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Profile'
+    AvatarUploadRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - avatar
+      properties:
+        avatar:
+          type: string
+          format: binary
+          description: JPG or PNG image. Maximum file size is 10485760 bytes (10 MiB) inclusive; larger files are rejected.
+    AvatarResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Avatar updated successfully
+        data:
+          type: object
+          required:
+          - avatarUrl
+          properties:
+            avatarUrl:
+              type: string
+              format: uri-reference
+              description: Legal same-origin URL for the separately stored, fully decoded JPG/PNG image; null after removal.
+    ChangePasswordRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - currentPassword
+      - newPassword
+      properties:
+        currentPassword:
+          type: string
+          format: password
+        newPassword:
+          type: string
+          format: password
+          minLength: 6
+      description: The request contains only currentPassword and newPassword. New-password confirmation is checked
+        by the FE before sending. The new password must be at least 6 characters.
+    UniversityService:
+      type: object
+      required:
+      - id
+      - name
+      - url
+      - displayOrder
+      - isActive
+      description: Matches the BR ServiceLink entity (service_id, name, url, description, display_order, is_active).
+        BR defines no organization, icon or category field.
+      properties:
+        id:
+          type: string
+          example: service-001
+          readOnly: true
+        name:
+          type: string
+          example: Moodle
+        description:
+          type: string
+          nullable: true
+          example: Online learning management system
+        url:
+          type: string
+          format: uri
+          example: https://moodle.hcmus.edu.vn
+        displayOrder:
+          type: integer
+          minimum: 0
+          example: 1
+        isActive:
+          type: boolean
+          example: true
+        version:
+          type: integer
+          readOnly: true
+          example: 1
+    CreateUserRequest:
+      type: object
+      required:
+      - email
+      - fullName
+      - role
+      properties:
+        email:
+          type: string
+          format: email
+        fullName:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+        studentNumber:
+          type: string
+          nullable: true
+          description: Required when role is student; staff-provisioned and unique.
+        facultyId:
+          type: string
+          nullable: true
+          description: Required when role is student; staff-provisioned and validated.
+        phoneNumber:
+          type: string
+          nullable: true
+      description: Create one user account with one role. Password activation/invitation is a separate flow.
+    AdminUpdateUserRequest:
+      type: object
+      required:
+      - reason
+      description: Staff-controlled fields. At least one of fullName or phoneNumber must be present in addition
+        to reason.
+      properties:
+        fullName:
+          type: string
+          minLength: 1
+        phoneNumber:
+          type: string
+          nullable: true
+        reason:
+          type: string
+          minLength: 1
+          description: Audit reason for staff-controlled changes.
+    AdminUser:
+      type: object
+      properties:
+        id:
+          type: string
+          example: user-001
+        email:
+          type: string
+          format: email
+        fullName:
+          type: string
+        phoneNumber:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/AccountStatus'
+        studentNumber:
+          type: string
+          nullable: true
+          description: Renamed from studentId (API-GAP-006).
+        faculty:
+          type: object
+          allOf:
+          - $ref: '#/components/schemas/FacultySummary'
+          nullable: true
+        role:
+          $ref: '#/components/schemas/UserRole'
+        permissions:
+          type: array
+          items:
+            type: string
+          readOnly: true
+          description: Effective permission codes, shown before an administrator changes the role (NFR-USA-13).
+            Included in single-user responses; may be omitted in list items.
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+          example: 3
+    AdminUserResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/AdminUser'
+    UserListResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+          - items
+          - pagination
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/AdminUser'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        totalItems:
+          type: integer
+          example: 100
+        totalPages:
+          type: integer
+          example: 10
+      required:
+      - page
+      - limit
+      - totalItems
+      - totalPages
+    Role:
+      type: object
+      properties:
+        id:
+          type: string
+          example: role-001
+        code:
+          $ref: '#/components/schemas/UserRole'
+        name:
+          type: string
+          example: Manager
+        description:
+          type: string
+    Permission:
+      type: object
+      properties:
+        id:
+          type: string
+          example: permission-001
+        code:
+          type: string
+          example: registration.create
+          description: Stable permission code as defined in BR (e.g. activity.manage, score.adjust, criteria.manage).
+        description:
+          type: string
+    RolePermissionsResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            role:
+              $ref: '#/components/schemas/Role'
+            permissions:
+              type: array
+              items:
+                $ref: '#/components/schemas/Permission'
+            version:
+              type: integer
+              readOnly: true
+    ActivityCategory:
+      type: object
+      properties:
+        id:
+          type: string
+          example: category-001
+        name:
+          type: string
+          example: Academic
+        description:
+          type: string
+        isActive:
+          type: boolean
+          example: true
+        version:
+          type: integer
+          readOnly: true
+      description: isActive=false hides the category from new activities and interest selection; existing references
+        stay valid.
+    CreateActivityCategoryRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+    UpdateActivityCategoryRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        isActive:
+          type: boolean
+    ActivityCategoryResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/ActivityCategory'
+    ScoreCriterion:
+      type: object
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        isActive:
+          type: boolean
+        policyVersions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScoringPolicyVersion'
+        version:
+          type: integer
+          readOnly: true
+    CreateScoreCriterionRequest:
+      type: object
+      required:
+      - code
+      - name
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    UpdateScoreCriterionRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        isActive:
+          type: boolean
+      description: Do not edit a policy version already used by a score award.
+    ScoreCriterionResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/ScoreCriterion'
+    OverviewReportResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            totalUsers:
+              type: integer
+              example: 5000
+            totalStudents:
+              type: integer
+              example: 4700
+            totalManagers:
+              type: integer
+              example: 280
+              description: Users with the manager role. Replaces totalOrganizers (API-GAP-008).
+            totalActivities:
+              type: integer
+              example: 250
+            totalRegistrations:
+              type: integer
+              example: 12000
+    GenericReportResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          additionalProperties: true
+          description: Report-specific aggregation fields. Formulas and granularity are TBD in UC-31; finalize with
+            the backend team.
+    TrainingScoreReportResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            semesterId:
+              type: string
+              example: sem-2026-1
+            totalStudents:
+              type: integer
+              example: 4700
+            averageScore:
+              type: number
+              example: 75.5
+            distribution:
+              type: array
+              items:
+                type: object
+                properties:
+                  range:
+                    type: string
+                    example: 0-50
+                  studentCount:
+                    type: integer
+                    example: 300
+    FacultySummary:
+      type: object
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+        name:
+          type: string
+    ActivityCategorySummary:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    ScoringPolicyVersion:
+      type: object
+      properties:
+        id:
+          type: string
+        criterionId:
+          type: string
+        semesterId:
+          type: string
+        activationAt:
+          type: string
+          format: date-time
+        weight:
+          type: number
+          minimum: 0
+          example: 1.5
+          description: Multiplier, not a percentage. weightedPoints = basePoints x weight, rounded to 2 decimals
+            (BR).
+        minPoints:
+          type: number
+          minimum: 0
+          example: 0
+          description: Lowest allowed base points for one award under this criterion. Must be <= maxPoints.
+        maxPoints:
+          type: number
+          minimum: 0
+          example: 10
+          description: Highest allowed base points for one award. Must be >= minPoints; otherwise 400 VALIDATION_FAILED.
+        semesterCap:
+          type: number
+          minimum: 0
+          example: 20
+          description: Upper bound of a student's total for this criterion in the semester, after weights and approved
+            adjustments. Totals are bounded to [0, semesterCap].
+        isUsed:
+          type: boolean
+          readOnly: true
+          description: True once any award applied this version; the version is then immutable.
+        status:
+          type: string
+          enum:
+          - draft
+          - scheduled
+          - active
+          - superseded
+          description: draft -> scheduled (activationAt in the future) or active; active -> superseded when a later
+            version activates.
+        version:
+          type: integer
+          readOnly: true
+    Organization:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - club
+          - faculty_unit
+          - department
+          - student_affairs_office
+        isActive:
+          type: boolean
+    OrganizationMembership:
+      type: object
+      properties:
+        membershipId:
+          type: string
+        organization:
+          $ref: '#/components/schemas/Organization'
+        userId:
+          type: string
+        responsibility:
+          type: string
+        startsAt:
+          type: string
+          format: date-time
+        endsAt:
+          type: string
+          format: date-time
+          nullable: true
+        isActive:
+          type: boolean
+    CurrentUserContextResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/Profile'
+            permissions:
+              type: array
+              items:
+                type: string
+            activeOrganizationMemberships:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrganizationMembership'
+            activeActivityAssignments:
+              type: array
+              items:
+                type: string
+    CreateServiceLinkRequest:
+      type: object
+      required:
+      - name
+      - url
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        url:
+          type: string
+          format: uri
+          description: Absolute http(s) URL of the external service.
+        description:
+          type: string
+          nullable: true
+        displayOrder:
+          type: integer
+          minimum: 0
+        isActive:
+          type: boolean
+          default: true
+    UpdateServiceLinkRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        url:
+          type: string
+          format: uri
+        description:
+          type: string
+          nullable: true
+        displayOrder:
+          type: integer
+          minimum: 0
+        isActive:
+          type: boolean
+    CreateScoringPolicyVersionRequest:
+      type: object
+      required:
+      - semesterId
+      - activationAt
+      - weight
+      - minPoints
+      - maxPoints
+      - semesterCap
+      description: 'Creates a draft version. Cross-field rule: minPoints <= maxPoints.'
+      properties:
+        semesterId:
+          type: string
+        activationAt:
+          type: string
+          format: date-time
+          description: When the version becomes effective for new awards in semesterId.
+        weight:
+          type: number
+          minimum: 0
+          example: 1.5
+          description: Multiplier, not a percentage. weightedPoints = basePoints x weight, rounded to 2 decimals
+            (BR).
+        minPoints:
+          type: number
+          minimum: 0
+          example: 0
+          description: Lowest allowed base points for one award under this criterion. Must be <= maxPoints.
+        maxPoints:
+          type: number
+          minimum: 0
+          example: 10
+          description: Highest allowed base points for one award. Must be >= minPoints; otherwise 400 VALIDATION_FAILED.
+        semesterCap:
+          type: number
+          minimum: 0
+          example: 20
+          description: Upper bound of a student's total for this criterion in the semester, after weights and approved
+            adjustments. Totals are bounded to [0, semesterCap].
+    ScoringPolicyVersionResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/ScoringPolicyVersion'
+    PolicyImpactPreview:
+      type: object
+      description: Impact of activating a version. Historical awards are never recalculated; they keep their applied
+        version.
+      properties:
+        versionId:
+          type: string
+        criterionId:
+          type: string
+        affectedSemesters:
+          type: array
+          items:
+            type: string
+        currentVersion:
+          type: object
+          allOf:
+          - $ref: '#/components/schemas/ScoringPolicyVersion'
+          nullable: true
+          description: Version this one would supersede, if any.
+        proposedVersion:
+          $ref: '#/components/schemas/ScoringPolicyVersion'
+        affectedActivityCount:
+          type: integer
+          description: Activities in the semester that advertise this criterion.
+        existingAwardCount:
+          type: integer
+          description: Awards already made under earlier versions; unchanged by activation.
+        warnings:
+          type: array
+          items:
+            type: string
+    Semester:
+      type: object
+      properties:
+        id:
+          type: string
+        quarterAcademicYear:
+          type: string
+          description: Follows BR `quarter_academic_year`. The two BR files disagree (academic_year + term); confirm.
+        startsAt:
+          type: string
+          format: date-time
+        endsAt:
+          type: string
+          format: date-time
+    OrganizationListResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+          - items
+          - pagination
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Organization'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+    OrganizationMembershipResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/OrganizationMembership'
+    AuditLogEntry:
+      type: object
+      description: Append-only record per BR AuditLog. Not editable through any endpoint.
+      properties:
+        id:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time
+        actor:
+          type: object
+          properties:
+            id:
+              type: string
+            fullName:
+              type: string
+        action:
+          type: string
+          example: user.role.update
+        entityType:
+          type: string
+          example: User
+        entityId:
+          type: string
+        reason:
+          type: string
+          nullable: true
+        beforeValues:
+          type: object
+          nullable: true
+          additionalProperties: true
+        afterValues:
+          type: object
+          nullable: true
+          additionalProperties: true
+    ImportResource:
+      type: string
+      enum:
+      - users
+      - user-role
+      - score-criteria
+      - activity-categories
+      description: users and user-role serve UC-29; score-criteria and activity-categories serve UC-30. Activity
+        and attendance imports belong to the manager contracts.
+    ImportRowResult:
+      type: object
+      properties:
+        rowNumber:
+          type: integer
+          description: 1-based row number in the uploaded file, excluding the header.
+        status:
+          type: string
+          enum:
+          - valid
+          - invalid
+        action:
+          type: string
+          enum:
+          - create
+          - update
+          - none
+          nullable: true
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              code:
+                type: string
+                example: DUPLICATE_VALUE
+              message:
+                type: string
+        proposedValues:
+          type: object
+          additionalProperties: true
+    ImportSession:
+      type: object
+      description: Result of validation. Nothing is written until confirm. Invalid rows are excluded from confirm
+        (UC-29 A5, UC-30 A4).
+      properties:
+        id:
+          type: string
+          example: import-001
+        resource:
+          $ref: '#/components/schemas/ImportResource'
+        status:
+          type: string
+          enum:
+          - validated
+          - confirmed
+          - cancelled
+          - expired
+        fileName:
+          type: string
+        totalRows:
+          type: integer
+        validRows:
+          type: integer
+        invalidRows:
+          type: integer
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportRowResult'
+        result:
+          type: object
+          nullable: true
+          description: Present after confirm.
+          properties:
+            created:
+              type: integer
+            updated:
+              type: integer
+            skipped:
+              type: integer
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+    ImportSessionResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/ImportSession'
+    InterestsResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityCategorySummary'
+    UniversityServiceResponse:
+      type: object
+      required:
+      - success
+      - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/UniversityService'
+  responses:
+    Unauthorized:
+      description: Authentication is required or the access token is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: The authenticated user does not have permission to perform this operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationError:
+      description: Request validation failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    MessageSuccess:
+      description: Operation completed successfully.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiMessage'
+    Conflict:
+      description: The request conflicts with the current state (duplicate value, invalid state transition, referenced
+        record).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    PreconditionFailed:
+      description: If-Match does not match the current version; another administrator changed the resource. Reload
+        and review.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  headers:
+    ETag:
+      description: Current resource version as a quoted string, e.g. "7". Send it back in If-Match.
+      schema:
+        type: string
+        example: '"7"'

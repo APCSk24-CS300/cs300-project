@@ -1,9 +1,25 @@
 import { isApiError, type ApiErrorCode } from "@/libs/api-client";
 
 /** The ONLY place where error codes become user-facing copy (spec FR-011). */
-export type ErrorContext = "login" | "logout" | "changePassword" | "createAccount" | "load";
+export type ErrorContext =
+  | "login"
+  | "logout"
+  | "changePassword"
+  | "createAccount"
+  | "load"
+  /** University Services Hub reads (UC-07). */
+  | "hub"
+  /** Service-link administration (BR-ADM-01): 409 / 412 / 404 copy. */
+  | "manageServiceLink";
 
 const UNAVAILABLE = "The service is unavailable. Please try again.";
+
+/** Service-link administration copy (spec 004 US3 #4, #5). */
+const SERVICE_LINK_MESSAGES: Partial<Record<ApiErrorCode, string>> = {
+  DUPLICATE_VALUE: "A service with this name already exists.",
+  PRECONDITION_FAILED: "This link was changed by someone else. Reload to see the latest version, then try again.",
+  NOT_FOUND: "This link no longer exists. Reload to see the current list.",
+};
 
 function formatRetryTime(retryAfterSeconds: number | undefined): string | null {
   if (retryAfterSeconds === undefined || !Number.isFinite(retryAfterSeconds)) {
@@ -52,6 +68,10 @@ export function toUserMessage(error: unknown, context: ErrorContext): string {
       return "Each account has exactly one role. Use separate accounts for different roles.";
     }
     return "Some fields need your attention.";
+  }
+
+  if (context === "manageServiceLink" && SERVICE_LINK_MESSAGES[error.code]) {
+    return SERVICE_LINK_MESSAGES[error.code]!;
   }
 
   if (error.code === "UNAUTHENTICATED" && context === "logout") {

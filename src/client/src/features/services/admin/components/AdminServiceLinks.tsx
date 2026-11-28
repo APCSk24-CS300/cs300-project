@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ForbiddenView } from "@/components/layout/ForbiddenView";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -10,7 +11,11 @@ import { useAdminServiceLinks } from "@/features/services/admin/hooks/useAdminSe
 import type { AdminHubService } from "@/features/services/admin/services/admin-hub.service";
 import type { ServiceLinkFormValues } from "@/features/services/admin/schema/serviceLink.schema";
 import type { UniversityService } from "@/features/services/types/service";
-import { ApiError } from "@/libs/api-client";
+import { useAuth } from "@/hooks/useAuth";
+import { useForbidden } from "@/hooks/useForbidden";
+import { ApiError, isApiError } from "@/libs/api-client";
+import { toUserMessage } from "@/libs/error-messages";
+import { getDashboardPath } from "@/libs/navigation";
 
 type Mode = { kind: "list" } | { kind: "add" } | { kind: "edit"; link: UniversityService };
 
@@ -20,8 +25,7 @@ export const ADMIN_CONTENT = {
   title: "University service links",
   description: "Links shown in the University Services hub. Deactivated links are hidden from users but kept here.",
   add: "Add service",
-  stale: "This link was changed by someone else. Reload to see the latest version, then try again.",
-  failed: "The change could not be saved. Please try again.",
+  stale: toUserMessage(new ApiError({ status: 412, code: "PRECONDITION_FAILED" }), "manageServiceLink"),
   reload: "Reload",
 };
 
@@ -35,15 +39,18 @@ function toFormValues(link: UniversityService): ServiceLinkFormValues {
   };
 }
 
+/** Error copy comes from toUserMessage (FR-011); stale (412) and missing (404) links offer a reload. */
 function bannerFor(error: unknown): Banner {
-  if (error instanceof ApiError && error.status === 412) return { tone: "error", text: ADMIN_CONTENT.stale, reload: true };
-  if (error instanceof ApiError && error.status === 404) return { tone: "error", text: "This link no longer exists.", reload: true };
-  return { tone: "error", text: ADMIN_CONTENT.failed };
+  const reload = isApiError(error) && (error.code === "PRECONDITION_FAILED" || error.code === "NOT_FOUND");
+  return { tone: "error", text: toUserMessage(error, "manageServiceLink"), reload };
 }
 
 /** Admin page body: list every link, add, edit, deactivate (with confirmation) and reactivate. */
 export function AdminServiceLinks({ service }: { service?: AdminHubService }) {
   const links = useAdminServiceLinks(service);
+  const { user } = useAuth();
+  // Wiring rule: the component that runs mutations owns useForbidden; the read hook reports "forbidden".
+  const forbidden = useForbidden();
   const [mode, setMode] = useState<Mode>({ kind: "list" });
   const [confirming, setConfirming] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -56,7 +63,7 @@ export function AdminServiceLinks({ service }: { service?: AdminHubService }) {
       const saved = await action();
       setBanner({ tone: "success", text: done(saved) });
     } catch (error) {
-      setBanner(bannerFor(error));
+      if (!forbidden.handleError(error)) setBanner(bannerFor(error));
     } finally {
       setBusy(null);
       setConfirming(null);
@@ -70,6 +77,7 @@ export function AdminServiceLinks({ service }: { service?: AdminHubService }) {
       setMode({ kind: "list" });
       setBanner({ tone: "success", text: `Saved “${saved.name}”.` });
     } catch (error) {
+      if (forbidden.handleError(error)) return;
       if (error instanceof ApiError && Object.keys(error.fieldErrors).length > 0) throw error; // the form shows these
       setBanner(bannerFor(error));
     }
@@ -101,6 +109,10 @@ export function AdminServiceLinks({ service }: { service?: AdminHubService }) {
     </div>
   ) : null;
 
+  if (links.status === "forbidden" || forbidden.isForbidden) {
+    return <ForbiddenView dashboardHref={getDashboardPath(user?.role)} />;
+  }
+
   if (links.status === "loading") {
     return (
       <>
@@ -121,6 +133,8 @@ export function AdminServiceLinks({ service }: { service?: AdminHubService }) {
     );
   }
 
+  const rows = links.links ?? [];
+
   return (
     <>
       {header}
@@ -138,7 +152,7 @@ export function AdminServiceLinks({ service }: { service?: AdminHubService }) {
         </section>
       ) : null}
 
-      {links.links.length === 0 ? (
+      {rows.length === 0 ? (
         <EmptyState className="mt-8" title="No service links yet" description="Add the first university service so users can reach it from the hub." />
       ) : (
         <div className="mt-8 overflow-x-auto rounded-2xl bg-surface shadow-card">
@@ -153,7 +167,7 @@ export function AdminServiceLinks({ service }: { service?: AdminHubService }) {
               </tr>
             </thead>
             <tbody>
-              {links.links.map((link) => (
+              {rows.map((link) => (
                 <tr key={link.id} className="border-b border-slate-100 last:border-0">
                   <td className="px-4 py-3 tabular-nums">{link.displayOrder}</td>
                   <td className="px-4 py-3">

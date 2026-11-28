@@ -38,19 +38,18 @@ export function createServiceLinkSeed(): MockServiceLink[] {
 /**
  * Adds what plan 005 introduced to a store written before it: the hub links and the hub permissions.
  * Users, sessions, tokens and lockouts are kept (approved plan change 1: migrate, never wipe).
- * Returns true when something was added.
+ * Runs once: a store that already has `serviceLinks` is left alone, so later permission changes
+ * (dev tools, tests) are not undone. Returns true when the store was migrated.
  */
 export function migrateHub(db: MockDb): boolean {
-  let changed = false;
-  if (!Array.isArray(db.serviceLinks)) {
-    db.serviceLinks = createServiceLinkSeed();
-    db.nextServiceLinkId = SERVICE_LINK_SEED.length + 1;
-    changed = true;
+  if (Array.isArray(db.serviceLinks)) {
+    return false;
   }
+  db.serviceLinks = createServiceLinkSeed();
+  db.nextServiceLinkId = SERVICE_LINK_SEED.length + 1;
   for (const permission of HUB_PERMISSIONS) {
     if (!db.permissions.some((p) => p.code === permission.code)) {
       db.permissions.push({ ...permission });
-      changed = true;
     }
   }
   const grants: Record<string, string[]> = {
@@ -61,13 +60,10 @@ export function migrateHub(db: MockDb): boolean {
   for (const [roleId, codes] of Object.entries(grants)) {
     const current = (db.rolePermissions[roleId] ??= []);
     for (const code of codes) {
-      if (!current.includes(code)) {
-        current.push(code);
-        changed = true;
-      }
+      if (!current.includes(code)) current.push(code);
     }
   }
-  return changed;
+  return true;
 }
 
 function user(partial: Omit<MockUser, "passwordPlain" | "version" | "phoneNumber"> & Partial<MockUser>): MockUser {

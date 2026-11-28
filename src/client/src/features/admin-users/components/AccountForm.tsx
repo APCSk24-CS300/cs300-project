@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { TextInput } from "@/components/ui/TextInput";
 import { ROLE_CODES, ROLE_LABEL } from "@/libs/roles";
 import type { AccountFieldsInput } from "@/features/admin-users/schema/new-account.schema";
-import type { Resource } from "@/features/admin-users/hooks/useAsyncResource";
+import type { Resource } from "@/hooks/useAsyncResource";
 import type { Faculty } from "@/features/admin-users/types/admin-users";
 
 type AccountFormProps = {

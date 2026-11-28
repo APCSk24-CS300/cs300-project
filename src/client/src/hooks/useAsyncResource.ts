@@ -20,7 +20,7 @@ interface Settled<T> {
 }
 
 /**
- * Shared read-hook core for this feature: loading / error / forbidden / success (FR-026),
+ * Shared read-hook core (admin-users, University Services Hub): loading / error / forbidden / success (FR-026),
  * with `isForbiddenError` per the T030 wiring rule (no useForbidden inside hooks).
  * "loading" is derived (the last settled result belongs to another request key), so no
  * state is set synchronously inside the effect.

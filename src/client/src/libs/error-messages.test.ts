@@ -52,4 +52,15 @@ describe("toUserMessage", () => {
     }
     expect(toUserMessage(new Error("raw"), "load")).toBe("The service is unavailable. Please try again.");
   });
+  it("service-link administration copy (manageServiceLink)", () => {
+    const e = (status: number, code: ApiErrorCode) => new ApiError({ status, code });
+    expect(toUserMessage(e(409, "DUPLICATE_VALUE"), "manageServiceLink")).toBe("A service with this name already exists.");
+    expect(toUserMessage(e(412, "PRECONDITION_FAILED"), "manageServiceLink")).toBe(
+      "This link was changed by someone else. Reload to see the latest version, then try again.",
+    );
+    expect(toUserMessage(e(404, "NOT_FOUND"), "manageServiceLink")).toBe("This link no longer exists. Reload to see the current list.");
+    expect(toUserMessage(e(400, "VALIDATION_FAILED"), "manageServiceLink")).toBe("Some fields need your attention.");
+    expect(toUserMessage(e(503, "SERVICE_UNAVAILABLE"), "hub")).toBe("The service is unavailable. Please try again.");
+    expect(toUserMessage(e(403, "FORBIDDEN"), "hub")).toBe("You don't have permission to do this.");
+  });
 });

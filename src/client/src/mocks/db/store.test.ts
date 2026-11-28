@@ -69,4 +69,11 @@ describe("mock store", () => {
     expect(JSON.parse(window.localStorage.getItem(MOCK_DB_KEY) ?? "{}").serviceLinks).toHaveLength(7);
     expect(readDb().permissions.filter((p) => p.code.startsWith("hub."))).toHaveLength(2);
   });
+
+  it("does not re-grant hub permissions that were removed after the migration", () => {
+    updateDb((db) => {
+      db.rolePermissions["role-student"] = db.rolePermissions["role-student"].filter((c) => c !== "hub.services.read");
+    });
+    expect(readDb().rolePermissions["role-student"]).not.toContain("hub.services.read");
+  });
 });

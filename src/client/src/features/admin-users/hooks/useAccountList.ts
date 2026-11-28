@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { isRoleCode, type RoleCode } from "@/libs/roles";
 import { adminUsersService } from "@/features/admin-users/services/admin-users.service";
 import type { AccountPage } from "@/features/admin-users/types/admin-users";
-import { useAsyncResource } from "@/features/admin-users/hooks/useAsyncResource";
+import { useAsyncResource } from "@/hooks/useAsyncResource";
 
 export interface AccountListState {
   search: string;

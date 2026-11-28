@@ -14,7 +14,7 @@ import {
 import { ServiceCard } from "@/features/services/components/ServiceCard";
 import { ServiceGrid } from "@/features/services/components/ServiceGrid";
 import { ServiceGridSkeleton } from "@/features/services/components/ServiceGridSkeleton";
-import { useUniversityServices } from "@/features/services/hooks/useUniversityServices";
+import { useHubServices } from "@/features/services/hooks/useHubServices";
 import type { HubService } from "@/features/services/services/hub.service";
 import { getLoginHref } from "@/libs/navigation";
 
@@ -30,7 +30,7 @@ type ServicesSectionProps = {
 export function ServicesSection({ service }: ServicesSectionProps) {
   const auth = useContext(AuthContext);
   const signedIn = Boolean(auth?.user);
-  const state = useUniversityServices(service, signedIn);
+  const state = useHubServices(service, signedIn);
 
   return (
     <Section id="services" labelledBy="services-heading" background="primary-dark">
@@ -45,12 +45,12 @@ export function ServicesSection({ service }: ServicesSectionProps) {
           <div className="mt-10">
             {state.status === "loading" ? <ServiceGridSkeleton count={LANDING_SERVICE_LIMIT} /> : null}
             {state.status === "success" ? (
-              <ServiceGrid services={state.services.slice(0, LANDING_SERVICE_LIMIT)} />
+              <ServiceGrid services={(state.services ?? []).slice(0, LANDING_SERVICE_LIMIT)} />
             ) : null}
             {state.status === "empty" ? (
               <p className="text-white/80">{SERVICES_CONTENT.emptyLabel}</p>
             ) : null}
-            {state.status === "error" ? (
+            {state.status === "error" || state.status === "forbidden" ? (
               <div role="alert" className="flex flex-wrap items-center gap-4 text-white">
                 <p>{SERVICES_CONTENT.errorLabel}</p>
                 <Button variant="white" size="sm" onClick={state.refetch}>

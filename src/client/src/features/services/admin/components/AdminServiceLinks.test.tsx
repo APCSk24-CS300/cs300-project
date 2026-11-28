@@ -122,4 +122,24 @@ describe("AdminServiceLinks", () => {
     await user.click(retry);
     expect(await screen.findByText("No service links yet")).toBeInTheDocument();
   });
+  it("shows the forbidden view when the API answers 403", async () => {
+    // The administrator role lost hub.services.manage (the API, not the UI, decides).
+    updateDb((db) => {
+      db.rolePermissions["role-administrator"] = db.rolePermissions["role-administrator"].filter((c) => c !== "hub.services.manage");
+    });
+    setup();
+    expect(await screen.findByText("You don't have permission to view this page")).toBeInTheDocument();
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+  });
+
+  it("shows the forbidden view when a change is refused with 403", async () => {
+    const { user } = setup();
+    await user.click(await screen.findByRole("button", { name: "Deactivate Moodle" }));
+    updateDb((db) => {
+      db.rolePermissions["role-administrator"] = db.rolePermissions["role-administrator"].filter((c) => c !== "hub.services.manage");
+    });
+    await user.click(within(screen.getByRole("group")).getByRole("button", { name: "Deactivate" }));
+    expect(await screen.findByText("You don't have permission to view this page")).toBeInTheDocument();
+    expect(stored("Moodle")).toMatchObject({ isActive: true });
+  });
 });

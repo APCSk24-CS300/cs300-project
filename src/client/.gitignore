@@ -43,5 +43,5 @@ next-env.d.ts
 
 # 
 .env.local
-# Public configuration template only
+# example env is committed (the !.env.example rule above)
 !.env.example

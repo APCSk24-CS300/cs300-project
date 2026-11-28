@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 import type { AuthContextValue } from "@/features/auth/context/AuthContext";
-import type { SessionUser } from "@/features/auth/types/auth";
+import type { CurrentUser } from "@/features/auth/types/auth";
 import type { Activity, LandingActivities } from "@/features/activities/types";
 import type { ActivityDTO } from "@/features/activities/types";
 import type { RoleCode } from "@/libs/roles";
@@ -46,42 +46,43 @@ export function createLandingActivities(
   };
 }
 
-export function createSessionUser(role: RoleCode): SessionUser {
-  const base = {
-    userId: role === "student" ? 1 : role === "manager" ? 2 : 3,
-    email: `${role}@hcmus.edu.vn`,
-    fullName: `Test ${role}`,
-    avatarUrl: null,
-    permissions: [],
-  };
-
-  if (role === "student") {
-    return {
-      ...base,
-      role,
-      studentNumber: "22120001",
-      facultyId: 1,
-    };
-  }
-
+export function createCurrentUser(role: RoleCode, overrides: Partial<CurrentUser> = {}): CurrentUser {
   return {
-    ...base,
+    id: role === "student" ? "user-001" : role === "manager" ? "user-002" : "user-003",
+    email: `${role}@example.invalid`,
+    fullName: `Test ${role}`,
     role,
-    studentNumber: null,
-    facultyId: null,
+    status: "active",
+    avatarUrl: null,
+    studentNumber: role === "student" ? "23127001" : null,
+    faculty: role === "student" ? { id: "120", code: "CIT", name: "Computer and Information Technology field" } : null,
+    permissions: [],
+    mustChangePassword: false,
+    ...overrides,
   };
 }
+
+/** Kept for existing tests. */
+export const createSessionUser = createCurrentUser;
 
 export function createAuthContextValue(
   overrides: Partial<AuthContextValue> = {},
 ): AuthContextValue {
+  const user = overrides.user ?? null;
   return {
-    user: null,
-    isAuthenticated: false,
+    user,
+    status: user ? "signedIn" : "signedOut",
+    isAuthenticated: Boolean(user),
     isLoading: false,
-    login: vi.fn(async () => createSessionUser("student")),
-    logout: vi.fn(async () => undefined),
+    bootstrapError: null,
+    signOutReason: null,
+    login: vi.fn(async () => createCurrentUser("student")),
+    logout: vi.fn(async () => "confirmed" as const),
+    refresh: vi.fn(async () => user),
     refreshUser: vi.fn(async () => undefined),
+    retryBootstrap: vi.fn(),
+    changePassword: vi.fn(async () => createCurrentUser("student")),
+    signOutLocally: vi.fn(),
     ...overrides,
   };
 }

@@ -1,6 +1,7 @@
 import { RoleCode } from "@/libs/roles";
 
-export type ID = number;
+/** Contract identifiers are strings (e.g. `user-001`). */
+export type ID = string;
 export type ISODateString = string;
 
 
@@ -15,7 +16,7 @@ export const PERMISSION_CODES = [
   "appeal.review",
   "criteria.manage",
   "reports.view",
-  "role.manage", 
+  "role.manage",
 ] as const;
 export type PermissionCode = (typeof PERMISSION_CODES)[number];
 
@@ -48,8 +49,8 @@ export interface Faculty {
 
 export interface Semester {
   semesterId: ID;
-  academicYear: string; 
-  term: string; 
+  academicYear: string;
+  term: string;
   startsAt: ISODateString;
   endsAt: ISODateString;
 }
@@ -58,7 +59,7 @@ export interface User {
   userId: ID;
   roleId: ID;
   email: string;
-  passwordHash: string; 
+  passwordHash: string;
   fullName: string;
   studentNumber: string | null;
   facultyId: ID | null;

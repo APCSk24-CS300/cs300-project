@@ -1,10 +1,59 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { afterEach, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
+import { server } from "@/mocks/node";
+import { resetMockDb } from "@/mocks/db/store";
+import { TOKEN_STORAGE_KEY } from "@/libs/token-store";
+import { SESSION_HINT_COOKIE } from "@/libs/session-hint";
+import {
+  getMockPathname,
+  getMockSearchParams,
+  mockRouter,
+  resetMockNavigation,
+} from "./navigation-mock";
+
+// jsdom replaces FormData/File/Blob with its own classes, which Node's fetch (used by MSW in tests)
+// cannot serialize: a multipart body arrives as "[object FormData]". Use the Node realm's classes so
+// avatar uploads reach the MSW handlers as real multipart, as in the browser (plan 006 step 4).
+// The Node FormData constructor is taken from a parsed form body (no extra dependency).
+if (typeof window !== "undefined") {
+  const { File: NodeFile, Blob: NodeBlob } = await import("node:buffer");
+  const parsed = await new Request("http://setup.local", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: "a=1",
+  }).formData();
+  const NodeFormData = parsed.constructor as typeof FormData;
+  Object.assign(globalThis, { FormData: NodeFormData, File: NodeFile, Blob: NodeBlob });
+}
+
+process.env.NEXT_PUBLIC_API_BASE_URL = "http://localhost:8080/api/v1";
+process.env.NEXT_PUBLIC_API_MODE = "mock";
+
+// One MSW handler set for app and tests (research R1).
+beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+
+beforeEach(() => {
+  // Node-environment tests (e.g. the /api/backend route handler) have no window or document.
+  if (typeof window === "undefined") return;
+  resetMockDb();
+  window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+  document.cookie = `${SESSION_HINT_COOKIE}=; Path=/; Max-Age=0`;
+  resetMockNavigation();
+});
 
 afterEach(() => {
   cleanup();
 });
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => mockRouter,
+  usePathname: () => getMockPathname(),
+  useSearchParams: () => getMockSearchParams(),
+  redirect: vi.fn(),
+}));
 
 vi.mock("next/image", async () => {
   const React = await import("react");
@@ -136,4 +185,11 @@ if (typeof HTMLDialogElement !== "undefined") {
 
 if (typeof window !== "undefined") {
   window.scrollTo = vi.fn();
+}
+
+// jsdom has no object URLs; the avatar image and preview use them (plan 006 step 6). Tests may override.
+if (typeof URL !== "undefined" && typeof URL.createObjectURL !== "function") {
+  let next = 0;
+  URL.createObjectURL = () => `blob:test-${++next}`;
+  URL.revokeObjectURL = () => undefined;
 }

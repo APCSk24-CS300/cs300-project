@@ -147,7 +147,7 @@ export function SiteHeader({ links }: SiteHeaderProps) {
     >
       <span
         aria-hidden="true"
-        className="h-9 w-24 animate-pulse rounded-pill bg-slate-200 motion-reduce:animate-none"
+        className="h-9 w-24 animate-pulse rounded-pill bg-skeleton motion-reduce:animate-none"
       />
     </span>
   ) : (
@@ -207,7 +207,7 @@ export function SiteHeader({ links }: SiteHeaderProps) {
             aria-expanded={menuOpen}
             aria-controls="mobile-navigation"
             onClick={() => setMenuOpen(true)}
-            className="inline-flex size-11 items-center justify-center rounded-full text-text hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring lg:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-full text-text hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring lg:hidden"
           >
             <MenuIcon aria-hidden="true" className="size-6" />
           </button>
@@ -225,7 +225,7 @@ export function SiteHeader({ links }: SiteHeaderProps) {
         }}
         onClick={handleBackdropClick}
         onKeyDown={handleDialogKeyDown}
-        className="m-0 ml-auto h-dvh max-h-none w-[min(86vw,360px)] max-w-none border-0 bg-surface p-0 text-text shadow-2xl backdrop:bg-black/40"
+        className="m-0 ml-auto h-dvh max-h-none w-[min(86vw,360px)] max-w-none border-0 bg-surface p-0 text-text shadow-2xl backdrop:bg-overlay/40"
       >
         {menuOpen ? (
           <div className="flex min-h-full flex-col px-5 py-4">
@@ -242,7 +242,7 @@ export function SiteHeader({ links }: SiteHeaderProps) {
                 data-dialog-close
                 aria-label="Close navigation menu"
                 onClick={() => closeMenu()}
-                className="inline-flex size-11 items-center justify-center rounded-full hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+                className="inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
               >
                 <CloseIcon aria-hidden="true" className="size-6" />
               </button>
@@ -261,7 +261,7 @@ export function SiteHeader({ links }: SiteHeaderProps) {
                       navigateFromMenu(link.id);
                     }}
                     className={cn(
-                      "flex min-h-11 items-center rounded-xl px-3 text-base transition-colors hover:bg-slate-100",
+                      "flex min-h-11 items-center rounded-xl px-3 text-base transition-colors hover:bg-surface-muted",
                       activeSection === link.id
                         ? "font-semibold text-primary underline decoration-2 underline-offset-4"
                         : "text-text",
@@ -273,7 +273,7 @@ export function SiteHeader({ links }: SiteHeaderProps) {
               ))}
             </ul>
 
-            <div className="mt-auto border-t border-slate-200 pt-5">
+            <div className="mt-auto border-t border-divider pt-5">
               {isLoading ? (
                 authAction
               ) : (

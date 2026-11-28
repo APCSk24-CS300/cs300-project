@@ -9,13 +9,6 @@ export type UniversityServiceDTO = {
   version: number;
 };
 
-/** The backend's response envelope (`ServiceResponse.get()` in src/server). */
-export type BackendEnvelope<T> = {
-  success: boolean;
-  statusCode: number;
-  payload: { message: string; data?: T };
-};
-
 /** Body of POST /admin/services. */
 export type CreateServiceLinkDTO = {
   name: string;

@@ -20,6 +20,24 @@
   --color-guide-gradient-from: #ffffff;
   --color-guide-gradient-to: #e3eefb;
   --color-focus-ring: #f2b31b;
+  --color-danger: #b91c1c;
+  --color-danger-surface: #fef2f2;
+  --color-info: #1f4fa3;
+  --color-info-surface: #eef4fc;
+  --color-border: #b5b5b5;
+  --color-border-strong: #8a8f98;
+  --color-page: #f8f8f8;
+  --color-heading: #10132f;
+  --color-placeholder: #8a8a8a;
+  /* C-VI: tokens for the values previously written as raw palette utilities (same values). */
+  --color-on-primary: #ffffff; /* was white */
+  --color-hover-tint: rgb(0 0 0 / 0.05); /* was black/5 */
+  --color-overlay: #000000; /* was black, used as overlay/30 and overlay/40 */
+  --color-skeleton: oklch(92.9% 0.013 255.508); /* was slate-200 */
+  --color-surface-muted: oklch(96.8% 0.007 247.896); /* was slate-100 */
+  --color-divider: oklch(92.9% 0.013 255.508); /* was slate-200 (borders) */
+  --color-hero-headline: #ffa800; /* was [#FFA800] */
+  --color-hero-shadow: rgb(0 0 0 / 0.9); /* was rgba(0,0,0,0.9) */
   --radius-card: 24px;
   --radius-pill: 9999px;
   --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.1);

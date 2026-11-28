@@ -217,4 +217,17 @@ describe("api client", () => {
       expect(new Headers(init.headers).get("If-Match")).toBe('"1"');
     });
   });
+  it("attaches the bearer to a same-origin relative base URL (real mode via /api/backend)", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "/api/backend/");
+    const fetchMock = vi.fn().mockImplementation(async () => json({ success: true, statusCode: 200, payload: { message: "OK", data: [] } }));
+    vi.stubGlobal("fetch", fetchMock);
+    setTokenProvider(() => "user-token");
+    await api.get("/hub/services");
+    await api.get("https://other.example/x");
+    const [url, init] = fetchMock.mock.calls[0]!;
+    expect(url).toBe("/api/backend/hub/services");
+    expect(new Headers((init as RequestInit).headers).get("Authorization")).toBe("Bearer user-token");
+    expect(new Headers((fetchMock.mock.calls[1]![1] as RequestInit).headers).get("Authorization")).toBeNull();
+    vi.unstubAllEnvs();
+  });
 });
